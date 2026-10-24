@@ -1,5 +1,6 @@
 import { eventsRange, kvSet, nowSec } from "../api";
 import { FocusSession, readList } from "./log";
+import { deadlinesMet } from "../study/plans";
 
 const DAY = 86400;
 
@@ -34,6 +35,8 @@ export interface WeekRecap {
   /** Consecutive days with some focus, ending today (or yesterday, if today hasn't started yet). */
   streak: number;
   deadlinesPast: number;
+  /** Of those, how many you ticked off before they were due. */
+  deadlinesMet: number;
   deadlinesAhead: number;
   tasksDone: number;
   lateNights: number;
@@ -74,6 +77,7 @@ export async function weekRecap(): Promise<WeekRecap> {
     best: days[bestDay] > 0 ? { minutes: days[bestDay], day: bestDay } : null,
     streak,
     deadlinesPast: deadlines.filter((e) => inWeek(e.start)).length,
+    deadlinesMet: (await deadlinesMet(from, now)).met,
     deadlinesAhead: deadlines.filter((e) => e.start > now).length,
     tasksDone: (await readList<number>("tasks_done_log")).filter(inWeek).length,
     lateNights: (await readList<number>("late_nights_log")).filter(inWeek).length,

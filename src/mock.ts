@@ -72,6 +72,13 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
       case "memory_list": case "feeds_list": return [];
       case "google_status": return { connected: false, configured: true, email: null };
       case "window_rect": return { x: 0, y: 0, w: 440, h: 180 };
+      case "google_add_event": {
+        const e = args.event;
+        const ev = { id: `m${Date.now()}`, source: "g", title: e.title, start: e.start, end: e.end, all_day: e.all_day, location: e.location ?? "", link: "", kind: "event" };
+        events.push(ev);
+        return ev;
+      }
+      case "frontmost_app": return new URLSearchParams(location.search).get("app"); // e.g. ?mock&app=YouTube
       default: return null;
     }
   },

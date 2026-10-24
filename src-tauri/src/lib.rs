@@ -197,6 +197,12 @@ fn toggle_glance(app: &AppHandle) {
     }
 }
 
+/// Which app is in front, for the procrastination nudge. Name only, read on demand, never stored.
+#[tauri::command]
+fn frontmost_app() -> Option<String> {
+    mac::frontmost_app()
+}
+
 #[tauri::command]
 fn log(msg: String) {
     eprintln!("[js] {msg}");
@@ -274,6 +280,7 @@ pub fn run() {
             hide_panel,
             show_glance,
             resize_glance,
+            frontmost_app,
             expand_panel,
             quit,
             log,

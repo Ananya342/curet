@@ -65,6 +65,17 @@ pub fn describe(win: &WebviewWindow) -> String {
     }
 }
 
+/// The name of the app in front (e.g. "Discord", or "YouTube" for a web app added to the Dock). Only the name:
+/// no window titles, URLs or screen contents, so it needs no Screen Recording or Accessibility permission.
+pub fn frontmost_app() -> Option<String> {
+    use objc2_app_kit::NSWorkspace;
+    let app = NSWorkspace::sharedWorkspace().frontmostApplication()?;
+    if app.processIdentifier() == std::process::id() as i32 {
+        return None; // Curet itself
+    }
+    app.localizedName().map(|n| n.to_string())
+}
+
 /// Whether another app is full screen on the display at this rect (logical, top-left origin): its normal
 /// window then exactly covers the display, menu bar strip included, which an ordinary window never does.
 pub fn fullscreen_app_on(x: f64, y: f64, w: f64, h: f64) -> bool {

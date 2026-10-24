@@ -39,6 +39,9 @@ export default function Rhythm() {
   const [nudges, setNudges] = useState(true);
   useEffect(() => { kvGet("nudges_on").then((v) => setNudges(v !== "off")); }, []);
   const setNudgesOn = (on: boolean) => { setNudges(on); kvSet("nudges_on", on ? null : "off"); };
+  const plans = useToggle("plans_on");
+  const procrastination = useToggle("procrastination_on");
+  const study = (type: "propose" | "block" | "submit" | "procrastinate") => emitTo("pet", "study-preview", { type });
 
   return (
     <section aria-labelledby="h-rhythm">
@@ -91,6 +94,20 @@ export default function Rhythm() {
         <button className="btn sm soft" onClick={() => tryIt("recap")}>Try recap</button>
         <button className="btn sm soft" onClick={() => tryIt("week")}>Try heads-up</button>
       </div>
+      <h3 className="sub">Study help</h3>
+      <div className="rrow">
+        <label className="check"><input type="checkbox" checked={plans.on} onChange={(e) => plans.set(e.target.checked)} /><span>Offer study blocks before deadlines</span></label>
+      </div>
+      <div className="rrow">
+        <label className="check"><input type="checkbox" checked={procrastination.on} onChange={(e) => procrastination.set(e.target.checked)} /><span>Notice distracting apps when something's due</span></label>
+      </div>
+      <div className="row-btns">
+        <button className="btn sm soft" onClick={() => study("propose")}>Try study plan</button>
+        <button className="btn sm soft" onClick={() => study("block")}>Try study time</button>
+        <button className="btn sm soft" onClick={() => study("submit")}>Try “submitted?”</button>
+        <button className="btn sm soft" onClick={() => study("procrastinate")}>Try distraction</button>
+      </div>
+      <p className="hint">Only the name of the app in front is checked (like “Discord” or a YouTube web app), on this Mac, and it’s never saved. Sites in a browser tab aren’t seen.</p>
       <p className="hint">Briefings show up when your pet is awake and out, and Sunday’s evening one previews the week: exams, deadlines and the heaviest day. For quiet time, open your pet’s menu and choose Focus: it locks in, holds your reminders, and tells you what it held when the timer ends.</p>
     </section>
   );

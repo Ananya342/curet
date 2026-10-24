@@ -16,6 +16,8 @@ export interface WellbeingCtx {
   wakeUp: (o?: { text?: string; sleepy?: boolean }) => Promise<void>;
   celebrate: () => Promise<void>;
   openPanel: (tab: string) => void;
+  /** Told when a focus session ends, with how many reminders it held (the study loop asks "did you finish?"). */
+  onFocusEnd?: (completed: boolean, held: number) => void;
 }
 
 interface Held { title: string; start: number; kind: string }
@@ -57,6 +59,7 @@ export function useWellbeing(c: WellbeingCtx) {
       rich: queued.length > 0,
       actions: queued.length ? [{ label: "Open Today", run: () => { openPanel("today"); hush(); } }, { label: "Got it", run: hush }] : undefined,
     });
+    ctx.current.onFocusEnd?.(completed, queued.length);
   }, []);
 
   const armTimer = useCallback((until: number) => {
@@ -192,5 +195,5 @@ export function useWellbeing(c: WellbeingCtx) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { focusing, focusEnds: focusUntil.current, focusActive, openFocusMenu, showFocusStatus, holdReminder };
+  return { focusing, focusEnds: focusUntil.current, focusActive, openFocusMenu, showFocusStatus, holdReminder, beginFocus };
 }

@@ -25,6 +25,7 @@ export async function freeGaps(day: Date, minMinutes: number, from?: number): Pr
 
   const gaps: Gap[] = [];
   for (const e of busy) {
+    if (e.start >= end) break; // after 10pm: the free time stops at 10 either way
     if (e.start - cursor >= min) gaps.push({ start: cursor, end: e.start, minutes: Math.round((e.start - cursor) / 60), nextTitle: e.title });
     cursor = Math.max(cursor, e.end);
   }

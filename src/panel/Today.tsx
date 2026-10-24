@@ -3,11 +3,15 @@ import { invoke } from "@tauri-apps/api/core";
 import { emitTo, listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { CalEvent, Task, addCalendarEvent, eventsRange, fmtDay, fmtTime, nowSec, refreshEvents, startOfDay, tasks, untilLabel } from "../api";
+import { StudyPlan, deadlineKey, deadlinesDone, setDeadlineDone, studyPlans } from "../study/plans";
+import Syllabus from "./Syllabus";
 
 export default function Today() {
   const [today, setToday] = useState<CalEvent[]>([]);
   const [deadlines, setDeadlines] = useState<CalEvent[]>([]);
   const [todo, setTodo] = useState<Task[]>([]);
+  const [done, setDone] = useState<Record<string, number>>({});
+  const [plans, setPlans] = useState<StudyPlan[]>([]);
   const [title, setTitle] = useState("");
   const [hint, setHint] = useState("");
   const [syncing, setSyncing] = useState(false);
@@ -23,6 +27,9 @@ export default function Today() {
     setDeadlines(up.filter((e) => e.kind === "deadline"));
     // Open tasks, then whatever was ticked off today (struck through).
     setTodo(ts.filter((x) => !x.done || (x.done_at ?? 0) >= d));
+    const [dn, ps] = await Promise.all([deadlinesDone(), studyPlans()]);
+    setDone(dn);
+    setPlans(ps);
   }, []);
 
   useEffect(() => {
@@ -33,8 +40,8 @@ export default function Today() {
     const pad = (n: number) => String(n).padStart(2, "0");
     setEv((e) => ({ ...e, date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`, time: `${pad(d.getHours())}:00` }));
     load();
-    const un = listen("events-updated", load);
-    return () => { un.then((f) => f()); };
+    const un = [listen("events-updated", load), listen("plans-updated", load)];
+    return () => { un.forEach((p) => p.then((f) => f())); };
   }, [load]);
 
   const add = async (e: React.FormEvent) => {
@@ -103,19 +110,30 @@ export default function Today() {
         <section aria-labelledby="h-deadlines">
           <h2 id="h-deadlines">Coming deadlines</h2>
           <ul className="items">
-            {deadlines.map((e) => (
-              <li key={e.id + e.start}>
-                <span className="dot deadline" aria-hidden="true" />
-                <div className="grow">
-                  <div className="t">{e.title}</div>
-                  <div className="s tnum">Deadline · {fmtDay(e.start)}, {fmtTime(e.start)} · in {untilLabel(e.start, now)}</div>
-                </div>
-                {e.link && <button className="btn sm soft" onClick={() => openUrl(e.link)}>Open</button>}
-              </li>
-            ))}
+            {deadlines.map((e) => {
+              const key = deadlineKey(e);
+              const isDone = Boolean(done[key]);
+              const plan = plans.find((p) => p.key === key && p.status !== "skipped" && p.end > now);
+              return (
+                <li key={e.id + e.start} className={isDone ? "done" : ""}>
+                  <input type="checkbox" checked={isDone} onChange={() => setDeadlineDone(key, !isDone).then(load)} aria-label={`Mark “${e.title}” as done`} />
+                  <div className="grow">
+                    <div className="t">{e.title}</div>
+                    <div className="s tnum">
+                      {fmtDay(e.start)}, {fmtTime(e.start)} · in {untilLabel(e.start, now)}
+                      {plan && !isDone && <> · <b>study {fmtDay(plan.start)} {fmtTime(plan.start)}</b></>}
+                    </div>
+                  </div>
+                  {!isDone && !plan && <button className="btn sm" onClick={() => emitTo("pet", "plan-deadline", key)} title="Your pet finds a free stretch before it's due">Plan</button>}
+                  {e.link && <button className="btn sm soft" onClick={() => openUrl(e.link)}>Open</button>}
+                </li>
+              );
+            })}
           </ul>
         </section>
       )}
+
+      <Syllabus />
 
       <section aria-labelledby="h-add">
         <h2 id="h-add">Add an event</h2>

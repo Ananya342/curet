@@ -1,7 +1,8 @@
 import { MutableRefObject, useEffect, useRef } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { eventsRange, kvSet, nowSec } from "../api";
-import { weekKey } from "./recap";
+import { weekKey, weekStart } from "./recap";
+import { deadlinesMet } from "../study/plans";
 
 type Action = { label: string; run: () => void };
 export interface MindfulCtx {
@@ -55,7 +56,9 @@ export function useMindful(c: MindfulCtx) {
       if (!preview) await kvSet("last_recap", week);
       await rouse();
       const { say, hush, openPanel } = ctx.current;
-      say("Your week in review is ready.\nAnd one small question to reflect on.", {
+      const d = await deadlinesMet(weekStart(), nowSec());
+      const score = d.total ? `\n${d.total} ${d.total === 1 ? "deadline" : "deadlines"}, ${d.met} met${d.met === d.total ? ", every one" : ""}` : "";
+      say(`Your week in review is ready.${score}\nAnd one small question to reflect on.`, {
         ms: 30000,
         actions: [
           { label: "See my week", run: () => { hush(); openPanel("week"); } },

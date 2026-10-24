@@ -37,6 +37,15 @@ img { -webkit-user-drag: none; }
 /* While the whole pet fades, WebKit clips that drop-shadow at the image's edges into dark lines down each side. */
 .sprite img { transition: filter 0.3s; }
 .stage[data-fading] .sprite img { filter: none; }
+/* moods: a tear rolling down when sad, a sweat drop when worried, and a slower, slumped pet */
+.mood-drop { position: absolute; pointer-events: none; overflow: visible; filter: drop-shadow(0 1px 1px rgba(30, 60, 110, 0.25)); }
+.mood-drop.tear { transform-origin: 50% 0; animation: mood-tear 2.6s ease-in infinite; }
+.mood-drop.sweat { animation: mood-sweat 1.6s ease-in-out infinite; }
+@keyframes mood-tear { 0% { transform: translateY(0) scale(0.2); opacity: 0; } 25% { transform: translateY(0) scale(1); opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(22px) scale(0.85); opacity: 0; } }
+@keyframes mood-sweat { 0%, 100% { transform: translateY(0) rotate(-12deg); opacity: 0.9; } 50% { transform: translateY(3px) rotate(-12deg); opacity: 1; } }
+.stage[data-mood="sad"] .breath { animation-duration: 5.5s; }
+.stage[data-mood="sad"] .sprite { transform: scale(1.03, 0.95); transform-origin: 50% 100%; filter: saturate(0.75) brightness(0.96); }
+.stage[data-mood="worried"] .breath { animation-duration: 1.8s; }
 /* accessories, drawn inside the sprite so they move with the pet */
 .acc { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
 .acc-shine { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
@@ -391,6 +400,13 @@ svg.spinning { animation: spin 0.8s linear infinite; }
 .tasks .grow em { display: block; }
 .tasks li.done .tt { text-decoration: line-through 2px; text-decoration-color: var(--ink-soft); color: var(--ink-soft); }
 .tasks li.done em { opacity: 0.6; }
+.items li.done .t { text-decoration: line-through 2px; text-decoration-color: var(--ink-soft); color: var(--ink-soft); }
+.items li.done .s { opacity: 0.6; }
+.items li .s b { color: var(--ink); font-weight: 800; }
+.syllabus .tasks li.off .tt { color: var(--ink-soft); }
+.row-actions { display: flex; gap: 8px; }
+.settings h3.sub { margin: 10px 0 0; font-size: 13.5px; font-weight: 900; }
+.row-actions .btn:first-child { flex: 1; }
 .tasks li.overdue em { color: #c2304c; font-weight: 800; }
 @media (prefers-color-scheme: dark) { .panel .tasks li.overdue em { color: #ff9db1; } }
 .panel input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 22px; height: 22px; flex: none; margin: 0; border: 2px solid var(--edge); border-radius: 8px; background: var(--raised); box-shadow: 0 2px 0 var(--pop); cursor: pointer; display: grid; place-items: center; transition: background-color 0.15s; }

@@ -4,7 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { emitTo, listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { ChatIcon, HideIcon, PetsIcon, SettingsIcon, SleepIcon, TodayIcon, WakeIcon } from "../menuIcons";
-import { PETS, PET_IDS, PetId, pick } from "../pets";
+import { PETS, PET_IDS, PetId, PetView, pick } from "../pets";
 import { Area, Screen, fmtTime, getPetId, greeting, kvGet, kvSet, nowSec, setPetId } from "../api";
 import { startHitReporting } from "../hit";
 import { DEFAULT_OUTFIT, Outfit, getOutfit } from "../accessories";
@@ -14,6 +14,8 @@ import { Laptop } from "../wellbeing/FocusGear";
 import { useWellbeing } from "../wellbeing/useWellbeing";
 import { speak, stopSpeaking } from "../voice/tts";
 import { useMindful } from "../wellbeing/useMindful";
+import { useStudy } from "../study/useStudy";
+import { MoodInfo, currentMood } from "../study/mood";
 
 const WIN_W = 340;
 const WIN_H = 400;
@@ -38,10 +40,29 @@ const THOUGHTS: Record<string, ReactElement> = {
   dots: <svg viewBox="0 0 24 24" width="16" height="16" fill={INK}><circle cx="5" cy="12" r="2.2" /><circle cx="12" cy="12" r="2.2" /><circle cx="19" cy="12" r="2.2" /></svg>,
 };
 
+/** A tear rolling from under the eye when sad; a sweat drop at the temple when worried. Drawn inside the sprite, so it moves with it. */
+function MoodDrop({ view, W, H, sad }: { view: PetView; W: number; H: number; sad: boolean }) {
+  const eye = [...view.eyes].sort((a, b) => a.x - b.x)[0];
+  const size = Math.max(7, view.eye.rx * W * (sad ? 0.75 : 0.85));
+  const style = sad
+    ? { left: eye.x * W - size / 2, top: (eye.y + view.eye.ry * 1.05) * H, width: size, height: size * 1.35 }
+    : { left: Math.min(W - size, (view.head.x + view.head.w * 0.42) * W), top: (view.head.y + 0.1) * H, width: size, height: size * 1.35 };
+  return (
+    <svg className={`mood-drop ${sad ? "tear" : "sweat"}`} viewBox="0 0 10 13.5" style={style} aria-hidden="true">
+      <path d="M5 0C5 0 10 6.5 10 8.8A5 5 0 0 1 0 8.8C0 6.5 5 0 5 0Z" fill={sad ? "#7cc4ff" : "#a8dcff"} stroke="rgba(40,80,140,0.45)" strokeWidth="0.6" />
+      <ellipse cx="3.4" cy="8.4" rx="1.1" ry="1.7" fill="#fff" opacity="0.85" />
+    </svg>
+  );
+}
+
 export default function Pet() {
   const [petId, setPetIdState] = useState<PetId>("ghost");
   const def = PETS[petId];
   const [outfit, setOutfit] = useState<Outfit>(DEFAULT_OUTFIT);
+  // Worried before an unfinished deadline, sad after a missed one (study/mood.ts).
+  const [mood, setMood] = useState<MoodInfo>({ mood: "happy", why: "" });
+  const moodRef = useRef(mood);
+  moodRef.current = mood;
 
   const [mode, _setMode] = useState<Mode>("sleeping");
   const modeRef = useRef<Mode>("sleeping");
@@ -438,7 +459,11 @@ export default function Pet() {
   const panel = (tab: string) => { closeMenu(); invoke("toggle_panel", { tab, forceOpen: true }).catch(() => {}); };
 
   // Briefings, focus mode and break reminders live in wellbeing/useWellbeing.ts.
-  const wb = useWellbeing({ modeRef, say, hush, lockIn, unlock, wakeUp, celebrate, openPanel: panel });
+  const focusEnded = useRef<(completed: boolean, held: number) => void>(undefined);
+  const wb = useWellbeing({ modeRef, say, hush, lockIn, unlock, wakeUp, celebrate, openPanel: panel, onFocusEnd: (c, h) => focusEnded.current?.(c, h) });
+  // Study blocks: offer one before a deadline, call you to it, then ask whether you finished (study/useStudy.ts).
+  const study = useStudy({ modeRef, say, hush, wakeUp, beginFocus: wb.beginFocus, focusActive: wb.focusActive });
+  focusEnded.current = study.onFocusEnd;
 
   // Look away together: the pet shuts its eyes and counts down, then opens them again.
   const endEyeRest = useCallback((finished: boolean) => {
@@ -585,7 +610,8 @@ export default function Pet() {
       animate(sy, [1, 0.8, 1.06, 1], { duration: 0.35 });
       animate(sx, [1, 1.14, 0.97, 1], { duration: 0.35 });
       if (menu) { closeMenu(); return; }
-      say(pick(d2.boops), { ms: 1500 });
+      const m = moodRef.current;
+      say(m.mood === "sad" ? `${m.why}…` : m.mood === "worried" ? `${m.why}!` : pick(d2.boops), { ms: m.mood === "happy" ? 1500 : 3000 });
       return;
     }
     // Poke the body.
@@ -675,6 +701,31 @@ export default function Pet() {
       look.set(clamp(dx / 70, -4, 4));
     });
     return () => { cancelled = true; unlisten.forEach((u) => u()); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Mood: checked every minute, and right after anything that could change it. It speaks up when it turns sad,
+  // and cheers when it's all caught up again.
+  useEffect(() => {
+    let prev: MoodInfo["mood"] | null = null;
+    const check = async () => {
+      const m = await currentMood().catch(() => null);
+      if (!m) return;
+      const quiet = !["idle", "walking"].includes(modeRef.current);
+      if (prev && prev !== "sad" && m.mood === "sad" && !quiet) {
+        say(`${m.why}…`, { ms: 9000, actions: [{ label: "Open Today", run: () => { hush(); invoke("toggle_panel", { tab: "today", forceOpen: true }).catch(() => {}); } }, { label: "I know", run: hush }] });
+      } else if (prev === "sad" && m.mood !== "sad") {
+        spawnFx("heart", 6);
+        if (!quiet) say("Yay, all caught up!", { ms: 3000 });
+      }
+      prev = m.mood;
+      setMood(m);
+    };
+    check();
+    const t = window.setInterval(check, 60_000);
+    const later = () => window.setTimeout(check, 400);
+    const un = [listen("plans-updated", later), listen("events-updated", later), listen("celebrate", later)];
+    return () => { window.clearInterval(t); un.forEach((p) => p.then((f) => f())); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -855,7 +906,7 @@ export default function Pet() {
   const breathClass = mode === "sleeping" ? "breath slow" : mode === "focusing" ? "breath work" : mode === "idle" || mode === "alert" ? "breath" : "";
 
   return (
-    <div className="stage" data-mode={mode} data-fading={fading || undefined} style={{ width: WIN_W, height: WIN_H }}>
+    <div className="stage" data-mode={mode} data-mood={mood.mood} data-fading={fading || undefined} style={{ width: WIN_W, height: WIN_H }}>
       {bubble && !menu && (
         <div className={`bubble${bubble.rich ? " rich" : ""}`} role="status" aria-live="polite" data-hit style={{ bottom: FLOOR_PAD + sh + hatRoom + 12, maxHeight: WIN_H - (FLOOR_PAD + sh + hatRoom + 12) - 8, left: bubbleCx, ["--tail" as string]: `${tailShift}px` }} onClick={() => { touch(); hush(); setBadge(false); if (modeRef.current === "alert") setMode("idle"); }}>
           <div className="bubble-text">{bubble.text}</div>
@@ -933,6 +984,7 @@ export default function Pet() {
                       }}><i /></motion.div>
                     ))}
                     <Accessories view={view} W={sw} H={sh} outfit={outfit} side={view !== def} />
+                    {mood.mood !== "happy" && !["sleeping", "hidden", "hiding"].includes(mode) && <MoodDrop view={view} W={sw} H={sh} sad={mood.mood === "sad"} />}
                   </div>
                 </motion.div>
               </div>

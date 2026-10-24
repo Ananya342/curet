@@ -51,7 +51,7 @@ export default function Week() {
               ))}
             </div>
             <ul className="stats three">
-              <li><b className="tnum">{r.deadlinesPast}</b><span>{r.deadlinesPast === 1 ? "Deadline" : "Deadlines"} got through</span></li>
+              <li><b className="tnum">{r.deadlinesMet}/{r.deadlinesPast}</b><span>{r.deadlinesPast === 1 ? "Deadline" : "Deadlines"} met</span></li>
               <li><b className="tnum">{r.deadlinesAhead}</b><span>Due in the next 7 days</span></li>
               <li><b className="tnum">{r.tasksDone}</b><span>{r.tasksDone === 1 ? "Task" : "Tasks"} ticked off</span></li>
             </ul>
