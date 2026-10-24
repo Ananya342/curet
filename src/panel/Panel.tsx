@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { PETS, PetId } from "../pets";
@@ -8,15 +8,16 @@ import Today from "./Today";
 import Settings from "./Settings";
 
 type Tab = "chat" | "today" | "settings";
-const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: "chat", label: "Chat", icon: "💬" },
-  { id: "today", label: "Today", icon: "📅" },
-  { id: "settings", label: "Settings", icon: "⚙️" },
+const TABS: { id: Tab; label: string }[] = [
+  { id: "chat", label: "Chat" },
+  { id: "today", label: "Today" },
+  { id: "settings", label: "Settings" },
 ];
 
 export default function Panel() {
   const [tab, setTab] = useState<Tab>("chat");
   const [petId, setPetId] = useState<PetId>("ghost");
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   useEffect(() => {
     getPetId().then(setPetId);
@@ -29,20 +30,44 @@ export default function Panel() {
     return () => { un.forEach((p) => p.then((f) => f())); window.removeEventListener("keydown", onKey); };
   }, []);
 
+  // Arrow keys move between tabs (WAI-ARIA tabs pattern); only the selected tab is in the tab order.
+  const onTabKey = (e: React.KeyboardEvent) => {
+    const i = TABS.findIndex((t) => t.id === tab);
+    const next = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : e.key === "Home" ? 0 : e.key === "End" ? TABS.length - 1 : null;
+    if (next === null) return;
+    e.preventDefault();
+    const t = TABS[(next + TABS.length) % TABS.length];
+    setTab(t.id);
+    tabRefs.current[t.id]?.focus();
+  };
+
   return (
     <div className="panel">
       <header data-tauri-drag-region>
         <img src={PETS[petId].src} alt="" draggable={false} data-tauri-drag-region />
-        <nav>
+        <h1 className="sr-only" translate="no">LifePet</h1>
+        <div className="tabs" role="tablist" aria-label="LifePet sections" onKeyDown={onTabKey}>
           {TABS.map((t) => (
-            <button key={t.id} className={tab === t.id ? "on" : ""} onClick={() => setTab(t.id)}>
-              <span>{t.icon}</span> {t.label}
+            <button
+              key={t.id}
+              ref={(el) => { tabRefs.current[t.id] = el; }}
+              role="tab"
+              id={`tab-${t.id}`}
+              aria-selected={tab === t.id}
+              aria-controls="panel-body"
+              tabIndex={tab === t.id ? 0 : -1}
+              className="tab"
+              onClick={() => setTab(t.id)}
+            >
+              {t.label}
             </button>
           ))}
-        </nav>
-        <button className="x" onClick={() => invoke("hide_panel")} title="Close (esc)">✕</button>
+        </div>
+        <button className="icon-btn" onClick={() => invoke("hide_panel")} aria-label="Close panel" title="Close (Esc)">
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 3.5l9 9m0-9l-9 9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none" /></svg>
+        </button>
       </header>
-      <main>
+      <main id="panel-body" role="tabpanel" aria-labelledby={`tab-${tab}`}>
         {tab === "chat" && <Chat petId={petId} />}
         {tab === "today" && <Today />}
         {tab === "settings" && <Settings petId={petId} />}

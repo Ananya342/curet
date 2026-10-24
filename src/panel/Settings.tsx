@@ -7,19 +7,24 @@ import { Feed, kvGet, kvSet, setPetId } from "../api";
 import { DEFAULT_MODEL } from "../ai/gemini";
 
 interface GStatus { connected: boolean; configured: boolean; email: string | null }
-const link = (url: string, text: string) => <a href="#" onClick={(e) => { e.preventDefault(); openUrl(url); }}>{text}</a>;
+type Note = { where: string; text: string; bad?: boolean };
+
+const link = (url: string, text: string) => (
+  <a href={url} onClick={(e) => { e.preventDefault(); openUrl(url); }}>{text}</a>
+);
+const Spinner = () => <span className="spin" aria-hidden="true" />;
 
 export default function Settings({ petId }: { petId: PetId }) {
   const [key, setKey] = useState("");
   const [model, setModel] = useState("");
-  const [saved, setSaved] = useState("");
+  const [saved, setSaved] = useState(false);
   const [feeds, setFeeds] = useState<(Feed & { err?: string })[]>([]);
   const [g, setG] = useState<GStatus>({ connected: false, configured: true, email: null });
   const [gerr, setGerr] = useState("");
   const [bsUrl, setBsUrl] = useState("");
   const [icalUrl, setIcalUrl] = useState("");
   const [busy, setBusy] = useState("");
-  const [msg, setMsg] = useState<{ where: string; text: string; bad?: boolean } | null>(null);
+  const [note, setNote] = useState<Note | null>(null);
 
   const load = useCallback(async () => {
     const list = await invoke<Feed[]>("feeds_list");
@@ -36,141 +41,159 @@ export default function Settings({ petId }: { petId: PetId }) {
     return () => { un.then((f) => f()); };
   }, [load]);
 
-  const flash = (s: string) => { setSaved(s); setTimeout(() => setSaved(""), 1800); };
+  const say = (where: string, text: string, bad = false) => setNote({ where, text, bad });
 
-  const saveGemini = async () => {
-    await kvSet("gemini_key", key.trim() || null);
+  const saveGemini = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!key.trim()) { say("gemini", "Paste your Gemini API key first.", true); return; }
+    await kvSet("gemini_key", key.trim());
     await kvSet("gemini_model", model.trim() || null);
-    flash("gemini");
+    setSaved(true);
+    say("gemini", "Saved. Your pet can think now.");
+    setTimeout(() => setSaved(false), 1800);
   };
 
-  const addFeed = async (where: string, name: string, url: string, kind: string, clear: () => void) => {
-    setBusy(where); setMsg(null);
+  const addFeed = (where: string, name: string, url: string, kind: string, empty: string, clear: () => void) => async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!url.trim()) { say(where, empty, true); return; }
+    setBusy(where); setNote(null);
     try {
       await invoke("feed_add", { name, url: url.trim(), kind });
       clear();
-      setMsg({ where, text: "Connected! Your events are syncing." });
-    } catch (e) {
-      setMsg({ where, text: String(e), bad: true });
+      say(where, "Connected. Your events are syncing.");
+    } catch (err) {
+      say(where, `${err} Check that you copied the whole link, then try again.`, true);
     }
     setBusy("");
   };
 
   const connectGoogle = async () => {
-    setBusy("google"); setMsg(null);
+    setBusy("google"); setNote(null);
     try {
       await invoke("google_connect");
-      setMsg({ where: "google", text: "Google Calendar connected 🎉" });
-    } catch (e) {
-      setMsg({ where: "google", text: String(e), bad: true });
+      say("google", "Google Calendar connected.");
+    } catch (err) {
+      say("google", `${err}`, true);
     }
     setBusy("");
     load();
   };
 
-  const Msg = ({ where }: { where: string }) =>
-    msg?.where === where ? <p className={msg.bad ? "err" : "ok"}>{msg.text}</p> : null;
+  const Status = ({ where }: { where: string }) => (
+    <p className={`note ${note?.where === where && note.bad ? "bad" : "good"}`} role="status">
+      {note?.where === where ? `${note.bad ? "Problem: " : "Done: "}${note.text}` : ""}
+    </p>
+  );
 
   return (
     <div className="scroll settings">
-      <section>
-        <h3>Your pet</h3>
-        <div className="pets">
+      <section aria-labelledby="h-pet">
+        <h2 id="h-pet">Your pet</h2>
+        <div className="pets" role="radiogroup" aria-label="Choose your pet">
           {PET_IDS.map((id) => (
-            <button key={id} className={id === petId ? "on" : ""} onClick={() => setPetId(id)}>
+            <button key={id} role="radio" aria-checked={id === petId} className="pet-pick" onClick={() => setPetId(id)}>
               <img src={PETS[id].src} alt="" draggable={false} />
-              <span>{PETS[id].name}</span>
+              <span translate="no">{PETS[id].name}</span>
             </button>
           ))}
         </div>
       </section>
 
-      <section>
-        <h3>Brightspace deadlines</h3>
+      <section aria-labelledby="h-bs">
+        <h2 id="h-bs">Brightspace deadlines</h2>
         <details open={!feeds.some((f) => f.kind === "brightspace")}>
-          <summary>How to get your Brightspace link</summary>
+          <summary>How to find your Brightspace link</summary>
           <ol className="guide">
-            <li>Open <b>Brightspace</b> and go to your <b>Calendar</b> (the 📅 in the top bar, or the Calendar widget).</li>
-            <li>Click <b>Settings</b> (⚙) at the top of the calendar and tick <b>Enable Calendar Feeds</b>, then save. <i>The Subscribe button stays hidden until you do this.</i></li>
-            <li>Click <b>Subscribe</b>. In the dropdown choose <b>All Calendars and Tasks</b> (or a single course).</li>
-            <li>Copy the whole link from the text box — it ends in something like <code>…feed.ics?token=…</code>.</li>
-            <li>Paste it below. Schools word the buttons a little differently, but the idea is the same.</li>
+            <li>In Brightspace, open <b>Calendar</b>.</li>
+            <li>Choose <b>Settings</b> (the gear) and turn on <b>Enable Calendar Feeds</b>. Save. <i>The Subscribe button stays hidden until you do.</i></li>
+            <li>Choose <b>Subscribe</b>, then <b>All Calendars and Tasks</b> (or a single course).</li>
+            <li>Copy the whole link. It ends in something like <code>feed.ics?token=…</code></li>
           </ol>
         </details>
-        <div className="row">
-          <input value={bsUrl} onChange={(e) => setBsUrl(e.target.value)} placeholder="Paste Brightspace calendar link" />
-          <button disabled={!bsUrl.trim() || busy === "bs"} onClick={() => addFeed("bs", "Brightspace", bsUrl, "brightspace", () => setBsUrl(""))}>
-            {busy === "bs" ? "…" : "Add"}
-          </button>
-        </div>
-        <Msg where="bs" />
+        <form className="inline-form" onSubmit={addFeed("bs", "Brightspace", bsUrl, "brightspace", "Paste your Brightspace calendar link first.", () => setBsUrl(""))} noValidate>
+          <input value={bsUrl} onChange={(e) => setBsUrl(e.target.value)} placeholder="https://school.brightspace.com/…/feed.ics" aria-label="Brightspace calendar link" autoComplete="off" spellCheck={false} inputMode="url" />
+          <button type="submit" className="btn" aria-busy={busy === "bs"}>Add link{busy === "bs" && <Spinner />}</button>
+        </form>
+        <Status where="bs" />
       </section>
 
-      <section>
-        <h3>Google Calendar</h3>
+      <section aria-labelledby="h-g">
+        <h2 id="h-g">Google Calendar</h2>
         {g.connected ? (
           <>
-            <div className="row between">
-              <span className="ok">✓ {g.email ?? "Connected"}</span>
-              <button className="ghost" onClick={() => invoke("google_disconnect").then(load)}>Sign out</button>
+            <div className="account">
+              <span className="avatar" aria-hidden="true">{(g.email ?? "G")[0].toUpperCase()}</span>
+              <div className="grow">
+                <div className="t">{g.email ?? "Connected"}</div>
+                <div className="s">Read-only access to your calendar</div>
+              </div>
+              <button className="btn sm soft" onClick={() => invoke("google_disconnect").then(load)}>Sign out</button>
             </div>
-            {gerr && <p className="err">{gerr}</p>}
+            {gerr && <p className="note bad" role="status">Problem: {gerr} Sign out and back in to reconnect.</p>}
           </>
         ) : (
           <>
-            <button className="google" disabled={!g.configured || busy === "google"} onClick={connectGoogle}>
-              {busy === "google" ? "Waiting for Google…" : "Sign in with Google"}
+            <button className="btn google" disabled={!g.configured} onClick={connectGoogle} aria-busy={busy === "google"}>
+              Sign in with Google{busy === "google" && <Spinner />}
             </button>
-            <Msg where="google" />
-            <p className="muted small">
-              {g.configured
-                ? "Opens your browser to sign in. LifePet only asks to read your calendar."
-                : "Google sign-in isn't set up in this build of LifePet."}
+            <p className="hint">
+              {busy === "google"
+                ? "Finish signing in in your browser. This waits up to 4 minutes."
+                : g.configured
+                  ? "Opens your browser. LifePet only asks to read your calendar."
+                  : "Google sign-in isn’t set up in this build of LifePet."}
             </p>
+            <Status where="google" />
             <details>
-              <summary>Prefer not to sign in? Use your secret iCal address</summary>
+              <summary>Use a secret iCal address instead</summary>
               <ol className="guide">
                 <li>Open {link("https://calendar.google.com/calendar/r/settings", "Google Calendar settings")}.</li>
-                <li>Under <b>Settings for my calendars</b>, pick your calendar → <b>Integrate calendar</b>.</li>
-                <li>Copy <b>Secret address in iCal format</b> and paste it below. Keep it private — anyone with it can see your events.</li>
+                <li>Pick your calendar, then <b>Integrate calendar</b>.</li>
+                <li>Copy <b>Secret address in iCal format</b>. Keep it private, since anyone with it can see your events.</li>
               </ol>
-              <div className="row">
-                <input value={icalUrl} onChange={(e) => setIcalUrl(e.target.value)} placeholder="Paste secret iCal address" />
-                <button disabled={!icalUrl.trim() || busy === "ical"} onClick={() => addFeed("ical", "Google", icalUrl, "events", () => setIcalUrl(""))}>
-                  {busy === "ical" ? "…" : "Add"}
-                </button>
-              </div>
-              <Msg where="ical" />
+              <form className="inline-form" onSubmit={addFeed("ical", "Google", icalUrl, "events", "Paste your secret iCal address first.", () => setIcalUrl(""))} noValidate>
+                <input value={icalUrl} onChange={(e) => setIcalUrl(e.target.value)} placeholder="https://calendar.google.com/…/basic.ics" aria-label="Secret iCal address" autoComplete="off" spellCheck={false} inputMode="url" />
+                <button type="submit" className="btn" aria-busy={busy === "ical"}>Add link{busy === "ical" && <Spinner />}</button>
+              </form>
+              <Status where="ical" />
             </details>
           </>
         )}
       </section>
 
       {feeds.length > 0 && (
-        <section>
-          <h3>Connected calendars</h3>
-          {feeds.map((f) => (
-            <div key={f.id} className="feed">
-              <div><b>{f.name}</b> <em>{f.kind === "brightspace" ? "deadlines" : "events"}</em>
-                {f.err && <div className="err">{f.err}</div>}</div>
-              <button className="ghost" onClick={() => invoke("feed_remove", { id: f.id }).then(load)}>Remove</button>
-            </div>
-          ))}
+        <section aria-labelledby="h-feeds">
+          <h2 id="h-feeds">Connected calendars</h2>
+          <ul className="items">
+            {feeds.map((f) => (
+              <li key={f.id}>
+                <div className="grow">
+                  <div className="t">{f.name}</div>
+                  <div className="s">{f.kind === "brightspace" ? "Deadlines" : "Events"}</div>
+                  {f.err && <div className="note bad">Problem: {f.err}</div>}
+                </div>
+                <button className="btn sm soft" onClick={() => invoke("feed_remove", { id: f.id }).then(load)} aria-label={`Remove ${f.name}`}>Remove</button>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 
-      <section>
-        <h3>Brain (Gemini)</h3>
-        <p className="muted small">Get a free key at {link("https://aistudio.google.com/apikey", "aistudio.google.com/apikey")}. It stays on this Mac.</p>
-        <input type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder="Gemini API key" />
-        <input value={model} onChange={(e) => setModel(e.target.value)} placeholder={`Model (default ${DEFAULT_MODEL})`} />
-        <button onClick={saveGemini}>{saved === "gemini" ? "Saved ✓" : "Save"}</button>
+      <section aria-labelledby="h-gem">
+        <h2 id="h-gem">Gemini</h2>
+        <p className="hint">Your pet thinks with Gemini. Get a free key at {link("https://aistudio.google.com/apikey", "aistudio.google.com/apikey")}. It stays on this Mac.</p>
+        <form className="stack" onSubmit={saveGemini} noValidate>
+          <input type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder="AIza…" aria-label="Gemini API key" autoComplete="off" spellCheck={false} />
+          <input value={model} onChange={(e) => setModel(e.target.value)} placeholder={DEFAULT_MODEL} aria-label="Model name (optional)" autoComplete="off" spellCheck={false} />
+          <button type="submit" className="btn">{saved ? "Saved" : "Save key"}</button>
+        </form>
+        <Status where="gemini" />
       </section>
 
-      <section className="foot">
-        <p className="muted small">Shortcut <kbd>⌥⌘L</kbd> tucks the pet into the menu bar and brings it back.</p>
-        <button className="ghost" onClick={() => invoke("quit")}>Quit LifePet</button>
-      </section>
+      <footer>
+        <p className="hint">Press <kbd>⌥&nbsp;⌘&nbsp;L</kbd> to tuck the pet into the menu bar and bring it back.</p>
+        <button className="btn quiet" onClick={() => invoke("quit")}>Quit LifePet</button>
+      </footer>
     </div>
   );
 }

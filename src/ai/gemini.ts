@@ -28,7 +28,19 @@ What you remember about the user:
 ${mem.length ? mem.map((m) => `- ${m.fact}`).join("\n") : "(nothing yet)"}`;
 }
 
-export async function ask(history: Msg[], text: string, petId: PetId): Promise<string> {
+const STATUS: Record<string, string> = {
+  get_events: "Checking your calendar…",
+  find_free_time: "Looking for free time…",
+  add_task: "Adding a task…",
+  list_tasks: "Reading your tasks…",
+  complete_task: "Ticking that off…",
+  remember: "Remembering that…",
+  recall: "Thinking back…",
+};
+
+/** `onStatus` reports what the pet is doing while it works, e.g. "Checking your calendar…". */
+export async function ask(history: Msg[], text: string, petId: PetId, onStatus?: (s: string) => void): Promise<string> {
+  onStatus?.("Thinking…");
   const key = await kvGet("gemini_key");
   if (!key) throw new Error("NO_KEY");
   const model = (await kvGet("gemini_model")) || DEFAULT_MODEL;
@@ -48,6 +60,7 @@ export async function ask(history: Msg[], text: string, petId: PetId): Promise<s
     const parts = [];
     for (const c of calls) {
       let result: unknown;
+      onStatus?.(STATUS[c.name ?? ""] ?? "Working on it…");
       try { result = await runTool(c.name!, (c.args ?? {}) as Record<string, any>); }
       catch (e) { result = { error: String(e) }; }
       parts.push({ functionResponse: { name: c.name, response: { result } } });
@@ -59,11 +72,11 @@ export async function ask(history: Msg[], text: string, petId: PetId): Promise<s
 
 export const friendlyError = (e: unknown) => {
   const m = e instanceof Error ? e.message : String(e);
-  if (m === "NO_KEY") return "I need a Gemini API key to think! Add one in Settings ⚙️ (it's free at aistudio.google.com/apikey).";
-  if (/API key|API_KEY|403|401/i.test(m)) return "Gemini didn't accept that API key. Double-check it in Settings ⚙️.";
-  if (/429|quota|RESOURCE_EXHAUSTED/i.test(m)) return "Gemini says I'm talking too much — rate limit hit. Try again in a minute.";
-  if (/404|not found|NOT_FOUND/i.test(m)) return "Gemini doesn't know that model name. Pick another in Settings ⚙️ (try gemini-flash-latest).";
-  return `Oops, something went wrong: ${m.slice(0, 200)}`;
+  if (m === "NO_KEY") return "I need a Gemini API key to think. Add one in Settings — it’s free at aistudio.google.com/apikey.";
+  if (/API key|API_KEY|403|401/i.test(m)) return "Gemini didn’t accept that API key. Check it in Settings, or paste a fresh one.";
+  if (/429|quota|RESOURCE_EXHAUSTED/i.test(m)) return "Gemini’s rate limit is full for now. Wait a minute, then ask again.";
+  if (/404|not found|NOT_FOUND/i.test(m)) return "Gemini doesn’t know that model name. Clear the model field in Settings to use the default.";
+  return `Something went wrong: ${m.slice(0, 200)}. Try again in a moment.`;
 };
 
 export { nowSec };

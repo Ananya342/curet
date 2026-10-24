@@ -3,61 +3,142 @@ import { PETS, PetId } from "../pets";
 import { kvGet, kvSet } from "../api";
 import { Msg, ask, friendlyError } from "../ai/gemini";
 
-const SUGGESTIONS = ["What's on today?", "When am I free tomorrow?", "Help me plan my day", "What's due this week?"];
+const SUGGESTIONS = ["What’s on today?", "When am I free tomorrow?", "Help me plan my day", "What’s due this week?"];
 
 export default function Chat({ petId }: { petId: PetId }) {
+  const pet = PETS[petId];
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState("");
+  const [undo, setUndo] = useState<Msg[] | null>(null);
   const end = useRef<HTMLDivElement>(null);
-  const input = useRef<HTMLInputElement>(null);
+  const field = useRef<HTMLTextAreaElement>(null);
+  const undoTimer = useRef<number>(0);
 
   useEffect(() => {
     kvGet("chat").then((s) => { try { s && setMsgs(JSON.parse(s)); } catch { /* ignore */ } });
-    input.current?.focus();
+    field.current?.focus();
   }, []);
-  useEffect(() => { end.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, busy]);
+  useEffect(() => { end.current?.scrollIntoView({ block: "end" }); }, [msgs, busy, status]);
+
+  const grow = () => {
+    const el = field.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+  };
+  useEffect(grow, [text]);
 
   const send = async (t = text) => {
     t = t.trim();
-    if (!t || busy) return;
+    if (busy) return;
+    if (!t) { field.current?.focus(); return; }
     setText("");
+    setUndo(null);
     const history = msgs.slice(-20);
     const next = [...msgs, { role: "user" as const, text: t }];
     setMsgs(next);
     setBusy(true);
     let reply: string;
-    try { reply = await ask(history, t, petId); } catch (e) { reply = friendlyError(e); }
+    try { reply = await ask(history, t, petId, setStatus); } catch (e) { reply = friendlyError(e); }
     const done = [...next, { role: "model" as const, text: reply }];
     setMsgs(done);
     setBusy(false);
+    setStatus("");
     kvSet("chat", JSON.stringify(done.slice(-40)));
+    field.current?.focus();
   };
 
-  const clear = () => { setMsgs([]); kvSet("chat", null); };
+  // Clearing is easy to regret, so offer a short undo instead of a confirmation dialog.
+  const clear = () => {
+    setUndo(msgs);
+    setMsgs([]);
+    kvSet("chat", null);
+    window.clearTimeout(undoTimer.current);
+    undoTimer.current = window.setTimeout(() => setUndo(null), 7000);
+  };
+  const restore = () => {
+    if (!undo) return;
+    setMsgs(undo);
+    kvSet("chat", JSON.stringify(undo.slice(-40)));
+    setUndo(null);
+  };
+
+  const onKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+      e.preventDefault();
+      send();
+    }
+  };
 
   return (
     <div className="chat">
-      <div className="msgs">
+      <div className="log" role="log" aria-live="polite" aria-label="Conversation">
         {msgs.length === 0 && (
-          <div className="hello">
-            <img src={PETS[petId].src} alt="" draggable={false} />
-            <p>Hi, I'm {PETS[petId].name}! Ask me about your schedule, deadlines, or what to do next.</p>
+          <div className="empty">
+            <img src={pet.src} alt="" draggable={false} />
+            <h2><span translate="no">{pet.name}</span> can read your calendar.</h2>
+            <p>Ask about your day, find a free hour, or hand over a to-do.</p>
             <div className="chips">
-              {SUGGESTIONS.map((s) => <button key={s} onClick={() => send(s)}>{s}</button>)}
+              {SUGGESTIONS.map((s) => <button key={s} className="chip" onClick={() => send(s)}>{s}</button>)}
             </div>
           </div>
         )}
-        {msgs.map((m, i) => (
-          <div key={i} className={`msg ${m.role}`}>{m.text}</div>
-        ))}
-        {busy && <div className="msg model typing"><i /><i /><i /></div>}
+        {msgs.map((m, i) =>
+          m.role === "user" ? (
+            <div key={i} className="you">{m.text}</div>
+          ) : (
+            <div key={i} className="turn">
+              <img src={pet.src} alt="" draggable={false} />
+              <div>
+                <div className="who" translate="no">{pet.name}</div>
+                <p>{m.text}</p>
+              </div>
+            </div>
+          ),
+        )}
+        {busy && (
+          <div className="turn">
+            <img src={pet.src} alt="" draggable={false} />
+            <div>
+              <div className="who" translate="no">{pet.name}</div>
+              <p className="status"><span className="paws" aria-hidden="true"><i /><i /><i /></span>{status || "Thinking…"}</p>
+            </div>
+          </div>
+        )}
         <div ref={end} />
       </div>
+
+      {undo && (
+        <div className="toast" role="status">
+          Chat cleared.
+          <button className="link" onClick={restore}>Undo</button>
+        </div>
+      )}
+
       <form className="composer" onSubmit={(e) => { e.preventDefault(); send(); }}>
-        <input ref={input} value={text} onChange={(e) => setText(e.target.value)} placeholder={`Message ${PETS[petId].name}…`} />
-        <button type="submit" disabled={busy || !text.trim()}>↑</button>
-        {msgs.length > 0 && <button type="button" className="ghost" title="Clear chat" onClick={clear}>🧹</button>}
+        <div className="field">
+          <textarea
+            ref={field}
+            rows={1}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={onKey}
+            placeholder={`Ask ${pet.name} anything…`}
+            aria-label={`Message ${pet.name}`}
+            autoComplete="off"
+            spellCheck
+          />
+          <button type="submit" className="send" aria-label="Send message" aria-busy={busy}>
+            {busy ? <span className="spin" aria-hidden="true" /> : (
+              <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M8 13V3m0 0L3.5 7.5M8 3l4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
+            )}
+          </button>
+        </div>
+        {msgs.length > 0 && (
+          <button type="button" className="quiet" onClick={clear}>New chat</button>
+        )}
       </form>
     </div>
   );

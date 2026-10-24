@@ -659,7 +659,7 @@ export default function Pet() {
   return (
     <div className="stage" data-mode={mode} style={{ width: WIN_W, height: WIN_H }}>
       {bubble && !menu && (
-        <div className="bubble" data-hit style={{ bottom: FLOOR_PAD + sh + 12, left: bubbleCx, ["--tail" as string]: `${tailShift}px` }} onClick={() => { touch(); hush(); setBadge(false); if (modeRef.current === "alert") setMode("idle"); }}>
+        <div className="bubble" role="status" aria-live="polite" data-hit style={{ bottom: FLOOR_PAD + sh + 12, left: bubbleCx, ["--tail" as string]: `${tailShift}px` }} onClick={() => { touch(); hush(); setBadge(false); if (modeRef.current === "alert") setMode("idle"); }}>
           <div className="bubble-text">{bubble.text}</div>
           {bubble.actions && (
             <div className="bubble-actions">
@@ -674,7 +674,7 @@ export default function Pet() {
       {menu === "main" && menuItems.map((it, i) => {
         const p = mainOrbs[i];
         return (
-          <button key={it.key} data-hit className="orb" style={{ left: p.x - 25, top: p.y - 25, animationDelay: `${i * 40}ms` }}
+          <button key={it.key} data-hit className="orb" aria-label={it.label} style={{ left: p.x - 25, top: p.y - 25, animationDelay: `${i * 40}ms` }}
             onClick={() => { touch(); it.run(); }}>
             <span>{it.icon}</span><em>{it.label}</em>
           </button>
@@ -683,7 +683,7 @@ export default function Pet() {
       {menu === "picker" && PET_IDS.map((id, i) => {
         const p = pickOrbs[i];
         return (
-          <button key={id} data-hit className={`orb pick ${id === petId ? "on" : ""}`} style={{ left: p.x - 27, top: p.y - 27, animationDelay: `${i * 40}ms` }}
+          <button key={id} data-hit className={`orb pick ${id === petId ? "on" : ""}`} aria-label={`Switch to ${PETS[id].name}`} style={{ left: p.x - 27, top: p.y - 27, animationDelay: `${i * 40}ms` }}
             onClick={() => { touch(); closeMenu(); setPetId(id); }}>
             <img src={PETS[id].src} alt={PETS[id].name} draggable={false} /><em>{PETS[id].name}</em>
           </button>
