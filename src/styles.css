@@ -85,7 +85,9 @@ img { -webkit-user-drag: none; }
   background: rgba(255, 255, 255, 0.92); border-radius: 999px; padding: 1px 7px; white-space: nowrap; box-shadow: 0 1px 4px rgba(60, 40, 110, 0.15);
   opacity: 0; transform: translate(var(--tag-dx, 0px), -4px); transition: opacity 0.12s, transform 0.12s; pointer-events: none;
 }
-.orb:hover, .orb:focus-visible { transform: scale(1.12); background: #fff; z-index: 6; }
+/* `scale`, not `transform`: the pop-in animation holds transform, so a hover transform would never show. */
+.orb { transition: scale 0.18s cubic-bezier(0.2, 1.6, 0.4, 1), filter 0.18s; }
+.orb:hover, .orb:focus-visible { scale: 1.18; z-index: 6; }
 .orb:hover em, .orb:focus-visible em { opacity: 1; transform: translate(var(--tag-dx, 0px), 0); }
 .orb.pick { width: 54px; height: 54px; }
 .orb.pick img { width: 40px; height: 40px; object-fit: contain; }
@@ -338,7 +340,7 @@ kbd { background: var(--raised); border: 2px solid var(--edge); border-radius: 7
 .orb:nth-of-type(4) { background: #ffd95a; }
 .orb:nth-of-type(5) { background: #ff8fb8; }
 .orb:nth-of-type(6) { background: #ff7a59; }
-.orb:hover, .orb:focus-visible { background: inherit; filter: brightness(1.06); }
+.orb:hover, .orb:focus-visible { filter: brightness(1.06); }
 .orb em { font-family: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif; font-weight: 800; border: 2px solid #3a2a2a; background: #fffdf7; color: #3a2a2a; box-shadow: 0 2px 0 #3a2a2a; }
 .orb .glyph { display: grid; place-items: center; line-height: 0; color: #3a2a2a; }
 .orb .glyph svg { width: 24px; height: 24px; display: block; }
