@@ -2,6 +2,7 @@ mod calendar;
 mod db;
 mod hit;
 mod mac;
+mod quiet;
 mod scheduler;
 mod tray;
 mod wellbeing;
@@ -284,6 +285,7 @@ pub fn run() {
             expand_panel,
             quit,
             log,
+            quiet::quiet_state,
             db::kv_get,
             db::kv_set,
             db::events_range,

@@ -6,6 +6,9 @@ const kv = new Map<string, string>(Object.entries({ pet_id: "ghost" }));
 kv.set("gemini_key", "mock-key");
 const startX = new URLSearchParams(location.search).get("x");
 if (startX) kv.set("pet_x", startX); // e.g. ?mock&x=-80 pins the pet to the left screen edge
+// ?mock&quiet=dnd | muted | zero — pretend the Mac is asking for silence, to check that the
+// pet's voice stays quiet without having to flip real system settings.
+const quietAs = new URLSearchParams(location.search).get("quiet");
 const focusMin = new URLSearchParams(location.search).get("focus");
 if (focusMin) kv.set("focus_until", String(Math.floor(Date.now() / 1000) + Number(focusMin) * 60)); // ?mock&focus=18 starts mid-session
 const now = Math.floor(Date.now() / 1000);
@@ -72,6 +75,7 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
       case "memory_list": case "feeds_list": return [];
       case "google_status": return { connected: false, configured: true, email: null };
       case "window_rect": return { x: 0, y: 0, w: 440, h: 180 };
+<<<<<<< Updated upstream
       case "google_add_event": {
         const e = args.event;
         const ev = { id: `m${Date.now()}`, source: "g", title: e.title, start: e.start, end: e.end, all_day: e.all_day, location: e.location ?? "", link: "", kind: "event" };
@@ -79,6 +83,14 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
         return ev;
       }
       case "frontmost_app": return new URLSearchParams(location.search).get("app"); // e.g. ?mock&app=YouTube
+=======
+      case "quiet_state": return {
+        dnd: quietAs === "dnd",
+        muted: quietAs === "muted",
+        volume: quietAs === "zero" ? 0 : 60,
+        audio_known: true,
+      };
+>>>>>>> Stashed changes
       default: return null;
     }
   },

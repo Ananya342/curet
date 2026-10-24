@@ -5,7 +5,7 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import { PetId } from "../pets";
 import { Feed, kvGet, kvSet } from "../api";
 import { DEFAULT_MODEL, ENV_GEMINI_KEY } from "../ai/gemini";
-import { ENV_ELEVEN_KEY, Voice, listVoices, resetVoiceCache, synthesize } from "../voice/tts";
+import { ENV_ELEVEN_KEY, Quiet, Voice, listVoices, quietState, resetVoiceCache, synthesize } from "../voice/tts";
 import Rhythm from "./Rhythm";
 
 interface GStatus { connected: boolean; configured: boolean; email: string | null; can_write: boolean }
@@ -31,6 +31,7 @@ export default function Settings(_: { petId: PetId }) {
   const [voices, setVoices] = useState<Voice[]>([]);
   const [voice, setVoice] = useState("");
   const [voiceOn, setVoiceOn] = useState(true);
+  const [quiet, setQuiet] = useState<Quiet | null>(null);
 
   const load = useCallback(async () => {
     const list = await invoke<Feed[]>("feeds_list");
@@ -46,6 +47,7 @@ export default function Settings(_: { petId: PetId }) {
     kvGet("eleven_key").then((v) => setVKey(v ?? ""));
     kvGet("eleven_voice").then((v) => setVoice(v ?? ""));
     kvGet("voice_on").then((v) => setVoiceOn(v !== "off"));
+    quietState().then(setQuiet).catch(() => setQuiet(null));
     const un = listen("events-updated", load);
     return () => { un.then((f) => f()); };
   }, [load]);
@@ -259,6 +261,12 @@ export default function Settings(_: { petId: PetId }) {
           />
           <span>Speak notifications out loud</span>
         </label>
+        {voiceOn && quiet && (quiet.dnd || (quiet.audio_known && (quiet.muted || quiet.volume <= 0))) && (
+          <p className="note good" role="status">
+            Silent right now: {quiet.dnd ? "Focus is on" : quiet.muted ? "this Mac is muted" : "the volume is at zero"}.
+            Reminders will still appear in a bubble.
+          </p>
+        )}
         <details open={!ENV_ELEVEN_KEY}>
           <summary>Key and voice</summary>
           <form className="stack" onSubmit={saveVoice} noValidate>

@@ -1,3 +1,4 @@
+import { invoke } from "@tauri-apps/api/core";
 import { kvGet } from "../api";
 
 /** Default key from .env.local, used when none is saved in Settings (same deal as Gemini). */
@@ -38,6 +39,28 @@ export function forSpeech(text: string): string {
     .join(" ")
     .replace(/\s{2,}/g, " ")
     .trim();
+}
+
+export interface Quiet { dnd: boolean; muted: boolean; volume: number; audio_known: boolean }
+
+/** What the Mac's own Focus and volume settings say about making noise right now. */
+export const quietState = () => invoke<Quiet>("quiet_state");
+
+/**
+ * Whether the machine is asking for silence: Focus/Do Not Disturb on, output muted, or the
+ * volume at zero. Someone sitting in a library has already told their Mac to be quiet, and the
+ * pet should take the hint rather than announcing a deadline out loud.
+ *
+ * If the check itself fails (mock mode in a browser, or the command missing) this returns false
+ * so the voice still works — a broken probe shouldn't silently disable the whole feature.
+ */
+export async function askingForQuiet(): Promise<boolean> {
+  try {
+    const q = await quietState();
+    return q.dnd || (q.audio_known && (q.muted || q.volume <= 0));
+  } catch {
+    return false;
+  }
 }
 
 let current: HTMLAudioElement | null = null;
@@ -110,6 +133,9 @@ export async function speak(text: string): Promise<void> {
     if (!key) return;
     const line = forSpeech(text);
     if (!line) return;
+    // Checked before the request, not after: generating audio for a muted Mac would spend
+    // ElevenLabs credits on something nobody can hear.
+    if (await askingForQuiet()) return;
     const voiceId = await resolveVoice(key);
     if (!voiceId) return;
     await synthesize(line, key, voiceId, (await kvGet("eleven_model")) || undefined);
