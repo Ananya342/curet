@@ -29,6 +29,7 @@ img { -webkit-user-drag: none; }
 .squish { transform-origin: 50% 100%; }
 .breath { transform-origin: 50% 100%; animation: breathe 3.2s ease-in-out infinite; }
 .breath.slow { animation-duration: 5.5s; }
+.breath.work { animation-duration: 2.1s; }
 @keyframes breathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.012, 1.03) translateY(-1px); } }
 .sprite { position: relative; }
 .sprite img { width: 100%; height: 100%; display: block; pointer-events: none; filter: drop-shadow(0 5px 7px rgba(40, 30, 70, 0.2)); }
@@ -52,6 +53,33 @@ img { -webkit-user-drag: none; }
   20% { opacity: 1; }
   100% { transform: translate(16px, -42px) rotate(12deg); opacity: 0; }
 }
+
+/* ---- focus mode: everything pops in and out the same way, staggered by --d, so going in and coming back match */
+.gear-pop { animation: gear-in 0.42s cubic-bezier(0.3, 1.6, 0.5, 1) var(--d, 0s) both; }
+.gear-pop.out { animation: gear-out 0.26s ease-in both; }
+@keyframes gear-in { from { opacity: 0; transform: translateY(10px) scale(0.6); } }
+@keyframes gear-out { to { opacity: 0; transform: translateY(8px) scale(0.6); } }
+
+.desk { position: absolute; left: 50%; bottom: -4px; translate: -50% 0; z-index: 2; pointer-events: none; transform-origin: 50% 100%; }
+.desk svg { display: block; width: 100%; overflow: visible; }
+.desk path, .desk rect { stroke: #3a2a2a; stroke-width: 2.5; stroke-linejoin: round; }
+.laptop .lid { fill: #8fd3ff; }
+.laptop .sticker { fill: #ff8fb8; stroke-width: 2; }
+.laptop .base { fill: #fffdf7; }
+.laptop .glow { fill: #cfeeff; stroke: none; filter: blur(5px); animation: screen-glow 2.4s ease-in-out infinite; }
+@keyframes screen-glow { 50% { opacity: 0.45; } }
+
+
+
+
+.think {
+  position: absolute; z-index: 3; pointer-events: none; display: grid; place-items: center; width: 34px; height: 30px; border-radius: 50%;
+  background: #fffdf7; border: 2px solid #3a2a2a; box-shadow: 0 2px 0 #3a2a2a; font-size: 15px; animation: think 2.6s ease-out both;
+}
+.think::before, .think::after { content: ""; position: absolute; border-radius: 50%; background: #fffdf7; border: 2px solid #3a2a2a; }
+.think::before { width: 10px; height: 10px; left: -4px; bottom: -8px; }
+.think::after { width: 6px; height: 6px; left: -11px; bottom: -15px; }
+@keyframes think { 0% { opacity: 0; transform: translateY(8px) scale(0.6); } 15%, 75% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-10px); } }
 
 .badge {
   position: absolute; top: -8px; right: -2px; width: 28px; height: 28px; border-radius: 50%;
@@ -337,7 +365,9 @@ kbd { background: var(--raised); border: 2px solid var(--edge); border-radius: 7
 .bubble { border: 2.5px solid #3a2a2a; box-shadow: 0 3px 0 #3a2a2a; font-family: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif; font-weight: 700; color: #3a2a2a; background: #fffdf7; }
 .bubble::after { background: #fffdf7; border: 2.5px solid #3a2a2a; border-top: 0; border-left: 0; box-shadow: none; }
 .bubble-actions button { border: 2px solid #3a2a2a; background: #ffd95a; color: #3a2a2a; box-shadow: 0 2px 0 #3a2a2a; font-weight: 800; }
-.bubble-actions button:first-child:not(:last-child) { background: #6fdcb2; color: #3a2a2a; }
+.bubble-actions button:nth-child(1) { background: #6fdcb2; }
+.bubble-actions button:nth-child(2) { background: #ffd95a; }
+.bubble-actions button:nth-child(3) { background: #ff8fb8; }
 .orb { border: 2.5px solid #3a2a2a; box-shadow: 0 3px 0 #3a2a2a; background: #ffd95a; }
 .orb:nth-of-type(1) { background: #ff9248; }
 .orb:nth-of-type(2) { background: #6fdcb2; }

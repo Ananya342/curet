@@ -8,6 +8,7 @@ import { PETS, PET_IDS, PetId, pick } from "../pets";
 import { Area, Screen, fmtTime, getPetId, greeting, kvGet, kvSet, nowSec, setPetId } from "../api";
 import { startHitReporting } from "../hit";
 import { FocusIcon } from "../wellbeing/FocusIcon";
+import { Laptop } from "../wellbeing/FocusGear";
 import { useWellbeing } from "../wellbeing/useWellbeing";
 
 const WIN_W = 340;
@@ -15,7 +16,7 @@ const WIN_H = 400;
 const FLOOR_PAD = 6;
 const SLEEP_AFTER_MS = 10 * 60 * 1000;
 
-type Mode = "sleeping" | "waking" | "idle" | "walking" | "alert" | "dragged" | "tossed" | "hiding" | "hidden";
+type Mode = "sleeping" | "waking" | "idle" | "walking" | "alert" | "focusing" | "dragged" | "tossed" | "hiding" | "hidden";
 interface Bubble { id: number; text: string; rich?: boolean; actions?: { label: string; run: () => void }[] }
 interface Fx { id: number; kind: "heart" | "star" | "boop" | "confetti"; x: number; y: number; dx: number; text?: string }
 
@@ -43,6 +44,13 @@ export default function Pet() {
   const [poof, setPoof] = useState<null | { id: number; x: number; y: number; puffs: { x: number; y: number; s: number; d: number }[] }>(null);
   const [badge, setBadge] = useState(false);
   const [lidFill, setLidFill] = useState<string[]>([]);
+  // Focus mode: the props are "in" while locked in and "out" for the moment they pack away. A thought drifts up
+  // now and then.
+  const [gear, setGear] = useState<null | "in" | "out">(null);
+  const [thought, setThought] = useState<null | { id: number; e: string }>(null);
+  const [streak, setStreak] = useState(0);
+  const streakRef = useRef(0);
+  streakRef.current = streak;
 
   // Motion values driving the sprite.
   const sx = useMotionValue(1), sy = useMotionValue(1), rot = useMotionValue(0), ty = useMotionValue(0);
@@ -142,7 +150,12 @@ export default function Pet() {
   }, [sx, sy, ty]);
 
   const blink = useCallback(async () => {
-    if (modeRef.current === "sleeping" || lid.get() > 0.05) return;
+    if (modeRef.current === "sleeping") return;
+    if (modeRef.current === "focusing") {
+      await animate(lid, [0, 1, 0], { duration: 0.17 });
+      return;
+    }
+    if (lid.get() > 0.05) return;
     await animate(lid, [0, 1, 0], { duration: 0.17 });
   }, [lid]);
 
@@ -175,6 +188,39 @@ export default function Pet() {
     ]);
     setZzz(true);
   }, [lid, sx, sy]);
+
+  // Going into focus and coming back mirror each other: eyes open and a small hop while the laptop pops in,
+  // then a lean into the work; coming back, it pops out the same way, the pet straightens up and hops.
+  const lockIn = useCallback(async () => {
+    if (["hiding", "hidden", "dragged", "tossed"].includes(modeRef.current)) return;
+    walkTok.current++;
+    closeMenu();
+    setZzz(false);
+    setMode("focusing");
+    setGear("in");
+    await Promise.all([animate(lid, 0, { duration: 0.25, ease: "easeOut" }), hop(16)]);
+    await Promise.all([
+      animate(sy, 0.96, { duration: 0.35 }),
+      animate(sx, 1.04, { duration: 0.35 }),
+      animate(lean, 5, { duration: 0.35 }),
+    ]);
+  }, [hop, lean, lid, sx, sy]);
+
+  const unlock = useCallback(async () => {
+    if (modeRef.current !== "focusing") return;
+    setGear("out");
+    await Promise.all([
+      animate(lid, 0, { duration: 0.28, ease: "easeOut" }),
+      animate(sy, 1, { duration: 0.28 }),
+      animate(sx, 1, { duration: 0.28 }),
+      animate(lean, 0, { duration: 0.28 }),
+      animate(look, 0, { duration: 0.28 }),
+    ]);
+    setGear(null);
+    setMode("idle");
+    await hop(16);
+    touch();
+  }, [hop, lean, lid, look, sx, sy]);
 
   const wakeUp = useCallback(async (opts: { text?: string; sleepy?: boolean } = {}) => {
     walkTok.current++;
@@ -359,7 +405,7 @@ export default function Pet() {
   const panel = (tab: string) => { closeMenu(); invoke("toggle_panel", { tab, forceOpen: true }).catch(() => {}); };
 
   // Briefings, focus mode and break reminders live in wellbeing/useWellbeing.ts.
-  const wb = useWellbeing({ modeRef, say, hush, fallAsleep, wakeUp, celebrate, openPanel: panel });
+  const wb = useWellbeing({ modeRef, say, hush, lockIn, unlock, wakeUp, celebrate, openPanel: panel });
 
   const menuItems = [
     { key: "chat", icon: <ChatIcon />, label: "Chat", run: () => panel("chat") },
@@ -367,13 +413,13 @@ export default function Pet() {
     { key: "sleep", icon: mode === "sleeping" ? <WakeIcon /> : <SleepIcon />, label: mode === "sleeping" ? "Wake" : "Sleep", run: () => { closeMenu(); mode === "sleeping" ? wakeUp({ text: "" }) : fallAsleep(); } },
     { key: "hide", icon: <HideIcon />, label: "Hide", run: () => hidePet() },
     { key: "pet", icon: <PetsIcon />, label: "Pets", run: () => openMenu("picker") },
-    { key: "focus", icon: <FocusIcon />, label: wb.focusing ? "Focusing" : "Focus", run: () => { closeMenu(); wb.openFocusMenu(); } },
+    { key: "focus", icon: <FocusIcon />, label: wb.focusing ? "Locked in" : "Focus", run: () => { closeMenu(); wb.openFocusMenu(); } },
     { key: "settings", icon: <SettingsIcon />, label: "Settings", run: () => panel("settings") },
   ];
 
   // ---- pointer interaction --------------------------------------------------------------------------
   const drag = useRef<null | {
-    sx: number; sy: number; wx: number; wy: number; moved: boolean; asleep?: boolean;
+    sx: number; sy: number; wx: number; wy: number; moved: boolean; asleep?: boolean; focused?: boolean;
     samples: { t: number; x: number; y: number }[];
   }>(null);
 
@@ -404,6 +450,7 @@ export default function Pet() {
         walkTok.current++; physTok.current++;
         closeMenu(); hush();
         if (modeRef.current === "sleeping") { d.asleep = true; animate(lid, 0.4, { duration: 0.2 }); setZzz(false); }
+        if (modeRef.current === "focusing") { d.focused = true; }
         setMode("dragged");
         animate(sy, 1.06, { duration: 0.2 });
         animate(sx, 0.95, { duration: 0.2 });
@@ -456,12 +503,13 @@ export default function Pet() {
       // Picked up mid-nap: once it lands, finish waking up properly instead of staying half-awake.
       toss(vx, vy).then(() => {
         if (d.asleep && modeRef.current === "idle") wakeUp({ sleepy: true, text: pick(["whoa, where am I?", "mmf… okay, I'm up!", "huh? we moved?"]) });
+        else if (d.focused && modeRef.current === "idle" && wb.focusActive()) lockIn();
       });
       return;
     }
     // A click.
     touch();
-    if (modeRef.current === "sleeping" && wb.focusActive()) { wb.showFocusStatus(); return; }
+    if (modeRef.current === "focusing" || (modeRef.current === "sleeping" && wb.focusActive())) { wb.showFocusStatus(); return; }
     if (modeRef.current === "sleeping") { wakeUp({ sleepy: true, text: pick(["mmf… I'm up!", "five more minutes…", "huh? oh, hi!"]) }); return; }
     const clickNow = performance.now();
     const isDouble = clickNow - lastClick.current < 350;
@@ -498,7 +546,7 @@ export default function Pet() {
   const onContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     touch();
-    if (modeRef.current === "sleeping" && wb.focusActive()) { wb.showFocusStatus(); return; }
+    if (modeRef.current === "focusing" || (modeRef.current === "sleeping" && wb.focusActive())) { wb.showFocusStatus(); return; }
     if (modeRef.current === "sleeping") { wakeUp({ sleepy: true, text: "" }); return; }
     if (["hiding", "hidden", "waking"].includes(modeRef.current)) return;
     menu ? closeMenu() : openMenu("main");
@@ -607,11 +655,76 @@ export default function Pet() {
     loop();
     const tick = window.setInterval(() => {
       if (modeRef.current !== "idle" || draggingRef.current || menuRef.current) return;
-      if (Date.now() - lastInteract.current > SLEEP_AFTER_MS) { fallAsleep(); return; }
+      if (Date.now() - lastInteract.current > SLEEP_AFTER_MS) { if (!wb.focusActive()) fallAsleep(); return; }
       if (Math.random() < 0.05 && !bubbleTimer.current) wander();
     }, 1000);
     return () => { clearTimeout(t); clearInterval(tick); };
   }, [blink, fallAsleep, wander]);
+
+  // The usable screen changes under the pet: a full-screen app hides the Dock and menu bar, a display is plugged
+  // in, or the Dock moves. Re-measure every so often and glide onto the new floor, so the pet always sits on
+  // the bottom edge and the menu and bubble keep their bearings.
+  useEffect(() => {
+    let settling = false;
+    const t = window.setInterval(async () => {
+      const s = await invoke<Screen | null>("screen_info").catch(() => null);
+      if (!s || settling) return;
+      const a = screen.current, n = s.work;
+      if (a.x === n.x && a.y === n.y && a.w === n.w && a.h === n.h) return;
+      screen.current = n;
+      if (!["idle", "sleeping", "focusing", "alert"].includes(modeRef.current) || draggingRef.current) return;
+      const b = bounds();
+      const from = { ...pos.current }, to = { x: clamp(from.x, b.minX, b.maxX), y: b.floorY };
+      if (Math.hypot(to.x - from.x, to.y - from.y) < 1) return;
+      settling = true;
+      await animate(0, 1, { duration: 0.45, ease: "easeInOut", onUpdate: (k) => moveTo(from.x + (to.x - from.x) * k, from.y + (to.y - from.y) * k) });
+      homeX.current = to.x;
+      settling = false;
+    }, 1500);
+    return () => clearInterval(t);
+  }, [bounds, moveTo]);
+
+  // While locked in: quick little typing taps, the eyes glancing across the screen, a determined nod now and
+  // then and the odd thought drifting up.
+  useEffect(() => {
+    if (mode !== "focusing") return;
+    let alive = true;
+    const think = window.setInterval(() => {
+      const id = Date.now();
+      setThought({ id, e: pick(["💻", "✏️", "💡", "🧠", "📝"]) });
+      window.setTimeout(() => setThought((t) => (t?.id === id ? null : t)), 2600);
+    }, 70000);
+    (async () => {
+      await sleep(700);
+      for (let n = 1; alive && modeRef.current === "focusing"; n++) {
+        await animate(ty, [0, -1.5, 0, -1, 0, -1.5, 0], { duration: 0.9 });
+        if (!alive) break;
+        if (n % 3 === 0) await animate(look, [0, -2, 2, 0], { duration: 1.4, ease: "easeInOut" });
+        else if (n % 4 === 0) await animate(ty, [0, 2.5, 0], { duration: 0.45, ease: "easeInOut" });
+        await sleep(500 + Math.random() * 900);
+      }
+    })();
+    return () => { alive = false; clearInterval(think); };
+  }, [mode, look, ty]);
+
+  // Today's streak: a focus block that ran to its end time counts as done.
+  const focusEndsSeen = useRef(0);
+  useEffect(() => {
+    kvGet("focus_streak").then((v) => {
+      try { const t = JSON.parse(v ?? ""); if (t.day === new Date().toDateString()) setStreak(t.n); } catch { /* none yet */ }
+    });
+  }, []);
+  useEffect(() => {
+    if (wb.focusing) { focusEndsSeen.current = wb.focusEnds; return; }
+    const ends = focusEndsSeen.current;
+    focusEndsSeen.current = 0;
+    if (!ends || nowSec() < ends - 3) return;
+    const next = streakRef.current + 1;
+    setStreak(next);
+    kvSet("focus_streak", JSON.stringify({ day: new Date().toDateString(), n: next }));
+    window.setTimeout(() => spawnFx("boop", 1, undefined, `🔥 ${next} today`), 1600);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wb.focusing]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeMenu();
@@ -666,7 +779,10 @@ export default function Pet() {
   const bubbleCx = clamp(cx, visLo + 156, Math.max(visLo + 156, visHi - 156));
   const tailShift = clamp(cx - bubbleCx, -110, 110);
 
-  const breathClass = mode === "sleeping" ? "breath slow" : mode === "idle" || mode === "alert" ? "breath" : "";
+  // Props show while locked in, and stay for their pop-out; a drag, toss or hide puts them away at once.
+  const showGear = gear !== null && (mode === "focusing" || gear === "out");
+
+  const breathClass = mode === "sleeping" ? "breath slow" : mode === "focusing" ? "breath work" : mode === "idle" || mode === "alert" ? "breath" : "";
 
   return (
     <div className="stage" data-mode={mode} data-fading={fading || undefined} style={{ width: WIN_W, height: WIN_H }}>
@@ -709,6 +825,12 @@ export default function Pet() {
           ))}
         </div>
       )}
+      {thought && mode === "focusing" && !bubble && !menu && (
+        <div key={thought.id} className="think" style={{ left: WIN_W / 2 + sw * 0.32, bottom: FLOOR_PAD + sh - 4 }} aria-hidden="true">
+          <span>{thought.e}</span>
+        </div>
+      )}
+
       {fx.map((f) => (
         <span key={f.id} className={`fx ${f.kind}`} style={{ left: f.x, top: f.y, ["--dx" as string]: `${f.dx}px` }}>
           {f.kind === "heart" ? "💕" : f.kind === "star" ? "✨" : f.kind === "confetti" ? pick(["🎉", "✨", "🎊", "⭐", "💜"]) : f.text}
@@ -741,6 +863,7 @@ export default function Pet() {
         {mode === "sleeping" && zzz && (
           <div className="zs"><span>z</span><span>Z</span><span>z</span></div>
         )}
+        {showGear && <Laptop width={Math.min(sw * 0.7, 112)} state={gear!} />}
         {badge && <div className="badge">!</div>}
       </div>
     </div>

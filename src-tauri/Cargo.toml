@@ -32,7 +32,7 @@ sha2 = "0.11.1"
 base64 = "0.23.1"
 url = "2.5.8"
 objc2 = "0.6.5"
-objc2-app-kit = { version = "0.3.2", features = ["NSWindow", "NSResponder", "NSApplication"] }
+objc2-app-kit = { version = "0.3.2", features = ["NSWindow", "NSPanel", "NSResponder", "NSApplication"] }
 reqwest = { version = "0.13.5", default-features = false, features = ["json", "rustls", "query", "form"] }
 
 
