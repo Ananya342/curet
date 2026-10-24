@@ -4,6 +4,7 @@ mod hit;
 mod mac;
 mod scheduler;
 mod tray;
+mod wellbeing;
 
 use serde::Serialize;
 use std::{

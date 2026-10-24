@@ -364,3 +364,16 @@ kbd { background: var(--raised); border: 2px solid var(--edge); border-radius: 7
 .fields { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; }
 .panel select { appearance: none; -webkit-appearance: none; padding-right: 26px; background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%), linear-gradient(135deg, var(--ink) 50%, transparent 50%); background-position: calc(100% - 15px) 17px, calc(100% - 10px) 17px; background-size: 5px 5px; background-repeat: no-repeat; }
 .panel input:disabled { opacity: 0.5; }
+
+/* wellbeing: briefing bubble lists lines; seventh menu orb */
+.bubble.rich { text-align: left; white-space: pre-line; max-width: 300px; font-weight: 700; line-height: 1.4; }
+.bubble.rich .bubble-actions { justify-content: flex-start; }
+.orb:nth-of-type(7) { background: #b6e35a; }
+
+/* daily rhythm settings */
+.rrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 42px; }
+.check, .check-label { display: flex; align-items: center; gap: 10px; font-weight: 800; cursor: pointer; }
+.check-label { cursor: default; }
+.rrow input[type="time"] { width: 124px; }
+.rrow select { width: 156px; }
+.row-btns { display: flex; gap: 6px; flex-wrap: wrap; }

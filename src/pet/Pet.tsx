@@ -7,6 +7,8 @@ import { ChatIcon, HideIcon, PetsIcon, SettingsIcon, SleepIcon, TodayIcon, WakeI
 import { PETS, PET_IDS, PetId, pick } from "../pets";
 import { Area, Screen, fmtTime, getPetId, greeting, kvGet, kvSet, nowSec, setPetId } from "../api";
 import { startHitReporting } from "../hit";
+import { FocusIcon } from "../wellbeing/FocusIcon";
+import { useWellbeing } from "../wellbeing/useWellbeing";
 
 const WIN_W = 340;
 const WIN_H = 400;
@@ -14,7 +16,7 @@ const FLOOR_PAD = 6;
 const SLEEP_AFTER_MS = 10 * 60 * 1000;
 
 type Mode = "sleeping" | "waking" | "idle" | "walking" | "alert" | "dragged" | "tossed" | "hiding" | "hidden";
-interface Bubble { id: number; text: string; actions?: { label: string; run: () => void }[] }
+interface Bubble { id: number; text: string; rich?: boolean; actions?: { label: string; run: () => void }[] }
 interface Fx { id: number; kind: "heart" | "star" | "boop" | "confetti"; x: number; y: number; dx: number; text?: string }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -100,9 +102,9 @@ export default function Pet() {
     window.setTimeout(() => setFx((f) => f.filter((q) => !items.includes(q))), 1500);
   }, []);
 
-  const say = useCallback((text: string, opts: { ms?: number; actions?: Bubble["actions"] } = {}) => {
+  const say = useCallback((text: string, opts: { ms?: number; actions?: Bubble["actions"]; rich?: boolean } = {}) => {
     window.clearTimeout(bubbleTimer.current);
-    const b: Bubble = { id: Date.now(), text, actions: opts.actions };
+    const b: Bubble = { id: Date.now(), text, actions: opts.actions, rich: opts.rich };
     setBubble(b);
     const ms = opts.ms ?? Math.max(3000, text.length * 70);
     bubbleTimer.current = window.setTimeout(() => setBubble((cur) => (cur?.id === b.id ? null : cur)), ms);
@@ -356,12 +358,16 @@ export default function Pet() {
   // ---- menu actions ---------------------------------------------------------------------------------
   const panel = (tab: string) => { closeMenu(); invoke("toggle_panel", { tab, forceOpen: true }).catch(() => {}); };
 
+  // Briefings, focus mode and break reminders live in wellbeing/useWellbeing.ts.
+  const wb = useWellbeing({ modeRef, say, hush, fallAsleep, wakeUp, celebrate, openPanel: panel });
+
   const menuItems = [
     { key: "chat", icon: <ChatIcon />, label: "Chat", run: () => panel("chat") },
     { key: "today", icon: <TodayIcon />, label: "Today", run: () => panel("today") },
     { key: "sleep", icon: mode === "sleeping" ? <WakeIcon /> : <SleepIcon />, label: mode === "sleeping" ? "Wake" : "Sleep", run: () => { closeMenu(); mode === "sleeping" ? wakeUp({ text: "" }) : fallAsleep(); } },
     { key: "hide", icon: <HideIcon />, label: "Hide", run: () => hidePet() },
     { key: "pet", icon: <PetsIcon />, label: "Pets", run: () => openMenu("picker") },
+    { key: "focus", icon: <FocusIcon />, label: wb.focusing ? "Focusing" : "Focus", run: () => { closeMenu(); wb.openFocusMenu(); } },
     { key: "settings", icon: <SettingsIcon />, label: "Settings", run: () => panel("settings") },
   ];
 
@@ -455,6 +461,7 @@ export default function Pet() {
     }
     // A click.
     touch();
+    if (modeRef.current === "sleeping" && wb.focusActive()) { wb.showFocusStatus(); return; }
     if (modeRef.current === "sleeping") { wakeUp({ sleepy: true, text: pick(["mmf… I'm up!", "five more minutes…", "huh? oh, hi!"]) }); return; }
     const clickNow = performance.now();
     const isDouble = clickNow - lastClick.current < 350;
@@ -491,6 +498,7 @@ export default function Pet() {
   const onContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     touch();
+    if (modeRef.current === "sleeping" && wb.focusActive()) { wb.showFocusStatus(); return; }
     if (modeRef.current === "sleeping") { wakeUp({ sleepy: true, text: "" }); return; }
     if (["hiding", "hidden", "waking"].includes(modeRef.current)) return;
     menu ? closeMenu() : openMenu("main");
@@ -499,6 +507,7 @@ export default function Pet() {
   // ---- reminders -----------------------------------------------------------------------------------------
   const onReminder = useCallback(async (r: { id: string; title: string; start: number; link: string; kind: string }) => {
     if (modeRef.current === "hidden" || modeRef.current === "hiding") return;
+    if (wb.holdReminder(r)) return; // focus mode: it will be listed when the session ends
     if (modeRef.current === "sleeping") await wakeUp({ text: "", sleepy: true });
     closeMenu();
     setMode("alert");
@@ -662,7 +671,7 @@ export default function Pet() {
   return (
     <div className="stage" data-mode={mode} data-fading={fading || undefined} style={{ width: WIN_W, height: WIN_H }}>
       {bubble && !menu && (
-        <div className="bubble" role="status" aria-live="polite" data-hit style={{ bottom: FLOOR_PAD + sh + 12, left: bubbleCx, ["--tail" as string]: `${tailShift}px` }} onClick={() => { touch(); hush(); setBadge(false); if (modeRef.current === "alert") setMode("idle"); }}>
+        <div className={`bubble${bubble.rich ? " rich" : ""}`} role="status" aria-live="polite" data-hit style={{ bottom: FLOOR_PAD + sh + 12, left: bubbleCx, ["--tail" as string]: `${tailShift}px` }} onClick={() => { touch(); hush(); setBadge(false); if (modeRef.current === "alert") setMode("idle"); }}>
           <div className="bubble-text">{bubble.text}</div>
           {bubble.actions && (
             <div className="bubble-actions">

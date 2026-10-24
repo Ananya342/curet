@@ -21,12 +21,13 @@
 - [ ] Custom app icon and menu-bar icon
 
 ## From the original concept
-- [ ] Morning briefing and evening summary
-- [ ] Focus mode (pet sleeps while you concentrate)
-- [ ] Break reminders after long work sessions
+- [x] Morning briefing and evening summary
+- [x] Focus mode (pet sleeps while you concentrate)
+- [x] Break reminders after long work sessions
 - [ ] Task breakdown and free-time suggestions
 - [ ] Cosmetics and unlockables
-- [ ] Gmail, Notion, Todoist integrations
+- [ ] Notion: plan written in docs/notion-integration.md, not built yet
+- [ ] Gmail, Todoist integrations
 
 ## Housekeeping
 - [ ] Decide: move API keys to the macOS Keychain

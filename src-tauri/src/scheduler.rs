@@ -1,4 +1,4 @@
-use crate::{calendar, db::{self, Db}, tray};
+use crate::{calendar, db::{self, Db}, tray, wellbeing};
 use chrono::Utc;
 use serde::Serialize;
 use std::{collections::HashSet, time::Duration};
@@ -29,6 +29,7 @@ pub fn spawn(app: AppHandle) {
             .and_then(|s| serde_json::from_str(&s).ok())
             .unwrap_or_default();
         let mut last_refresh = 0i64;
+        let mut wb = wellbeing::State::default();
         loop {
             let now = Utc::now().timestamp();
             if now - last_refresh > 600 {
@@ -65,6 +66,7 @@ pub fn spawn(app: AppHandle) {
                 }
                 db::set(&app.state::<Db>(), "fired", Some(&serde_json::to_string(&fired).unwrap()));
             }
+            wellbeing::tick(&app, &mut wb);
             tray::update(&app);
             tokio::time::sleep(Duration::from_secs(20)).await;
         }
