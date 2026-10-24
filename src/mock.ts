@@ -3,6 +3,7 @@
 const handlers = new Map<string, { cb: number; id: number }[]>();
 let nextId = 1;
 const kv = new Map<string, string>(Object.entries({ pet_id: "ghost" }));
+kv.set("gemini_key", "mock-key");
 const startX = new URLSearchParams(location.search).get("x");
 if (startX) kv.set("pet_x", startX); // e.g. ?mock&x=-80 pins the pet to the left screen edge
 const now = Math.floor(Date.now() / 1000);
@@ -18,6 +19,26 @@ const emit = (event: string, payload: unknown) =>
   (handlers.get(event) ?? []).forEach(({ cb, id }) => (window as any)[`_${cb}`]?.({ event, id, payload }));
 
 (window as any).__mockEmit = emit;
+
+// Fake Gemini: stream a reply in slow chunks so the chat's streaming path can be watched.
+const realFetch = window.fetch.bind(window);
+window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+  const url = String(typeof input === "string" || input instanceof URL ? input : input.url);
+  if (!url.includes("generativelanguage.googleapis.com") || !url.includes("streamGenerateContent")) return realFetch(input, init);
+  const words = "You have a lecture in 25 minutes and coffee with Maya later. Essay 2 is due tomorrow evening, so tonight is a good time to start it.".split(" ");
+  const enc = new TextEncoder();
+  const body = new ReadableStream({
+    async start(c) {
+      for (let i = 0; i < words.length; i += 4) {
+        await new Promise((r) => setTimeout(r, 350));
+        const text = words.slice(i, i + 4).join(" ") + (i + 4 < words.length ? " " : "");
+        c.enqueue(enc.encode(`data: ${JSON.stringify({ candidates: [{ content: { role: "model", parts: [{ text }] } }] })}\r\n\r\n`));
+      }
+      c.close();
+    },
+  });
+  return new Response(body, { status: 200, headers: { "Content-Type": "text/event-stream" } });
+};
 (window as any).__TAURI_INTERNALS__ = {
   metadata: { currentWindow: { label: "mock" }, currentWebview: { windowLabel: "mock", label: "mock" } },
   transformCallback(cb: (a: unknown) => void) {
