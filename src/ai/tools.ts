@@ -2,6 +2,8 @@ import { Type } from "@google/genai";
 import { emitTo } from "@tauri-apps/api/event";
 import { addCalendarEvent, eventsRange, memories, nowSec, startOfDay, tasks } from "../api";
 import { freeGaps } from "../wellbeing/gaps";
+import { getFocusUntil } from "../wellbeing/focus";
+import { cleanTitle, journalEntries } from "./snapshot";
 
 export const declarations = [
   {
@@ -14,6 +16,17 @@ export const declarations = [
         end_date: { type: Type.STRING, description: "Last day, YYYY-MM-DD. Defaults to start_date." },
       },
       required: ["start_date"],
+    },
+  },
+  {
+    name: "get_deadlines",
+    description: "List deadlines (assignments, quizzes, exams due) between two local dates. Use for dates outside the deadlines already listed.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        start_date: { type: Type.STRING, description: "First day, YYYY-MM-DD. Defaults to today." },
+        end_date: { type: Type.STRING, description: "Last day, YYYY-MM-DD. Defaults to 90 days after start_date." },
+      },
     },
   },
   {
@@ -56,7 +69,11 @@ export const declarations = [
       required: ["title"],
     },
   },
-  { name: "list_tasks", description: "List the user's open to-do items.", parameters: { type: Type.OBJECT, properties: {} } },
+  {
+    name: "list_tasks",
+    description: "List the user's to-do items.",
+    parameters: { type: Type.OBJECT, properties: { include_done: { type: Type.BOOLEAN, description: "Also list ticked-off tasks. Default false." } } },
+  },
   {
     name: "complete_task",
     description: "Mark a to-do item as done, by id or by (part of) its title.",
@@ -70,6 +87,17 @@ export const declarations = [
     description: "Save a lasting fact about the user (preferences, goals, projects, routines) for future conversations.",
     parameters: { type: Type.OBJECT, properties: { fact: { type: Type.STRING } }, required: ["fact"] },
   },
+  {
+    name: "read_journal",
+    description: "Read the user's private weekly journal entries, newest first. Only when the user asks about their journal or reflections.",
+    parameters: { type: Type.OBJECT, properties: { limit: { type: Type.NUMBER, description: "How many entries. Default 5." } } },
+  },
+  {
+    name: "start_focus",
+    description: "Start a focus block: the pet locks in and holds reminders until it ends.",
+    parameters: { type: Type.OBJECT, properties: { minutes: { type: Type.NUMBER, description: "Length in minutes. Default 25." } } },
+  },
+  { name: "end_focus", description: "End the current focus block early.", parameters: { type: Type.OBJECT, properties: {} } },
   {
     name: "recall",
     description: "Search saved memories about the user.",
@@ -95,6 +123,12 @@ export async function runTool(name: string, args: Record<string, any>): Promise<
         ends: e.all_day ? undefined : local(e.end), link: e.link || undefined, where: e.location || undefined,
       }));
     }
+    case "get_deadlines": {
+      const from = args.start_date ? startOfDay(parseDay(args.start_date)) : startOfDay();
+      const to = args.end_date ? startOfDay(parseDay(args.end_date)) + 86400 : from + 90 * 86400;
+      const evs = (await eventsRange(from, to)).filter((e) => e.kind === "deadline");
+      return evs.slice(0, 80).map((e) => ({ title: cleanTitle(e.title), due: e.all_day ? new Date(e.start * 1000).toDateString() : local(e.start), link: e.link || undefined }));
+    }
     case "find_free_time": {
       const day = parseDay(args.date);
       const floor = startOfDay(day) === startOfDay() ? nowSec() : undefined;
@@ -116,7 +150,7 @@ export async function runTool(name: string, args: Record<string, any>): Promise<
       return await tasks.add(args.title, due);
     }
     case "list_tasks":
-      return (await tasks.list()).map((t) => ({ id: t.id, title: t.title, due: t.due ? local(t.due) : null }));
+      return (await tasks.list(Boolean(args.include_done))).map((t) => ({ id: t.id, title: t.title, due: t.due ? local(t.due) : null, done: t.done }));
     case "complete_task": {
       const open = await tasks.list();
       const t = args.id != null
@@ -130,6 +164,18 @@ export async function runTool(name: string, args: Record<string, any>): Promise<
     case "remember":
       await memories.add(args.fact);
       return { saved: true };
+    case "read_journal":
+      return await journalEntries(Math.max(1, Math.min(20, Number(args.limit) || 5)));
+    case "start_focus": {
+      if (await getFocusUntil()) return { error: "Already focusing." };
+      const minutes = Math.max(5, Math.min(180, Math.round(Number(args.minutes) || 25)));
+      await emitTo("pet", "focus-request", { minutes });
+      return { started: true, minutes };
+    }
+    case "end_focus":
+      if (!(await getFocusUntil())) return { error: "Not focusing right now." };
+      await emitTo("pet", "focus-request", { minutes: 0 });
+      return { ended: true };
     case "recall":
       return (await memories.list(args.query, 10)).map((m) => m.fact);
     default:

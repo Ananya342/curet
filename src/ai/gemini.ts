@@ -1,8 +1,9 @@
 import { invoke } from "@tauri-apps/api/core";
 import { GoogleGenAI } from "@google/genai";
-import { eventsRange, fmtDay, fmtTime, kvGet, memories, nowSec, startOfDay, tasks } from "../api";
+import { kvGet, nowSec } from "../api";
 import { PETS, PetId } from "../pets";
 import { declarations, runTool } from "./tools";
+import { APP_GUIDE, appSnapshot } from "./snapshot";
 
 export interface Msg { role: "user" | "model"; text: string }
 // Default model. If Gemini rejects the name, chat falls back to FALLBACK_MODEL so it keeps working.
@@ -10,24 +11,17 @@ export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 const FALLBACK_MODEL = "gemini-flash-latest";
 
 async function context(petId: PetId) {
-  const now = new Date();
-  const day = startOfDay(now);
-  const [evs, open, mem] = await Promise.all([eventsRange(day, day + 2 * 86400), tasks.list(), memories.list(null, 5)]);
-  const line = (e: (typeof evs)[number]) =>
-    `- ${e.kind === "deadline" ? "[DEADLINE] " : ""}${e.title} — ${e.all_day ? fmtDay(e.start) + " (all day)" : `${fmtDay(e.start)} ${fmtTime(e.start)}–${fmtTime(e.end)}`}`;
   const pet = PETS[petId];
-  return `You are ${pet.name}, a desktop assistant that helps the user with their calendar, deadlines and tasks.
-Write plainly and briefly (1–4 sentences unless asked for a plan). No roleplay: no sounds, no stage directions like *purr* or *yawn*, no baby talk, no emoji. Do not start a reply by announcing an action. Answer directly.
+  return `You are ${pet.name}, the pet inside Curet, a desktop app that helps a student with their calendar, deadlines, tasks, focus and wellbeing.
+Write plainly and briefly (1–4 sentences unless asked for a plan or a list). No roleplay: no sounds, no stage directions like *purr* or *yawn*, no baby talk, no emoji. Do not start a reply by announcing an action. Answer directly.
 Format replies in Markdown: **bold** for titles and times, "- " bullet lists for several items, one item per line.
-The calendar below is complete for the next 3 days: answer questions about those days straight from it, without calling a tool. Only call get_events for dates further out. Use the other tools to find free time, manage tasks and remember things. Never invent events — if the calendar is empty or not connected, say so and mention Settings.
-Call add_calendar_event only when the user clearly asks to schedule something, and include the exact title and time in the reply. Work out words like "tomorrow" or "Friday" from the current date and time below. When the user shares a lasting preference, goal or project, call remember. When they ask to be reminded or add something to do, call add_task.
-Now: ${now.toLocaleString([], { dateStyle: "full", timeStyle: "short" })} (${Intl.DateTimeFormat().resolvedOptions().timeZone}).
-Next 3 days:
-${evs.length ? evs.slice(0, 40).map(line).join("\n") : "(nothing on the calendar)"}
-Open tasks:
-${open.length ? open.map((t) => `- #${t.id} ${t.title}${t.due ? ` (due ${fmtDay(t.due)})` : ""}`).join("\n") : "(none)"}
-What you remember about the user:
-${mem.length ? mem.map((m) => `- ${m.fact}`).join("\n") : "(nothing yet)"}`;
+You can see everything stored in Curet: it is all in the snapshot below. Answer questions about deadlines, the calendar, tasks, this week, focus mode, the pet, connected calendars and settings straight from it, without calling a tool. Never say you can't see the user's deadlines or data. The deadline list covers the next 45 days; call get_deadlines or get_events only for dates outside what is listed. If a list is empty, say so plainly, and if no calendar is connected, point to Settings.
+Never invent events, deadlines or tasks. Work out words like "tomorrow" or "Friday" from the current date and time below.
+Call add_calendar_event only when the user clearly asks to schedule something, and include the exact title and time in the reply. When they ask to be reminded or add something to do, call add_task. When the user shares a lasting preference, goal or project, call remember. Call start_focus or end_focus when they ask to start or stop focusing.
+
+${APP_GUIDE}
+
+${await appSnapshot(petId)}`;
 }
 
 /** Drops a leading "I'll check / let me add…" sentence so the reply starts with the answer. */
@@ -49,6 +43,10 @@ export function replyWithoutLead(text: string, done = true): string | null {
 
 const STATUS: Record<string, string> = {
   get_events: "Checking your calendar…",
+  get_deadlines: "Checking your deadlines…",
+  read_journal: "Reading your journal…",
+  start_focus: "Starting focus…",
+  end_focus: "Ending focus…",
   find_free_time: "Looking for free time…",
   add_task: "Adding a task…",
   list_tasks: "Reading your tasks…",
