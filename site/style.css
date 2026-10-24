@@ -152,7 +152,7 @@ html.js .pets.is-live .pets-grid { width: 100%; min-height: 0; }
 .pets-list { grid-column: 1 / span 5; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; align-self: end; }
 .pets-list h2 { font-size: clamp(28px, 2.9vw, 44px); line-height: 1.15; color: var(--soft-dark); letter-spacing: -0.02em; margin-bottom: 4px; }
 .pets-list button {
-  appearance: none; background: none; border: 0; padding: 2px 0; font: inherit; font-weight: 900; font-size: clamp(36px, 4.4vw, 68px);
+  appearance: none; background: none; border: 0; padding: 2px 0; font: inherit; font-weight: 900; font-size: clamp(32px, 3.7vw, 58px);
   letter-spacing: -0.03em; line-height: 1.08; color: var(--soft-dark); cursor: pointer; text-align: left;
   transition: transform 0.2s var(--ease), color 0.2s;
 }

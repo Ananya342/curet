@@ -33,6 +33,8 @@ const PETS = {
   blob: { name: "Jelly", color: "#f4a3c1", w: 766, h: 638, alt: "Jelly, a pink and purple blob", fact: "A bouncy blob who is endlessly upbeat and goes boing when it is excited." },
   dragon: { name: "Ember", color: "#7addb6", w: 620, h: 794, alt: "Ember, a baby dragon", fact: "A baby dragon who takes your schedule very seriously and sneezes tiny puffs of smoke." },
   redpanda: { name: "Maple", color: "#ff7a59", w: 646, h: 698, alt: "Maple, a red panda", fact: "A curious red panda who gets excited about small wins, and is mostly thinking about snacks." },
+  perry: { name: "Perry", color: "#5cc6c9", w: 405, h: 554, alt: "Perry, a teal platypus in a brown fedora", fact: "A calm platypus secret agent in a fedora who keeps your day on track and chatters krrrr." },
+  dog: { name: "Biscuit", color: "#f4b266", w: 473, h: 530, alt: "Biscuit, a brown and white Cavalier puppy", fact: "A waggy Cavalier puppy who is thrilled about everything you finish, and is always up for a walk." },
 };
 const disc = document.getElementById("disc");
 const stage = document.getElementById("stage-pet");

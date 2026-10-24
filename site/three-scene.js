@@ -1,5 +1,5 @@
 // Curet, live: a Three.js layer over the page.
-//   hero      the five pets bounce around the pink disc; they flee your cursor and pop when booped
+//   hero      the seven pets bounce around the pink disc; they flee your cursor and pop when booped
 //   showcase  the chosen pet tilts toward you, hops when poked, and spins when you swap
 // One fixed, click-through canvas does all of it. People who ask for reduced motion get the plain page.
 import * as THREE from "./assets/vendor/three.module.min.js";
@@ -48,13 +48,15 @@ fit();
 addEventListener("resize", fit);
 
 // ------------------------------------------------------------------ pets as textured planes
-const IDS = ["ghost", "cat", "blob", "dragon", "redpanda"];
+const IDS = ["ghost", "cat", "blob", "dragon", "redpanda", "perry", "dog"];
 const LINES = {
   ghost: ["eep! hehe", "boo… that tickles!", "you found me!"],
   cat: ["mew!", "nyaa… again?", "hey, that’s my nose!"],
   blob: ["boing!", "blorp!", "squish squish!"],
   dragon: ["rawr! (a tiny one)", "*sneezes a smoke puff*", "grr… hehe"],
   redpanda: ["squeak!", "snack time?", "*wiggles tail*"],
+  perry: ["krrrr!", "*tips fedora*", "agent P, reporting!"],
+  dog: ["arf!", "*wags tail*", "woof! again again!"],
 };
 const loader = new THREE.TextureLoader();
 const tex = {};

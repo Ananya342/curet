@@ -39,13 +39,13 @@ Scenes.tuesday = (root, opts = {}) => Stage.scene(root, {
   },
 });
 
-// ---- Five of them: scrolling picks the next pet. The Three.js showcase does the rest:
+// ---- Seven of them: scrolling picks the next pet. The Three.js showcase does the rest:
 //      it spins at each change and leans through the scroll; the disc breathes.
 Scenes.pets = (root, opts = {}) => Stage.scene(root, {
-  hold: opts.hold ?? 3,
+  hold: opts.hold ?? 4,
   scrub: Stage.lenis ? true : 0.5,
   phone: "rest",
-  beats: 5,
+  beats: 7,
   build(tl, { q }) {
     const disc = q(".disc")[0];
     tl.fromTo(disc, { scale: 0.82 }, { scale: 1, duration: 0.12, ease: "power3.out" }, 0)
