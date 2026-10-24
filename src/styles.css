@@ -341,9 +341,6 @@ svg.spinning { animation: spin 0.8s linear infinite; }
 .settings footer { padding-top: 14px; border-top: 2px dashed var(--soft-line); display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
 kbd { background: var(--raised); border: 2px solid var(--edge); border-radius: 7px; padding: 0 6px; font-family: inherit; font-weight: 800; font-size: 12px; box-shadow: 0 2px 0 var(--pop); }
 
-.pet-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; padding: 2px 14px 12px; animation: pop-in 0.3s cubic-bezier(0.3, 1.5, 0.5, 1); }
-.pet-strip .pet-pick { min-height: 60px; }
-.pet-strip .pet-pick img { width: 34px; height: 34px; }
 
 /* ---------------------------------------------------------------- pet bubble + menu: same sticker style */
 .bubble { border: 2.5px solid #3a2a2a; box-shadow: 0 3px 0 #3a2a2a; font-family: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif; font-weight: 700; color: #3a2a2a; background: #fffdf7; }

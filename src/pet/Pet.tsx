@@ -367,7 +367,7 @@ export default function Pet() {
 
   // ---- pointer interaction --------------------------------------------------------------------------
   const drag = useRef<null | {
-    sx: number; sy: number; wx: number; wy: number; moved: boolean;
+    sx: number; sy: number; wx: number; wy: number; moved: boolean; asleep?: boolean;
     samples: { t: number; x: number; y: number }[];
   }>(null);
 
@@ -397,7 +397,7 @@ export default function Pet() {
         draggingRef.current = true;
         walkTok.current++; physTok.current++;
         closeMenu(); hush();
-        if (modeRef.current === "sleeping") { animate(lid, 0.4, { duration: 0.2 }); setZzz(false); }
+        if (modeRef.current === "sleeping") { d.asleep = true; animate(lid, 0.4, { duration: 0.2 }); setZzz(false); }
         setMode("dragged");
         animate(sy, 1.06, { duration: 0.2 });
         animate(sx, 0.95, { duration: 0.2 });
@@ -447,7 +447,10 @@ export default function Pet() {
       const vy = clamp(((e.screenY - s0.y) / dt) * 1000, -3200, 2600);
       animate(sy, 1, { type: "spring", stiffness: 300, damping: 10 });
       animate(sx, 1, { type: "spring", stiffness: 300, damping: 10 });
-      toss(vx, vy);
+      // Picked up mid-nap: once it lands, finish waking up properly instead of staying half-awake.
+      toss(vx, vy).then(() => {
+        if (d.asleep && modeRef.current === "idle") wakeUp({ sleepy: true, text: pick(["whoa, where am I?", "mmf… okay, I'm up!", "huh? we moved?"]) });
+      });
       return;
     }
     // A click.
