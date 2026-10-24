@@ -73,9 +73,10 @@ export default function Panel() {
         }, 20000);
       }),
       // The glance behaves like a menu bar dropdown and goes away when you click elsewhere.
+      // Like a menu bar dropdown, the panel goes away when you click anywhere else, in either size.
       getCurrentWindow().onFocusChanged(({ payload: focused }) => {
         if (focused) auto.current = false;
-        else if (modeRef.current === "compact") close();
+        else close();
       }),
     ];
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();

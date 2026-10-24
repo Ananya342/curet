@@ -112,9 +112,9 @@ export function promptFor(week: string) {
 export const journal = {
   list: () => readList<JournalEntry>("journal"),
   async save(e: JournalEntry) {
-    const all = (await readList<JournalEntry>("journal")).filter((x) => x.week !== e.week);
+    const all = await readList<JournalEntry>("journal");
     all.push(e);
-    all.sort((a, b) => b.week.localeCompare(a.week));
+    all.sort((a, b) => b.at - a.at); // newest first; several entries a week are fine
     await kvSet("journal", JSON.stringify(all));
   },
 };

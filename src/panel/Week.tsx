@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { DAY_NAMES, JournalEntry, WeekRecap, fmtMinutes, journal, promptFor, weekKey, weekRecap } from "../wellbeing/recap";
-import { nowSec } from "../api";
-
-const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : "s"}`;
+import { fmtDay, nowSec } from "../api";
 
 /** This week at a glance (like Screen Time, but for studying), then a weekly journal prompt. */
 export default function Week() {
@@ -15,15 +13,13 @@ export default function Week() {
 
   useEffect(() => {
     weekRecap().then(setR);
-    journal.list().then((all) => {
-      setEntries(all);
-      setText(all.find((e) => e.week === week)?.text ?? "");
-    });
+    journal.list().then(setEntries);
   }, [week]);
 
   const save = async () => {
     await journal.save({ week, prompt, text: text.trim(), at: nowSec() });
     setEntries(await journal.list());
+    setText(""); // saved below, so the box is ready for the next thought
     setSaved(true);
     window.setTimeout(() => setSaved(false), 2000);
   };
@@ -31,7 +27,7 @@ export default function Week() {
   const max = Math.max(60, ...(r?.days ?? [0]));
   const today = Math.min(6, Math.floor((nowSec() - (r?.from ?? 0)) / 86400));
   const delta = r ? r.total - r.lastWeek : 0;
-  const past = entries.filter((e) => e.week !== week && e.text);
+  const kept = entries.filter((e) => e.text);
 
   return (
     <div className="scroll week">
@@ -54,17 +50,11 @@ export default function Week() {
                 </div>
               ))}
             </div>
-            <ul className="stats">
-              <li><b className="tnum">{r.longest ? fmtMinutes(r.longest.minutes) : "–"}</b><span>Longest session{r.longest ? `, ${DAY_NAMES[r.longest.day]}` : ""}</span></li>
-              <li><b>{r.best ? DAY_NAMES[r.best.day] : "–"}</b><span>Best day{r.best ? `, ${fmtMinutes(r.best.minutes)}` : ""}</span></li>
-              <li><b className="tnum">{r.streak ? `🔥 ${r.streak}` : "0"}</b><span>Day streak</span></li>
-              <li><b className="tnum">{r.finished}/{r.sessions}</b><span>Sessions finished</span></li>
+            <ul className="stats three">
               <li><b className="tnum">{r.deadlinesPast}</b><span>{r.deadlinesPast === 1 ? "Deadline" : "Deadlines"} got through</span></li>
               <li><b className="tnum">{r.deadlinesAhead}</b><span>Due in the next 7 days</span></li>
               <li><b className="tnum">{r.tasksDone}</b><span>{r.tasksDone === 1 ? "Task" : "Tasks"} ticked off</span></li>
-              <li><b className="tnum">{r.lateNights}</b><span title="Active after 12:30 am">{r.lateNights === 1 ? "Late night" : "Late nights"}</span></li>
             </ul>
-            {r.lateNights >= 2 && <p className="hint">{plural(r.lateNights, "late night")} this week. An earlier night or two could make next week feel easier.</p>}
           </>
         )}
       </section>
@@ -77,12 +67,12 @@ export default function Week() {
           <span className="hint">Stays on this Mac. Nothing is sent anywhere.</span>
           <button className="btn sm" onClick={save} disabled={!text.trim()}>{saved ? "Saved ✓" : "Save"}</button>
         </div>
-        {past.length > 0 && (
+        {kept.length > 0 && (
           <details>
-            <summary>Past reflections ({past.length})</summary>
+            <summary>Your reflections ({kept.length})</summary>
             <ul className="journal">
-              {past.map((e) => (
-                <li key={e.week}><p className="hint">{e.week} · {e.prompt}</p><p>{e.text}</p></li>
+              {kept.map((e) => (
+                <li key={e.at}><p className="hint">{fmtDay(e.at)} · {e.prompt}</p><p>{e.text}</p></li>
               ))}
             </ul>
           </details>
