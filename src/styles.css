@@ -19,8 +19,8 @@ img { -webkit-user-drag: none; }
 .stage { position: relative; overflow: hidden; }
 .pet { position: absolute; touch-action: none; cursor: grab; }
 .pet:active { cursor: grabbing; }
-.pet::after {
-  content: ""; position: absolute; left: 12%; right: 12%; bottom: -5px; height: 14px; z-index: -1;
+.ground {
+  position: absolute; left: 12%; right: 12%; bottom: -5px; height: 14px; z-index: -1;
   background: radial-gradient(ellipse at center, rgba(40, 30, 70, 0.22), rgba(40, 30, 70, 0) 70%);
 }
 .lean, .flyer, .flip, .breath, .squish { width: 100%; height: 100%; }
@@ -32,6 +32,9 @@ img { -webkit-user-drag: none; }
 @keyframes breathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.012, 1.03) translateY(-1px); } }
 .sprite { position: relative; }
 .sprite img { width: 100%; height: 100%; display: block; pointer-events: none; filter: drop-shadow(0 5px 7px rgba(40, 30, 70, 0.2)); }
+/* While the whole pet fades, WebKit clips that drop-shadow at the image's edges into dark lines down each side. */
+.sprite img { transition: filter 0.3s; }
+.stage[data-fading] .sprite img { filter: none; }
 .lid { position: absolute; border-radius: 50%; transform-origin: 50% 0; pointer-events: none; box-shadow: 0 0 3px 2px rgba(255, 255, 255, 0.08); }
 /* the closed-eye curve */
 .lid i {
@@ -102,14 +105,13 @@ img { -webkit-user-drag: none; }
 @keyframes fxboop { 0% { opacity: 0; transform: translate(-50%, 6px) scale(0.5); } 25% { opacity: 1; transform: translate(-50%, -8px) scale(1.25); } 100% { opacity: 0; transform: translate(-50%, -32px) scale(1); } }
 @keyframes fxconfetti { 0% { opacity: 0; transform: translate(0, 0) scale(0.5); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), 70px) rotate(300deg) scale(1); } }
 
-/* Cloud puffs that burst out when the pet poofs away or back. Each puff gets its offset, size and delay from Pet. */
+/* Cloud puffs that burst out when the pet poofs away. Each puff gets its offset, size and delay from Pet. */
 .poof { position: absolute; width: 0; height: 0; pointer-events: none; z-index: 4; }
 .poof i {
   position: absolute; left: calc(var(--s) / -2); top: calc(var(--s) / -2); width: var(--s); height: var(--s); border-radius: 50%;
   background: #fffdf7; box-shadow: inset -4px -5px 0 rgba(58, 42, 42, 0.1), 0 3px 8px rgba(60, 40, 110, 0.14);
   animation: puff 0.78s cubic-bezier(0.2, 0.9, 0.3, 1) both;
 }
-.poof.in i { animation-duration: 0.6s; }
 @keyframes puff {
   0% { opacity: 0; transform: translate(0, 0) scale(0.2); }
   12% { opacity: 1; }

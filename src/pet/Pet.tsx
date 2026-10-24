@@ -37,7 +37,8 @@ export default function Pet() {
   const [fx, setFx] = useState<Fx[]>([]);
   const [dir, setDir] = useState(1);
   const [zzz, setZzz] = useState(true);
-  const [poof, setPoof] = useState<null | { id: number; dir: "out" | "in"; x: number; y: number; puffs: { x: number; y: number; s: number; d: number }[] }>(null);
+  const [fading, setFading] = useState(false); // drops the drop-shadow while the pet fades out or back in
+  const [poof, setPoof] = useState<null | { id: number; x: number; y: number; puffs: { x: number; y: number; s: number; d: number }[] }>(null);
   const [badge, setBadge] = useState(false);
   const [lidFill, setLidFill] = useState<string[]>([]);
 
@@ -128,11 +129,13 @@ export default function Pet() {
     ]);
   }, [sx, sy]);
 
+  // Crouch, spring up stretched, round out at the top, land, squash, settle. The squash lands with the feet.
   const hop = useCallback(async (h = 34) => {
+    const shape = { duration: 0.64, times: [0, 0.18, 0.32, 0.5, 0.8, 0.88, 1], ease: "easeInOut" as const };
     await Promise.all([
-      animate(ty, [0, -h, 0], { duration: 0.5, ease: ["easeOut", "easeIn"] }),
-      animate(sy, [1, 1.12, 0.86, 1], { duration: 0.5, times: [0, 0.4, 0.85, 1] }),
-      animate(sx, [1, 0.92, 1.12, 1], { duration: 0.5, times: [0, 0.4, 0.85, 1] }),
+      animate(ty, [0, 0, -h, 0, 0], { duration: 0.64, times: [0, 0.18, 0.5, 0.82, 1], ease: ["linear", "easeOut", "easeIn", "linear"] }),
+      animate(sy, [1, 0.86, 1.1, 1, 1.03, 0.88, 1], shape),
+      animate(sx, [1, 1.1, 0.92, 1, 0.98, 1.1, 1], shape),
     ]);
   }, [sx, sy, ty]);
 
@@ -176,30 +179,27 @@ export default function Pet() {
     setMode("waking");
     closeMenu();
     touch();
-    // Settle into the curled-up pose first.
-    await Promise.all([animate(sy, 0.92, { duration: 0.35 }), animate(sx, 1.06, { duration: 0.35 }), animate(lid, 1, { duration: 0.2 })]);
-    await sleep(opts.sleepy ? 150 : 450);
+    // From the curled-up pose: one long stretch with the eyes coming half open, then open, blink, hop.
+    await Promise.all([animate(sy, 0.92, { duration: 0.2 }), animate(sx, 1.06, { duration: 0.2 }), animate(lid, 1, { duration: 0.15 })]);
+    if (!opts.sleepy) await sleep(150);
     setZzz(false);
-    // Big stretch + yawn.
     await Promise.all([
-      animate(sy, [0.92, 1.2, 1.12, 1], { duration: 0.85, times: [0, 0.4, 0.7, 1], ease: "easeInOut" }),
-      animate(sx, [1.06, 0.88, 0.93, 1], { duration: 0.85, times: [0, 0.4, 0.7, 1], ease: "easeInOut" }),
-      animate(rot, [0, -4, 4, 0], { duration: 0.85 }),
-      animate(lid, [1, 1, 0.7, 0.35], { duration: 0.85, times: [0, 0.4, 0.7, 1] }),
+      animate(sy, [0.92, 1.14, 1], { duration: 0.7, times: [0, 0.55, 1], ease: "easeInOut" }),
+      animate(sx, [1.06, 0.9, 1], { duration: 0.7, times: [0, 0.55, 1], ease: "easeInOut" }),
+      animate(lid, [1, 0.65, 0.3], { duration: 0.7, ease: "easeOut" }),
     ]);
-    // Eyes open, two quick blinks.
-    await animate(lid, 0, { duration: 0.25 });
-    await sleep(120);
-    await animate(lid, [0, 1, 0, 1, 0], { duration: 0.5, times: [0, 0.2, 0.4, 0.6, 1] });
+    await animate(lid, 0, { duration: 0.18, ease: "easeOut" });
+    await sleep(90);
+    await animate(lid, [0, 1, 0], { duration: 0.18 });
     setMode("idle");
-    await hop(36);
+    await hop(30);
     spawnFx("star", 3);
     let text = opts.text;
     if (text === undefined) {
       try { text = await greeting(); } catch { text = pick(petRef.current.greetings); }
     }
     if (text) say(text, { ms: 5500 });
-  }, [lid, rot, say, spawnFx, sx, sy, hop]);
+  }, [lid, say, spawnFx, sx, sy, hop]);
 
   // ---- movement ---------------------------------------------------------------------------------
   const walkTo = useCallback((targetX: number, speed = 70) => new Promise<void>((resolve) => {
@@ -285,8 +285,8 @@ export default function Pet() {
     requestAnimationFrame(step);
   }), [bounds, moveTo, rot, sx, sy]);
 
-  // ---- poof away / poof back, right where the pet stands ------------------------------------------
-  const cloud = (dir: "out" | "in") => {
+  // ---- poof away where the pet stands, and pop back in the same spot ------------------------------------------
+  const cloud = () => {
     const d = petRef.current;
     const w = d.w, h = d.w * d.ar;
     const puffs = Array.from({ length: 13 }, (_, i) => {
@@ -298,7 +298,7 @@ export default function Pet() {
         s: core ? 54 + Math.random() * 16 : 26 + Math.random() * 22, d: Math.random() * 90,
       };
     });
-    setPoof({ id: Date.now(), dir, x: WIN_W / 2, y: WIN_H - FLOOR_PAD - h / 2, puffs });
+    setPoof({ id: Date.now(), x: WIN_W / 2, y: WIN_H - FLOOR_PAD - h / 2, puffs });
   };
 
   const hidePet = useCallback(async () => {
@@ -310,7 +310,8 @@ export default function Pet() {
     animate(lid, 0, { duration: 0.1 });
     // Crouch, then spring up and shrink into the cloud.
     await Promise.all([animate(sy, 0.8, { duration: 0.14 }), animate(sx, 1.15, { duration: 0.14 })]);
-    cloud("out");
+    setFading(true);
+    cloud();
     await Promise.all([
       animate(sy, 1.3, { duration: 0.22, ease: "easeOut" }),
       animate(sx, 0.75, { duration: 0.22, ease: "easeOut" }),
@@ -320,7 +321,7 @@ export default function Pet() {
     ]);
     await sleep(520); // let the cloud drift apart
     await invoke("set_pet_visible", { visible: false });
-    setPoof(null);
+    setPoof(null); setFading(false);
     sx.set(1); sy.set(1); ty.set(0); rot.set(0); fly.set(1); op.set(1);
     setMode("hidden");
     await emitTo("popover", "pet-hidden", petRef.current.id);
@@ -334,19 +335,16 @@ export default function Pet() {
     const b = bounds();
     moveTo(clamp(pos.current.x, b.minX, b.maxX), b.floorY);
     lid.set(1); setZzz(false);
-    fly.set(0.2); op.set(0); rot.set(0); ty.set(0); sx.set(1); sy.set(1);
+    setFading(true);
+    fly.set(0.6); op.set(0); rot.set(0); ty.set(0); sx.set(1.06); sy.set(0.92); // the sleepy squash wakeUp starts from
     await invoke("set_pet_visible", { visible: true });
     await emitTo("popover", "pet-shown", petRef.current.id);
-    cloud("in");
-    await sleep(160);
     await Promise.all([
-      animate(fly, 1, { type: "spring", stiffness: 420, damping: 14 }),
-      animate(op, 1, { duration: 0.12 }),
-      animate(sy, [1.25, 0.85, 1], { duration: 0.45 }),
-      animate(sx, [0.8, 1.12, 1], { duration: 0.45 }),
+      animate(fly, 1, { type: "spring", stiffness: 380, damping: 18 }),
+      animate(op, 1, { duration: 0.18 }),
     ]);
-    window.setTimeout(() => setPoof(null), 600);
     await wakeUp();
+    setFading(false);
   }, [bounds, fly, lid, moveTo, op, rot, sx, sy, ty, wakeUp]);
 
   const toggleHide = useCallback(() => {
@@ -659,7 +657,7 @@ export default function Pet() {
   const breathClass = mode === "sleeping" ? "breath slow" : mode === "idle" || mode === "alert" ? "breath" : "";
 
   return (
-    <div className="stage" data-mode={mode} style={{ width: WIN_W, height: WIN_H }}>
+    <div className="stage" data-mode={mode} data-fading={fading || undefined} style={{ width: WIN_W, height: WIN_H }}>
       {bubble && !menu && (
         <div className="bubble" role="status" aria-live="polite" data-hit style={{ bottom: FLOOR_PAD + sh + 12, left: bubbleCx, ["--tail" as string]: `${tailShift}px` }} onClick={() => { touch(); hush(); setBadge(false); if (modeRef.current === "alert") setMode("idle"); }}>
           <div className="bubble-text">{bubble.text}</div>
@@ -693,7 +691,7 @@ export default function Pet() {
       })}
 
       {poof && (
-        <div key={poof.id} className={`poof ${poof.dir}`} style={{ left: poof.x, top: poof.y }}>
+        <div key={poof.id} className="poof" style={{ left: poof.x, top: poof.y }}>
           {poof.puffs.map((p, i) => (
             <i key={i} style={{ ["--x" as string]: `${p.x}px`, ["--y" as string]: `${p.y}px`, ["--s" as string]: `${p.s}px`, animationDelay: `${p.d}ms` }} />
           ))}
@@ -707,6 +705,7 @@ export default function Pet() {
 
       <div className="pet" style={{ left: (WIN_W - sw) / 2, bottom: FLOOR_PAD, width: sw, height: sh }}
         onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onContextMenu={onContextMenu}>
+        <motion.div className="ground" style={{ opacity: op, scaleX: fly }} />
         <motion.div className="lean" style={{ rotate: lean, x: look }}>
           <motion.div className="flyer" style={{ scale: fly, opacity: op }}>
             <div className="flip" style={{ transform: `scaleX(${dir})` }}>
