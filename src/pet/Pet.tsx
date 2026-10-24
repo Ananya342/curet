@@ -12,6 +12,7 @@ import Accessories, { headroom } from "./Accessories";
 import { FocusIcon } from "../wellbeing/FocusIcon";
 import { Laptop } from "../wellbeing/FocusGear";
 import { useWellbeing } from "../wellbeing/useWellbeing";
+import { speak, stopSpeaking } from "../voice/tts";
 import { useMindful } from "../wellbeing/useMindful";
 
 const WIN_W = 340;
@@ -123,15 +124,19 @@ export default function Pet() {
     window.setTimeout(() => setFx((f) => f.filter((q) => !items.includes(q))), 1500);
   }, []);
 
-  const say = useCallback((text: string, opts: { ms?: number; actions?: Bubble["actions"]; rich?: boolean } = {}) => {
+  // `speak` is opt-in rather than automatic: the pet chatters constantly (boops, pokes, greetings)
+  // and voicing all of it would be both irritating and a waste of ElevenLabs credits. Only the
+  // things the pet interrupts you *for* — reminders, briefings, breaks, nudges — pass it.
+  const say = useCallback((text: string, opts: { ms?: number; actions?: Bubble["actions"]; rich?: boolean; speak?: boolean } = {}) => {
     window.clearTimeout(bubbleTimer.current);
     const b: Bubble = { id: Date.now(), text, actions: opts.actions, rich: opts.rich };
     setBubble(b);
+    if (opts.speak) speak(text);
     const ms = opts.ms ?? Math.max(3000, text.length * 70);
     // Back to 0 once the bubble is gone, so the idle loop knows the pet is free to wander again.
     bubbleTimer.current = window.setTimeout(() => { bubbleTimer.current = 0; setBubble((cur) => (cur?.id === b.id ? null : cur)); }, ms);
   }, []);
-  const hush = () => { window.clearTimeout(bubbleTimer.current); bubbleTimer.current = 0; setBubble(null); };
+  const hush = () => { window.clearTimeout(bubbleTimer.current); bubbleTimer.current = 0; setBubble(null); stopSpeaking(); };
 
   const closeMenu = () => { window.clearTimeout(menuTimer.current); setMenu(null); };
   const openMenu = async (kind: "main" | "picker" = "main") => {
@@ -610,6 +615,7 @@ export default function Pet() {
     const dismiss = () => { setBadge(false); hush(); if (modeRef.current === "alert") setMode("idle"); };
     say(text, {
       ms: 60000,
+      speak: true,
       actions: [
         ...(r.link ? [{ label: r.kind === "deadline" ? "Open" : "Join", run: () => { openUrl(r.link).catch(() => {}); dismiss(); } }] : []),
         { label: "Got it", run: dismiss },

@@ -9,7 +9,7 @@ import { findNudge } from "./nudge";
 type Action = { label: string; run: () => void };
 export interface WellbeingCtx {
   modeRef: MutableRefObject<string>;
-  say: (text: string, opts?: { ms?: number; actions?: Action[]; rich?: boolean }) => void;
+  say: (text: string, opts?: { ms?: number; actions?: Action[]; rich?: boolean; speak?: boolean }) => void;
   hush: () => void;
   lockIn: () => Promise<void>;
   unlock: () => Promise<void>;
@@ -115,6 +115,7 @@ export function useWellbeing(c: WellbeingCtx) {
       say(text, {
         ms: 45000,
         rich: true,
+        speak: true,
         actions: [
           { label: "Open Today", run: () => { openPanel("today"); hush(); } },
           { label: kind === "morning" ? "Let’s go!" : "Thanks!", run: hush },
@@ -131,6 +132,7 @@ export function useWellbeing(c: WellbeingCtx) {
     if (modeRef.current === "sleeping") await wakeUp({ text: "", sleepy: true });
     say(`You’ve been at it for ${minutes} min. Stand up, stretch, sip some water 💧`, {
       ms: 30000,
+      speak: true,
       actions: [
         { label: "On it", run: () => { hush(); say("Back in a few! 🌿", { ms: 2500 }); } },
         { label: "Later", run: hush },
@@ -157,6 +159,7 @@ export function useWellbeing(c: WellbeingCtx) {
     if (modeRef.current === "sleeping") await wakeUp({ text: "", sleepy: true });
     say(`You’ve got about ${n.minutes} min free ${n.until}. Want to start “${n.task}”?`, {
       ms: 20000,
+      speak: true,
       actions: [
         { label: "Start it", run: () => { openPanel("today"); hush(); } },
         { label: "Not now", run: hush },

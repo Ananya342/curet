@@ -5,6 +5,7 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import { PetId } from "../pets";
 import { Feed, kvGet, kvSet } from "../api";
 import { DEFAULT_MODEL, ENV_GEMINI_KEY } from "../ai/gemini";
+import { ENV_ELEVEN_KEY, Voice, listVoices, resetVoiceCache, synthesize } from "../voice/tts";
 import Rhythm from "./Rhythm";
 
 interface GStatus { connected: boolean; configured: boolean; email: string | null; can_write: boolean }
@@ -26,6 +27,10 @@ export default function Settings(_: { petId: PetId }) {
   const [icalUrl, setIcalUrl] = useState("");
   const [busy, setBusy] = useState("");
   const [note, setNote] = useState<Note | null>(null);
+  const [vKey, setVKey] = useState("");
+  const [voices, setVoices] = useState<Voice[]>([]);
+  const [voice, setVoice] = useState("");
+  const [voiceOn, setVoiceOn] = useState(true);
 
   const load = useCallback(async () => {
     const list = await invoke<Feed[]>("feeds_list");
@@ -38,6 +43,9 @@ export default function Settings(_: { petId: PetId }) {
     load();
     kvGet("gemini_key").then((v) => setKey(v ?? ""));
     kvGet("gemini_model").then((v) => setModel(v ?? ""));
+    kvGet("eleven_key").then((v) => setVKey(v ?? ""));
+    kvGet("eleven_voice").then((v) => setVoice(v ?? ""));
+    kvGet("voice_on").then((v) => setVoiceOn(v !== "off"));
     const un = listen("events-updated", load);
     return () => { un.then((f) => f()); };
   }, [load]);
@@ -52,6 +60,46 @@ export default function Settings(_: { petId: PetId }) {
     setSaved(true);
     say("gemini", "Saved. Your pet can think now.");
     setTimeout(() => setSaved(false), 1800);
+  };
+
+  /** Saving the key also loads the account's voices, so the picker has something in it. */
+  const saveVoice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const k = vKey.trim() || ENV_ELEVEN_KEY;
+    if (!k) { say("voice", "Paste your ElevenLabs API key first.", true); return; }
+    setBusy("voice"); setNote(null);
+    try {
+      const list = await listVoices(k);
+      setVoices(list);
+      await kvSet("eleven_key", vKey.trim() || null);
+      const picked = voice || list[0]?.voice_id || "";
+      setVoice(picked);
+      await kvSet("eleven_voice", picked || null);
+      resetVoiceCache();
+      say("voice", list.length ? `Connected. ${list.length} voices available.` : "Connected, but this account has no voices.");
+    } catch (err) {
+      say("voice", err instanceof Error ? err.message : String(err), true);
+    }
+    setBusy("");
+  };
+
+  const pickVoice = async (id: string) => {
+    setVoice(id);
+    await kvSet("eleven_voice", id || null);
+    resetVoiceCache();
+  };
+
+  const testVoice = async () => {
+    const k = vKey.trim() || ENV_ELEVEN_KEY;
+    if (!k || !voice) { say("voice", "Save your key and pick a voice first.", true); return; }
+    setBusy("test"); setNote(null);
+    try {
+      await synthesize("Essay 2 is due in 2 hours.", k, voice);
+      say("voice", "Played a test line.");
+    } catch (err) {
+      say("voice", err instanceof Error ? err.message : String(err), true);
+    }
+    setBusy("");
   };
 
   const addFeed = (where: string, name: string, url: string, kind: string, empty: string, clear: () => void) => async (e: React.FormEvent) => {
@@ -195,6 +243,38 @@ export default function Settings(_: { petId: PetId }) {
             <Status where="gemini" />
           </>
         )}
+      </section>
+
+      <section aria-labelledby="h-voice">
+        <h2 id="h-voice">Voice</h2>
+        <p className="hint">
+          Your pet reads its reminders, briefings and nudges out loud with ElevenLabs. Everything
+          else it says stays quiet. {ENV_ELEVEN_KEY ? <>Using the key from <code>.env.local</code>.</> : <>Get a key at {link("https://elevenlabs.io/app/settings/api-keys", "elevenlabs.io")}.</>}
+        </p>
+        <label className="check">
+          <input
+            type="checkbox"
+            checked={voiceOn}
+            onChange={(e) => { setVoiceOn(e.target.checked); kvSet("voice_on", e.target.checked ? null : "off"); }}
+          />
+          <span>Speak notifications out loud</span>
+        </label>
+        <details open={!ENV_ELEVEN_KEY}>
+          <summary>Key and voice</summary>
+          <form className="stack" onSubmit={saveVoice} noValidate>
+            <input type="password" value={vKey} onChange={(e) => setVKey(e.target.value)} placeholder="sk_…" aria-label="ElevenLabs API key" autoComplete="off" spellCheck={false} />
+            <button type="submit" className="btn" disabled={busy === "voice"}>{busy === "voice" ? "Checking…" : "Save key"}</button>
+          </form>
+          {voices.length > 0 && (
+            <div className="stack">
+              <select value={voice} onChange={(e) => pickVoice(e.target.value)} aria-label="Voice">
+                {voices.map((v) => <option key={v.voice_id} value={v.voice_id}>{v.name}</option>)}
+              </select>
+              <button className="btn quiet" onClick={testVoice} disabled={busy === "test"}>{busy === "test" ? "Playing…" : "Test voice"}</button>
+            </div>
+          )}
+          <Status where="voice" />
+        </details>
       </section>
 
       <footer>
