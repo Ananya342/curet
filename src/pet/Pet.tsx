@@ -58,7 +58,6 @@ export default function Pet() {
   const lastClick = useRef(0);
   const fxId = useRef(1);
   const pokes = useRef<number[]>([]);
-  const lastBoop = useRef(0);
   const rub = useRef({ lastX: 0, dir: 0, flips: [] as number[] });
   const petRef = useRef(def);
   petRef.current = def;
@@ -472,10 +471,6 @@ export default function Pet() {
       spawnFx("star", 4, { x: nx, y: ny });
       animate(sy, [1, 0.8, 1.06, 1], { duration: 0.35 });
       animate(sx, [1, 1.14, 0.97, 1], { duration: 0.35 });
-      // A quick second click (double-click) shouldn't toggle the menu away.
-      const quick = Date.now() - lastBoop.current < 600;
-      lastBoop.current = Date.now();
-      if (quick) return;
       if (menu) { closeMenu(); return; }
       say(pick(d2.boops), { ms: 1500 });
       return;
