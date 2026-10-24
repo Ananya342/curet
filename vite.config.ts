@@ -7,6 +7,8 @@ const host = process.env.TAURI_DEV_HOST;
 // https://vite.dev/config/
 export default defineConfig(() => ({
   plugins: [react()],
+  // LIFEPET_GEMINI_KEY in .env.local becomes the default Gemini key (see .env.example).
+  envPrefix: ["VITE_", "LIFEPET_GEMINI_"],
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //

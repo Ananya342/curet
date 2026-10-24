@@ -242,7 +242,8 @@ img { -webkit-user-drag: none; }
 .panel.compact header > img { width: 34px; height: 34px; }
 .panel.compact h1 { font-size: 16px; font-weight: 900; }
 .glance { padding: 4px 14px 14px; gap: 12px; }
-.glance > .items, .glance > .pets, .glance-empty { flex: 1; }
+.glance > .items, .glance-pets, .glance-empty { flex: 1; }
+.glance-pets { min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; margin: 0 -14px; padding: 8px 14px 4px; }
 .glance .items li { padding: 7px 10px; }
 .glance .items .s { flex: none; }
 .glance-empty { display: grid; place-items: center; }
@@ -340,7 +341,7 @@ img { -webkit-user-drag: none; }
 .scroll { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 4px 16px 20px; }
 .scroll section { padding: 14px 0; border-top: 2px dashed var(--soft-line); display: flex; flex-direction: column; gap: 10px; }
 .scroll section:first-child { border-top: 0; padding-top: 6px; }
-.scroll h2 { display: inline-block; align-self: flex-start; font-size: 16px; font-weight: 900; padding: 0 5px; margin-left: -5px; background: linear-gradient(transparent 55%, color-mix(in srgb, var(--pet) 70%, transparent) 55%); border-radius: 3px; }
+.scroll h2, .glance-pets h2 { display: inline-block; align-self: flex-start; font-size: 16px; font-weight: 900; padding: 0 5px; margin-left: -5px; background: linear-gradient(transparent 55%, color-mix(in srgb, var(--pet) 70%, transparent) 55%); border-radius: 3px; }
 .head { display: flex; align-items: center; justify-content: space-between; }
 .hint { margin: 0; color: var(--ink-soft); font-size: 12.5px; font-weight: 600; text-wrap: pretty; }
 .note { margin: 0; font-size: 12.5px; font-weight: 700; }

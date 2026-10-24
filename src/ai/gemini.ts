@@ -68,12 +68,16 @@ const timing = (msg: string) => { invoke("log", { msg: `gemini ${msg}` }).catch(
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const isBusy = (e: unknown) => /\b(500|503)\b|UNAVAILABLE|overloaded|high demand|INTERNAL/i.test(String(e));
 
+/** The key saved in Settings, or else the one baked in from .env.local. */
+export const ENV_GEMINI_KEY = import.meta.env.LIFEPET_GEMINI_KEY?.trim() || "";
+export const geminiKey = async () => (await kvGet("gemini_key")) || ENV_GEMINI_KEY || null;
+
 export async function ask(
   history: Msg[], text: string, petId: PetId,
   onStatus?: (s: string) => void, onText?: (soFar: string) => void,
 ): Promise<string> {
   onStatus?.("Thinking…");
-  const key = await kvGet("gemini_key");
+  const key = await geminiKey();
   if (!key) throw new Error("NO_KEY");
   const chosen = await kvGet("gemini_model");
   // Try your model first, then the fallback, so one overloaded model doesn't stop the chat.

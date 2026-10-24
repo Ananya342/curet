@@ -67,7 +67,9 @@ fn screen_of(app: &AppHandle) -> Option<Screen> {
 
 /// The panel is one window in two sizes: the compact glance that drops from the menu bar icon, and the full
 /// Chat / Today / Settings view it grows into. Sizes include the 10px margin around the card for its shadow.
-const GLANCE: (f64, f64) = (400.0, 262.0);
+const GLANCE: (f64, f64) = (420.0, 280.0);
+/// The glance with its Pets view open: the picker and the dress-up controls.
+const GLANCE_PETS: (f64, f64) = (420.0, 660.0);
 const FULL: (f64, f64) = (400.0, 580.0);
 
 #[derive(Clone, Serialize)]
@@ -173,6 +175,17 @@ fn show_glance(app: AppHandle, focus: bool) -> Result<(), String> {
     Ok(())
 }
 
+/// Grow the glance downward for its Pets view, or back. It stays pinned under the menu bar.
+#[tauri::command]
+fn resize_glance(app: AppHandle, pets: bool) -> Result<(), String> {
+    let panel = win(&app, "panel")?;
+    let (w, mut h) = if pets { GLANCE_PETS } else { GLANCE };
+    if let Some(s) = screen_of(&app) {
+        h = h.min(s.work.h - 8.0);
+    }
+    panel.set_size(LogicalSize::new(w, h)).map_err(|e| e.to_string())
+}
+
 fn toggle_glance(app: &AppHandle) {
     let Ok(panel) = win(app, "panel") else { return };
     // Clicking the icon can blur an open glance, which hides it just before the click arrives here.
@@ -260,6 +273,7 @@ pub fn run() {
             toggle_panel,
             hide_panel,
             show_glance,
+            resize_glance,
             expand_panel,
             quit,
             log,

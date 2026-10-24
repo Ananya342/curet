@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { emitTo } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { CalEvent, fmtTime, nowSec, setPetId, untilLabel, upcoming } from "../api";
 import { PETS, PET_IDS, PetId } from "../pets";
+import Wardrobe from "./Wardrobe";
 
 export interface Reminder { id: string; title: string; start: number; link: string; kind: string }
 
 /** The compact view that drops from the menu bar icon: what's due next, or a reminder, plus quick actions. */
-export default function Glance({ petId, hidden, reminder, opened, onExpand, onClose, onDismiss }: {
+export default function Glance({ petId, hidden, reminder, opened, onExpand, onClose, onDismiss, onPets }: {
   petId: PetId;
   hidden: boolean;
   reminder: Reminder | null;
@@ -15,15 +17,23 @@ export default function Glance({ petId, hidden, reminder, opened, onExpand, onCl
   onExpand: (tab: string) => void;
   onClose: () => void;
   onDismiss: () => void;
+  onPets: (open: boolean) => void;
 }) {
   const [events, setEvents] = useState<CalEvent[]>([]);
   const [now, setNow] = useState(nowSec());
-  const [picking, setPicking] = useState(false);
+  const [picking, setPickingState] = useState(false);
+  // The Pets view (picker plus dress-up) needs more room, so the glance grows down for it.
+  const setPicking = (v: boolean) => {
+    setPickingState(v);
+    onPets(v);
+    invoke("resize_glance", { pets: v }).catch(() => {});
+  };
 
   useEffect(() => {
     const refresh = () => { setNow(nowSec()); upcoming(3).then(setEvents).catch(() => {}); };
     refresh();
-    setPicking(false);
+    setPickingState(false);
+    onPets(false);
     const t = setInterval(refresh, 30000);
     return () => clearInterval(t);
   }, [opened]);
@@ -53,13 +63,16 @@ export default function Glance({ petId, hidden, reminder, opened, onExpand, onCl
   return (
     <main className="glance">
       {picking ? (
-        <div className="pets" role="radiogroup" aria-label="Choose your pet">
-          {PET_IDS.map((id) => (
-            <button key={id} role="radio" aria-checked={id === petId} className="pet-pick" onClick={() => { setPetId(id); setPicking(false); }}>
-              <img src={PETS[id].src} alt="" draggable={false} />
-              <span translate="no">{PETS[id].name}</span>
-            </button>
-          ))}
+        <div className="glance-pets">
+          <div className="pets" role="radiogroup" aria-label="Choose your pet">
+            {PET_IDS.map((id) => (
+              <button key={id} role="radio" aria-checked={id === petId} className="pet-pick" onClick={() => setPetId(id)}>
+                <img src={PETS[id].src} alt="" draggable={false} />
+                <span translate="no">{PETS[id].name}</span>
+              </button>
+            ))}
+          </div>
+          <Wardrobe petId={petId} />
         </div>
       ) : events.length === 0 ? (
         <p className="hint glance-empty">Nothing coming up 🌿</p>
@@ -77,7 +90,7 @@ export default function Glance({ petId, hidden, reminder, opened, onExpand, onCl
       <div className="glance-actions">
         <button className="btn sm" onClick={toggle}>{hidden ? "Wake pet 🐾" : "Tuck in 🏝️"}</button>
         <button className="btn sm soft" onClick={() => onExpand("chat")}>Chat</button>
-        <button className={`btn sm soft${picking ? " on" : ""}`} aria-expanded={picking} onClick={() => setPicking((v) => !v)}>Pets</button>
+        <button className={`btn sm soft${picking ? " on" : ""}`} aria-expanded={picking} onClick={() => setPicking(!picking)}>{picking ? "Done" : "Pets"}</button>
       </div>
     </main>
   );

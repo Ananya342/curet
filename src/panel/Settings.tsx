@@ -4,9 +4,8 @@ import { listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { PETS, PET_IDS, PetId } from "../pets";
 import { Feed, kvGet, kvSet, setPetId } from "../api";
-import { DEFAULT_MODEL } from "../ai/gemini";
+import { DEFAULT_MODEL, ENV_GEMINI_KEY } from "../ai/gemini";
 import Rhythm from "./Rhythm";
-import Wardrobe from "./Wardrobe";
 
 interface GStatus { connected: boolean; configured: boolean; email: string | null; can_write: boolean }
 type Note = { where: string; text: string; bad?: boolean };
@@ -101,8 +100,6 @@ export default function Settings({ petId }: { petId: PetId }) {
         </div>
       </section>
 
-      <Wardrobe petId={petId} />
-
       <Rhythm />
 
       <section aria-labelledby="h-bs">
@@ -194,13 +191,20 @@ export default function Settings({ petId }: { petId: PetId }) {
 
       <section aria-labelledby="h-gem">
         <h2 id="h-gem">Gemini</h2>
-        <p className="hint">Your pet thinks with Gemini. Get a free key at {link("https://aistudio.google.com/apikey", "aistudio.google.com/apikey")}. It stays on this Mac.</p>
-        <form className="stack" onSubmit={saveGemini} noValidate>
-          <input type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder="AIza…" aria-label="Gemini API key" autoComplete="off" spellCheck={false} />
-          <input value={model} onChange={(e) => setModel(e.target.value)} placeholder={DEFAULT_MODEL} aria-label="Model name (optional)" autoComplete="off" spellCheck={false} />
-          <button type="submit" className="btn">{saved ? "Saved" : "Save key"}</button>
-        </form>
-        <Status where="gemini" />
+        {ENV_GEMINI_KEY ? (
+          <p className="hint">Your pet thinks with Gemini, using the key from <code>.env.local</code>.</p>
+        ) : (
+          <p className="hint">Your pet thinks with Gemini. Get a free key at {link("https://aistudio.google.com/apikey", "aistudio.google.com/apikey")}. It stays on this Mac.</p>
+        )}
+        <details open={!ENV_GEMINI_KEY}>
+          <summary>{ENV_GEMINI_KEY ? "Use a different key or model" : "Key and model"}</summary>
+          <form className="stack" onSubmit={saveGemini} noValidate>
+            <input type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder="AIza…" aria-label="Gemini API key" autoComplete="off" spellCheck={false} />
+            <input value={model} onChange={(e) => setModel(e.target.value)} placeholder={DEFAULT_MODEL} aria-label="Model name (optional)" autoComplete="off" spellCheck={false} />
+            <button type="submit" className="btn">{saved ? "Saved" : "Save key"}</button>
+          </form>
+          <Status where="gemini" />
+        </details>
       </section>
 
       <footer>
