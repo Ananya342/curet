@@ -3,6 +3,7 @@ import { animate, motion, useMotionValue } from "motion/react";
 import { invoke } from "@tauri-apps/api/core";
 import { emitTo, listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { ChatIcon, HideIcon, PetsIcon, SettingsIcon, SleepIcon, TodayIcon, WakeIcon } from "../menuIcons";
 import { PETS, PET_IDS, PetId, pick } from "../pets";
 import { Area, Screen, fmtTime, getPetId, greeting, kvGet, kvSet, nowSec, setPetId } from "../api";
 import { startHitReporting } from "../hit";
@@ -33,6 +34,8 @@ export default function Pet() {
 
   const [bubble, setBubble] = useState<Bubble | null>(null);
   const [menu, setMenu] = useState<null | "main" | "picker">(null);
+  const menuRef = useRef(menu);
+  menuRef.current = menu;
   const [fx, setFx] = useState<Fx[]>([]);
   const [dir, setDir] = useState(1);
   const [zzz, setZzz] = useState(true);
@@ -108,9 +111,13 @@ export default function Pet() {
   const hush = () => { window.clearTimeout(bubbleTimer.current); setBubble(null); };
 
   const closeMenu = () => { window.clearTimeout(menuTimer.current); setMenu(null); };
-  const openMenu = (kind: "main" | "picker" = "main") => {
+  const openMenu = async (kind: "main" | "picker" = "main") => {
     window.clearTimeout(menuTimer.current);
     hush();
+    // At a screen edge part of the window hangs off it, so step in until all of it shows and the orbs have room.
+    const w = screen.current;
+    const inside = clamp(pos.current.x, w.x, w.x + w.w - WIN_W);
+    if (Math.abs(inside - pos.current.x) > 1) await walkTo(inside, 320);
     setMenu(kind);
     menuTimer.current = window.setTimeout(() => setMenu(null), 9000);
   };
@@ -359,12 +366,12 @@ export default function Pet() {
   const panel = (tab: string) => { closeMenu(); invoke("toggle_panel", { tab, forceOpen: true }).catch(() => {}); };
 
   const menuItems = [
-    { key: "chat", icon: "💬", label: "Chat", run: () => panel("chat") },
-    { key: "today", icon: "📅", label: "Today", run: () => panel("today") },
-    { key: "sleep", icon: mode === "sleeping" ? "☀️" : "😴", label: mode === "sleeping" ? "Wake" : "Sleep", run: () => { closeMenu(); mode === "sleeping" ? wakeUp({ text: "" }) : fallAsleep(); } },
-    { key: "hide", icon: "🏝️", label: "Hide", run: () => hidePet() },
-    { key: "pet", icon: "🐾", label: "Pets", run: () => openMenu("picker") },
-    { key: "settings", icon: "⚙️", label: "Settings", run: () => panel("settings") },
+    { key: "chat", icon: <ChatIcon />, label: "Chat", run: () => panel("chat") },
+    { key: "today", icon: <TodayIcon />, label: "Today", run: () => panel("today") },
+    { key: "sleep", icon: mode === "sleeping" ? <WakeIcon /> : <SleepIcon />, label: mode === "sleeping" ? "Wake" : "Sleep", run: () => { closeMenu(); mode === "sleeping" ? wakeUp({ text: "" }) : fallAsleep(); } },
+    { key: "hide", icon: <HideIcon />, label: "Hide", run: () => hidePet() },
+    { key: "pet", icon: <PetsIcon />, label: "Pets", run: () => openMenu("picker") },
+    { key: "settings", icon: <SettingsIcon />, label: "Settings", run: () => panel("settings") },
   ];
 
   // ---- pointer interaction --------------------------------------------------------------------------
@@ -596,7 +603,7 @@ export default function Pet() {
     };
     loop();
     const tick = window.setInterval(() => {
-      if (modeRef.current !== "idle" || draggingRef.current) return;
+      if (modeRef.current !== "idle" || draggingRef.current || menuRef.current) return;
       if (Date.now() - lastInteract.current > SLEEP_AFTER_MS) { fallAsleep(); return; }
       if (Math.random() < 0.05 && !bubbleTimer.current) wander();
     }, 1000);
@@ -612,42 +619,44 @@ export default function Pet() {
   // ---- render -----------------------------------------------------------------------------------------------
   const cx = WIN_W / 2;
   const cy = WIN_H - FLOOR_PAD - sh / 2;
-  const radius = sh / 2 + 60;
-  const arc = (i: number, n: number) => {
-    const a = (-168 + (156 * i) / Math.max(1, n - 1)) * (Math.PI / 180);
-    return { x: cx + Math.cos(a) * radius, y: cy + Math.sin(a) * radius };
-  };
-
-  // Keep every orb on screen and apart, however close the pet is to an edge.
-  const layout = (n: number, r: number) => {
+  // Fan the orbs around the pet: straight up if it fits, otherwise tilted away from a nearby edge or on a wider
+  // ring, picking the gentlest fan that keeps every orb on screen and clear of the others and the pet. Labels
+  // only show on hover, so each one just gets nudged sideways to stay on screen.
+  const layout = (labels: string[], r: number) => {
+    const n = labels.length;
     const w = screen.current, px = pos.current.x, py = pos.current.y;
-    const xmin = Math.max(r + 2, w.x - px + r + 6);
-    const xmax = Math.max(xmin, Math.min(WIN_W - r - 2, w.x + w.w - px - r - 6));
-    const ymin = Math.max(r + 2, w.y - py + r + 6);
-    const ymax = Math.max(ymin, WIN_H - r - 22);
-    const fit = (p: { x: number; y: number }) => { p.x = clamp(p.x, xmin, xmax); p.y = clamp(p.y, ymin, ymax); };
-    const pts = Array.from({ length: n }, (_, i) => arc(i, n));
-    pts.forEach(fit);
-    for (let it = 0; it < 60; it++) {
-      for (let a = 0; a < n; a++) for (let b = a + 1; b < n; b++) {
-        const dx = pts[b].x - pts[a].x, dy = pts[b].y - pts[a].y, d = Math.hypot(dx, dy) || 0.01, min = 2 * r + 12;
-        if (d < min) { const k = (min - d) / 2 / d; pts[a].x -= dx * k; pts[a].y -= dy * k; pts[b].x += dx * k; pts[b].y += dy * k; }
-      }
-      // The pet's body is an obstacle too: lift orbs up over its silhouette.
+    const lo = { x: Math.max(2, w.x - px + 6), y: Math.max(2, w.y - py + 6) };
+    const hi = { x: Math.min(WIN_W - 2, w.x + w.w - px - 6), y: Math.min(WIN_H - 2, w.y + w.h - py - 2) };
+    const gap = 2 * r + 10;
+    const cost = (pts: { x: number; y: number }[]) => {
+      let bad = 0;
       for (const p of pts) {
-        const ex = sw / 2 + r * 0.7, ey = sh / 2 + r * 0.7;
-        const dx = p.x - cx;
-        if (Math.abs(dx) < ex) {
-          const top = cy - ey * Math.sqrt(1 - (dx / ex) ** 2);
-          if (p.y > top) p.y = top;
-        }
+        bad += Math.max(0, lo.x - (p.x - r)) + Math.max(0, p.x + r - hi.x) + Math.max(0, lo.y - (p.y - r)) + Math.max(0, p.y + r - hi.y);
+        if (((p.x - cx) / (sw / 2 + r * 0.8)) ** 2 + ((p.y - cy) / (sh / 2 + r * 0.8)) ** 2 < 1) bad += 30;
       }
-      pts.forEach(fit);
+      for (let a = 0; a < n; a++) for (let b = a + 1; b < n; b++) bad += Math.max(0, gap - Math.hypot(pts[b].x - pts[a].x, pts[b].y - pts[a].y));
+      return bad;
+    };
+    let best: { x: number; y: number }[] = [], bestScore = Infinity;
+    for (let ring = 0; ring <= 6; ring++) {
+      const R = sh / 2 + 52 + ring * 14;
+      const step = Math.max(30, (2 * Math.asin(Math.min(1, gap / (2 * R))) * 180) / Math.PI);
+      for (const tilt of [0, 15, -15, 30, -30, 45, -45, 60, -60, 80, -80]) {
+        const pts = Array.from({ length: n }, (_, i) => {
+          const a = ((-90 + tilt + (i - (n - 1) / 2) * step) * Math.PI) / 180;
+          return { x: cx + Math.cos(a) * R, y: cy + Math.sin(a) * R };
+        });
+        const score = cost(pts) * 1000 + Math.abs(tilt) + ring * 10;
+        if (score < bestScore) { bestScore = score; best = pts; }
+      }
     }
-    return pts;
+    return best.map((p, i) => {
+      const half = (labels[i].length * 6.6 + 20) / 2;
+      return { ...p, tagDx: clamp(p.x, lo.x + half, Math.max(lo.x + half, hi.x - half)) - p.x };
+    });
   };
-  const mainOrbs = menu === "main" ? layout(menuItems.length, 25) : [];
-  const pickOrbs = menu === "picker" ? layout(PET_IDS.length, 27) : [];
+  const mainOrbs = menu === "main" ? layout(menuItems.map((it) => it.label), 25) : [];
+  const pickOrbs = menu === "picker" ? layout(PET_IDS.map((id) => PETS[id].name), 27) : [];
 
   // Same for the speech bubble: slide it back inside the visible part of the window.
   const visLo = screen.current.x - pos.current.x, visHi = screen.current.x + screen.current.w - pos.current.x;
@@ -674,16 +683,16 @@ export default function Pet() {
       {menu === "main" && menuItems.map((it, i) => {
         const p = mainOrbs[i];
         return (
-          <button key={it.key} data-hit className="orb" aria-label={it.label} style={{ left: p.x - 25, top: p.y - 25, animationDelay: `${i * 40}ms` }}
+          <button key={it.key} data-hit className="orb" aria-label={it.label} style={{ left: p.x - 25, top: p.y - 25, animationDelay: `${i * 40}ms`, ["--tag-dx" as string]: `${p.tagDx}px` }}
             onClick={() => { touch(); it.run(); }}>
-            <span>{it.icon}</span><em>{it.label}</em>
+            <span className="glyph">{it.icon}</span><em>{it.label}</em>
           </button>
         );
       })}
       {menu === "picker" && PET_IDS.map((id, i) => {
         const p = pickOrbs[i];
         return (
-          <button key={id} data-hit className={`orb pick ${id === petId ? "on" : ""}`} aria-label={`Switch to ${PETS[id].name}`} style={{ left: p.x - 27, top: p.y - 27, animationDelay: `${i * 40}ms` }}
+          <button key={id} data-hit className={`orb pick ${id === petId ? "on" : ""}`} aria-label={`Switch to ${PETS[id].name}`} style={{ left: p.x - 27, top: p.y - 27, animationDelay: `${i * 40}ms`, ["--tag-dx" as string]: `${p.tagDx}px` }}
             onClick={() => { touch(); closeMenu(); setPetId(id); }}>
             <img src={PETS[id].src} alt={PETS[id].name} draggable={false} /><em>{PETS[id].name}</em>
           </button>

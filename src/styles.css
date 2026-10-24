@@ -83,8 +83,10 @@ img { -webkit-user-drag: none; }
 .orb em {
   position: absolute; top: 100%; margin-top: 3px; font-style: normal; font-size: 10.5px; font-weight: 700; color: var(--ink);
   background: rgba(255, 255, 255, 0.92); border-radius: 999px; padding: 1px 7px; white-space: nowrap; box-shadow: 0 1px 4px rgba(60, 40, 110, 0.15);
+  opacity: 0; transform: translate(var(--tag-dx, 0px), -4px); transition: opacity 0.12s, transform 0.12s; pointer-events: none;
 }
-.orb:hover { transform: scale(1.12); background: #fff; }
+.orb:hover, .orb:focus-visible { transform: scale(1.12); background: #fff; z-index: 6; }
+.orb:hover em, .orb:focus-visible em { opacity: 1; transform: translate(var(--tag-dx, 0px), 0); }
 .orb.pick { width: 54px; height: 54px; }
 .orb.pick img { width: 40px; height: 40px; object-fit: contain; }
 .orb.pick.on { box-shadow: 0 0 0 3px var(--violet), 0 5px 16px rgba(60, 40, 110, 0.25); }
@@ -336,8 +338,10 @@ kbd { background: var(--raised); border: 2px solid var(--edge); border-radius: 7
 .orb:nth-of-type(4) { background: #ffd95a; }
 .orb:nth-of-type(5) { background: #ff8fb8; }
 .orb:nth-of-type(6) { background: #ff7a59; }
-.orb:hover { background: inherit; filter: brightness(1.06); }
+.orb:hover, .orb:focus-visible { background: inherit; filter: brightness(1.06); }
 .orb em { font-family: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif; font-weight: 800; border: 2px solid #3a2a2a; background: #fffdf7; color: #3a2a2a; box-shadow: 0 2px 0 #3a2a2a; }
+.orb .glyph { display: grid; place-items: center; line-height: 0; color: #3a2a2a; }
+.orb .glyph svg { width: 24px; height: 24px; display: block; }
 .orb.pick.on { box-shadow: 0 0 0 3px #fffdf7, 0 0 0 5.5px #3a2a2a, 0 3px 0 5.5px #3a2a2a; }
 .fx.boop { color: #ff4f7b; }
 
