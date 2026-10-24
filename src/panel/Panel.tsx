@@ -8,14 +8,16 @@ import Chat from "./Chat";
 import Today from "./Today";
 import Settings from "./Settings";
 import Week from "./Week";
+import Pets from "./Pets";
 import Glance, { Reminder } from "./Glance";
 
-type Tab = "chat" | "today" | "week" | "settings";
+type Tab = "chat" | "today" | "week" | "pets" | "settings";
 type Mode = "compact" | "full";
 const TABS: { id: Tab; label: string }[] = [
   { id: "chat", label: "Chat" },
   { id: "today", label: "Today" },
   { id: "week", label: "Week" },
+  { id: "pets", label: "Pets" },
   { id: "settings", label: "Settings" },
 ];
 
@@ -148,6 +150,7 @@ export default function Panel() {
         {tab === "chat" && <Chat petId={petId} />}
         {tab === "today" && <Today />}
         {tab === "week" && <Week />}
+        {tab === "pets" && <Pets petId={petId} />}
         {tab === "settings" && <Settings petId={petId} />}
       </main>
     </div>

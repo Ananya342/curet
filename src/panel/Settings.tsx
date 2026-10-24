@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { PETS, PET_IDS, PetId } from "../pets";
-import { Feed, kvGet, kvSet, setPetId } from "../api";
+import { PetId } from "../pets";
+import { Feed, kvGet, kvSet } from "../api";
 import { DEFAULT_MODEL, ENV_GEMINI_KEY } from "../ai/gemini";
 import Rhythm from "./Rhythm";
 
@@ -15,7 +15,7 @@ const link = (url: string, text: string) => (
 );
 const Spinner = () => <span className="spin" aria-hidden="true" />;
 
-export default function Settings({ petId }: { petId: PetId }) {
+export default function Settings(_: { petId: PetId }) {
   const [key, setKey] = useState("");
   const [model, setModel] = useState("");
   const [saved, setSaved] = useState(false);
@@ -88,18 +88,6 @@ export default function Settings({ petId }: { petId: PetId }) {
 
   return (
     <div className="scroll settings">
-      <section aria-labelledby="h-pet">
-        <h2 id="h-pet">Your pet</h2>
-        <div className="pets" role="radiogroup" aria-label="Choose your pet">
-          {PET_IDS.map((id) => (
-            <button key={id} role="radio" aria-checked={id === petId} className="pet-pick" onClick={() => setPetId(id)}>
-              <img src={PETS[id].src} alt="" draggable={false} />
-              <span translate="no">{PETS[id].name}</span>
-            </button>
-          ))}
-        </div>
-      </section>
-
       <Rhythm />
 
       <section aria-labelledby="h-bs">
