@@ -33,6 +33,9 @@ export default function Rhythm() {
   const recap = useToggle("recap_on");
   const ahead = useToggle("week_ahead_on");
   const tryIt = (type: "eyes" | "late" | "recap" | "week") => emitTo("pet", "mindful-preview", { type });
+  const [wander, setWander] = useState(false);
+  useEffect(() => { kvGet("wander_on").then((v) => setWander(v === "on")); }, []);
+  const setWanderOn = (on: boolean) => { setWander(on); kvSet("wander_on", on ? "on" : null); emitTo("pet", "wander-changed", on); };
   const [nudges, setNudges] = useState(true);
   useEffect(() => { kvGet("nudges_on").then((v) => setNudges(v !== "off")); }, []);
   const setNudgesOn = (on: boolean) => { setNudges(on); kvSet("nudges_on", on ? null : "off"); };
@@ -40,6 +43,9 @@ export default function Rhythm() {
   return (
     <section aria-labelledby="h-rhythm">
       <h2 id="h-rhythm">Daily rhythm</h2>
+      <div className="rrow">
+        <label className="check"><input type="checkbox" checked={wander} onChange={(e) => setWanderOn(e.target.checked)} /><span>Let your pet wander around</span></label>
+      </div>
       <div className="rrow">
         <label className="check"><input type="checkbox" checked={morning.on} onChange={(e) => morning.setOn(e.target.checked)} /><span>Morning briefing</span></label>
         <input type="time" value={morning.time} disabled={!morning.on} onChange={(e) => morning.setTime(e.target.value)} aria-label="Morning briefing time" />

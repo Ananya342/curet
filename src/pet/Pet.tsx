@@ -75,6 +75,7 @@ export default function Pet() {
   const spriteRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const lastInteract = useRef(Date.now());
+  const wanderOn = useRef(false); // strolling on its own is opt-in, from Settings
   const walkTok = useRef(0);
   const physTok = useRef(0);
   const bubbleTimer = useRef<number>(0);
@@ -642,6 +643,8 @@ export default function Pet() {
     const add = async <T,>(name: string, fn: (p: T) => void) => { unlisten.push(await listen<T>(name, (e) => fn(e.payload))) };
     add<string>("pet-changed", (p) => { setPetIdState(p as PetId); spawnFx("star", 6); jelly(1.2); });
     add<Outfit>("outfit-changed", (o) => { setOutfit(o); spawnFx("star", 4); jelly(0.8); });
+    kvGet("wander_on").then((v) => { wanderOn.current = v === "on"; });
+    add<boolean>("wander-changed", (on) => { wanderOn.current = on; });
     add<null>("toggle-hide", () => toggleHide());
     add<null>("celebrate", () => celebrate());
     add<any>("reminder", (r) => onReminder(r));
@@ -701,7 +704,7 @@ export default function Pet() {
     const tick = window.setInterval(() => {
       if (modeRef.current !== "idle" || draggingRef.current || menuRef.current) return;
       if (Date.now() - lastInteract.current > SLEEP_AFTER_MS) { if (!wb.focusActive()) fallAsleep(); return; }
-      if (Math.random() < 0.05 && !bubbleTimer.current) wander();
+      if (wanderOn.current && Math.random() < 0.05 && !bubbleTimer.current) wander();
     }, 1000);
     return () => { clearTimeout(t); clearInterval(tick); };
   }, [blink, fallAsleep, wander]);
