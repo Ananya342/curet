@@ -1,6 +1,6 @@
 import { Type } from "@google/genai";
 import { emitTo } from "@tauri-apps/api/event";
-import { eventsRange, memories, nowSec, startOfDay, tasks } from "../api";
+import { addCalendarEvent, eventsRange, memories, nowSec, startOfDay, tasks } from "../api";
 
 export const declarations = [
   {
@@ -25,6 +25,22 @@ export const declarations = [
         min_minutes: { type: Type.NUMBER, description: "Minimum gap length. Default 30." },
       },
       required: ["date"],
+    },
+  },
+  {
+    name: "add_calendar_event",
+    description: "Add an event to the user's Google Calendar. Only call this when the user clearly asks to schedule or add something to their calendar.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        title: { type: Type.STRING },
+        start: { type: Type.STRING, description: "Local start time as YYYY-MM-DDTHH:MM, or just YYYY-MM-DD for an all-day event" },
+        duration_minutes: { type: Type.NUMBER, description: "Length in minutes. Default 60." },
+        all_day: { type: Type.BOOLEAN },
+        location: { type: Type.STRING },
+        description: { type: Type.STRING },
+      },
+      required: ["title", "start"],
     },
   },
   {
@@ -95,6 +111,15 @@ export async function runTool(name: string, args: Record<string, any>): Promise<
       }
       if (end - cursor >= min) free.push({ from: t(cursor), to: t(end), minutes: Math.round((end - cursor) / 60) });
       return free;
+    }
+    case "add_calendar_event": {
+      const allDay = Boolean(args.all_day) || String(args.start).length <= 10;
+      const startTs = allDay ? startOfDay(parseDay(String(args.start).slice(0, 10))) : Math.floor(new Date(args.start).getTime() / 1000);
+      if (!Number.isFinite(startTs)) return { error: "Couldn't understand that start time." };
+      const endTs = allDay ? startTs : startTs + Math.max(5, Number(args.duration_minutes) || 60) * 60;
+      const ev = await addCalendarEvent({ title: args.title, start: startTs, end: endTs, allDay, location: args.location, description: args.description });
+      await emitTo("pet", "celebrate", null);
+      return { added: ev.title, when: ev.all_day ? new Date(ev.start * 1000).toDateString() : local(ev.start), link: ev.link || undefined };
     }
     case "add_task": {
       const due = args.due_date ? startOfDay(parseDay(args.due_date)) + 86399 : null;

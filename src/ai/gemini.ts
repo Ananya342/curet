@@ -1,10 +1,13 @@
+import { invoke } from "@tauri-apps/api/core";
 import { GoogleGenAI } from "@google/genai";
 import { eventsRange, fmtDay, fmtTime, kvGet, memories, nowSec, startOfDay, tasks } from "../api";
 import { PETS, PetId } from "../pets";
 import { declarations, runTool } from "./tools";
 
 export interface Msg { role: "user" | "model"; text: string }
-export const DEFAULT_MODEL = "gemini-flash-latest";
+// Lite is much quicker to the first word; the fallback keeps chat working if that alias ever goes away.
+export const DEFAULT_MODEL = "gemini-flash-lite-latest";
+const FALLBACK_MODEL = "gemini-flash-latest";
 
 async function context(petId: PetId) {
   const now = new Date();
@@ -17,8 +20,8 @@ async function context(petId: PetId) {
   const pet = PETS[petId];
   return `You are ${pet.name}, ${pet.personality}. You live on the user's Mac desktop as their tiny life-assistant companion.
 Stay in character but be genuinely useful: short, warm, concrete replies (1–4 sentences unless asked for a plan). Use at most one emoji.
-Use the tools to read the calendar, find free time, manage tasks and remember things. Never invent events — if the calendar is empty or not connected, say so and mention Settings.
-When the user shares a lasting preference, goal or project, call remember. When they ask to be reminded or add something to do, call add_task.
+The calendar below is complete for the next 3 days: answer questions about those days straight from it, without calling a tool. Only call get_events for dates further out. Use the other tools to find free time, manage tasks and remember things. Never invent events — if the calendar is empty or not connected, say so and mention Settings.
+Call add_calendar_event only when the user clearly asks to schedule something; afterwards say the exact title and time you added. Work out words like "tomorrow" or "Friday" from the current date and time below. When the user shares a lasting preference, goal or project, call remember. When they ask to be reminded or add something to do, call add_task.
 Now: ${now.toLocaleString([], { dateStyle: "full", timeStyle: "short" })} (${Intl.DateTimeFormat().resolvedOptions().timeZone}).
 Next 3 days:
 ${evs.length ? evs.slice(0, 40).map(line).join("\n") : "(nothing on the calendar)"}
@@ -42,6 +45,13 @@ const STATUS: Record<string, string> = {
  * `onStatus` reports what the pet is doing while it works ("Checking your calendar…").
  * `onText` receives the reply so far, streamed as Gemini writes it.
  */
+
+/** Latency notes go to the app log (visible when LifePet is run from a terminal). */
+const timing = (msg: string) => { invoke("log", { msg: `gemini ${msg}` }).catch(() => {}); };
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const isBusy = (e: unknown) => /\b(500|503)\b|UNAVAILABLE|overloaded|high demand|INTERNAL/i.test(String(e));
+
 export async function ask(
   history: Msg[], text: string, petId: PetId,
   onStatus?: (s: string) => void, onText?: (soFar: string) => void,
@@ -49,7 +59,11 @@ export async function ask(
   onStatus?.("Thinking…");
   const key = await kvGet("gemini_key");
   if (!key) throw new Error("NO_KEY");
-  const model = (await kvGet("gemini_model")) || DEFAULT_MODEL;
+  const chosen = await kvGet("gemini_model");
+  // Try your model first, then the fallback, so one overloaded model doesn't stop the chat.
+  let models = [...new Set([chosen || DEFAULT_MODEL, FALLBACK_MODEL])];
+  let model = models[0];
+  const t0 = performance.now();
   const ai = new GoogleGenAI({ apiKey: key });
   const contents: any[] = [...history, { role: "user", text }].map((m) => ({ role: m.role, parts: [{ text: m.text }] }));
   const systemInstruction = await context(petId);
@@ -57,15 +71,33 @@ export async function ask(
   const base = { systemInstruction, tools: [{ functionDeclarations: declarations as any }] };
   // Thinking models reason silently before the first word, which is slow for a quick chat. Keep it minimal;
   // if this model rejects the setting, fall back to its defaults.
-  let thinking: Record<string, unknown> | null = /2\.5/.test(model) ? { thinkingBudget: 0 } : { thinkingLevel: "low" };
+  let thinking: Record<string, unknown> | null = /2\.5/.test(model) ? { thinkingBudget: 0 } : { thinkingLevel: "minimal" };
 
   for (let round = 0; round < 6; round++) {
-    const open = () => ai.models.generateContentStream({ model, contents, config: thinking ? { ...base, thinkingConfig: thinking as any } : base });
-    let stream;
-    try { stream = await open(); }
-    catch (e) {
-      if (thinking && /thinking/i.test(String(e))) { thinking = null; stream = await open(); } else throw e;
+    const tryOpen = async (m: string) => {
+      const go = () => ai.models.generateContentStream({ model: m, contents, config: thinking ? { ...base, thinkingConfig: thinking as any } : base });
+      try { return await go(); }
+      catch (e) {
+        if (thinking && /thinking/i.test(String(e))) { thinking = null; return await go(); }
+        throw e;
+      }
+    };
+    // Overloaded (503) or flaky (500) responses are usually brief: retry quietly, then move to the next model.
+    let stream: Awaited<ReturnType<typeof tryOpen>> | undefined;
+    let lastErr: unknown;
+    outer: for (let mi = 0; mi < models.length; mi++) {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try { stream = await tryOpen(models[mi]); model = models[mi]; models = models.slice(mi); break outer; }
+        catch (e) {
+          lastErr = e;
+          if (/404|not found|NOT_FOUND/i.test(String(e))) break;
+          if (isBusy(e)) { onStatus?.("Gemini is busy, trying again…"); timing(`${models[mi]} busy (attempt ${attempt + 1})`); await sleep(attempt ? 1600 : 700); continue; }
+          throw e;
+        }
+      }
     }
+    if (!stream) throw lastErr;
+    let first = true;
 
     let soFar = "";
     const parts: any[] = [];
@@ -73,11 +105,12 @@ export async function ask(
     for await (const chunk of stream) {
       for (const part of chunk.candidates?.[0]?.content?.parts ?? []) {
         parts.push(part);
+        if (first) { first = false; timing(`round ${round + 1}: first output after ${Math.round(performance.now() - t0)} ms (${model})`); }
         if (part.functionCall) calls.push(part.functionCall);
         else if (part.text && !part.thought) { soFar += part.text; onText?.(soFar); }
       }
     }
-    if (!calls.length) return soFar.trim() || "…";
+    if (!calls.length) { timing(`done in ${Math.round(performance.now() - t0)} ms, ${round + 1} round(s)`); return soFar.trim() || "…"; }
 
     contents.push({ role: "model", parts });
     const results = [];
@@ -97,9 +130,10 @@ export const friendlyError = (e: unknown) => {
   const m = e instanceof Error ? e.message : String(e);
   if (m === "NO_KEY") return "I need a Gemini API key to think. Add one in Settings — it’s free at aistudio.google.com/apikey.";
   if (/API key|API_KEY|403|401/i.test(m)) return "Gemini didn’t accept that API key. Check it in Settings, or paste a fresh one.";
+  if (/\b(500|503)\b|UNAVAILABLE|overloaded|high demand/i.test(m)) return "Gemini is overloaded right now. I tried twice and a backup model. Give it a minute, then ask again.";
   if (/429|quota|RESOURCE_EXHAUSTED/i.test(m)) return "Gemini’s rate limit is full for now. Wait a minute, then ask again.";
   if (/404|not found|NOT_FOUND/i.test(m)) return "Gemini doesn’t know that model name. Clear the model field in Settings to use the default.";
-  return `Something went wrong: ${m.slice(0, 200)}. Try again in a moment.`;
+  return "Something went wrong talking to Gemini. Try again in a moment.";
 };
 
 export { nowSec };

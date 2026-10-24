@@ -25,6 +25,13 @@ export const setPetId = async (id: PetId) => {
   await emitTo("panel", "pet-changed", id);
 };
 
+export interface NewEvent { title: string; start: number; end: number; allDay: boolean; location?: string; description?: string }
+/** Creates the event on the signed-in Google account's primary calendar. */
+export const addCalendarEvent = (e: NewEvent) =>
+  invoke<CalEvent>("google_add_event", {
+    event: { title: e.title, start: e.start, end: e.end, all_day: e.allDay, location: e.location ?? null, description: e.description ?? null },
+  });
+
 export const eventsRange = (from: number, to: number) => invoke<CalEvent[]>("events_range", { from, to });
 export const refreshEvents = () => invoke<void>("refresh_events");
 export const tasks = {

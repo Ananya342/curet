@@ -255,6 +255,7 @@ pub fn run() {
             calendar::google_status,
             calendar::google_connect,
             calendar::google_disconnect,
+            calendar::google_add_event,
             calendar::refresh_events,
         ])
         .setup(move |app| {

@@ -209,7 +209,7 @@ img { -webkit-user-drag: none; }
 .link { border: 0; background: none; color: var(--ink); text-decoration: underline; text-decoration-color: var(--pet); text-decoration-thickness: 2px; font: inherit; font-weight: 800; cursor: pointer; padding: 4px 6px; margin-left: 4px; min-height: 24px; }
 
 /* fields */
-.panel input[type="text"], .panel input[type="password"], .panel input:not([type]), .panel textarea {
+.panel input[type="text"], .panel input[type="password"], .panel input[type="date"], .panel input[type="time"], .panel select, .panel input:not([type]), .panel textarea {
   width: 100%; padding: 9px 13px; min-height: 40px; border-radius: 14px; border: 2px solid var(--edge); background: var(--raised); color: var(--ink); font: inherit;
   box-shadow: 0 2px 0 var(--pop); transition: box-shadow 0.15s, transform 0.15s;
 }
@@ -340,3 +340,7 @@ kbd { background: var(--raised); border: 2px solid var(--edge); border-radius: 7
 .orb em { font-family: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif; font-weight: 800; border: 2px solid #3a2a2a; background: #fffdf7; color: #3a2a2a; box-shadow: 0 2px 0 #3a2a2a; }
 .orb.pick.on { box-shadow: 0 0 0 3px #fffdf7, 0 0 0 5.5px #3a2a2a, 0 3px 0 5.5px #3a2a2a; }
 .fx.boop { color: #ff4f7b; }
+
+.fields { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; }
+.panel select { appearance: none; -webkit-appearance: none; padding-right: 26px; background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%), linear-gradient(135deg, var(--ink) 50%, transparent 50%); background-position: calc(100% - 15px) 17px, calc(100% - 10px) 17px; background-size: 5px 5px; background-repeat: no-repeat; }
+.panel input:disabled { opacity: 0.5; }

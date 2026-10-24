@@ -18,14 +18,14 @@ Open the panel → **Settings**.
 
 **Google Calendar, easy way** — Google Calendar settings → your calendar → *Integrate calendar* → copy **Secret address in iCal format** → paste into LifePet.
 
-**Google Calendar** — press **Sign in with Google**. Your browser opens, you pick your own Google account, and LifePet gets read-only access to your calendar. Sign out in Settings revokes the access.
+**Google Calendar** — press **Sign in with Google**. Your browser opens, you pick your own Google account, and LifePet can see your calendar and add events you create (from the Today tab, or by asking your pet). Sign out in Settings revokes the access.
 
 **Gemini** — get a free key at <https://aistudio.google.com/apikey> and paste it in Settings → Brain. The default model is `gemini-flash-latest`; change it if you like.
 
 ## Maintainers: set up Google sign-in (once)
 LifePet ships one OAuth client; every user signs in with their own account.
 1. In [Google Cloud Console](https://console.cloud.google.com/) create a project and enable the **Google Calendar API**.
-2. Google Auth Platform → configure the consent screen (External), add scopes `calendar.readonly`, `openid`, `email`, and a privacy-policy URL.
+2. Google Auth Platform → configure the consent screen (External), add scopes `calendar.events`, `calendar.calendarlist.readonly`, `openid`, `email`, and a privacy-policy URL.
 3. Clients → **Create client** → type **Desktop app**.
 4. Put the client in `.env.local` (copy `.env.example`, it is gitignored) or pass it on the command line, then build:
    ```bash

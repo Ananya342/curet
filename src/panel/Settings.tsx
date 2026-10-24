@@ -6,7 +6,7 @@ import { PETS, PET_IDS, PetId } from "../pets";
 import { Feed, kvGet, kvSet, setPetId } from "../api";
 import { DEFAULT_MODEL } from "../ai/gemini";
 
-interface GStatus { connected: boolean; configured: boolean; email: string | null }
+interface GStatus { connected: boolean; configured: boolean; email: string | null; can_write: boolean }
 type Note = { where: string; text: string; bad?: boolean };
 
 const link = (url: string, text: string) => (
@@ -19,7 +19,7 @@ export default function Settings({ petId }: { petId: PetId }) {
   const [model, setModel] = useState("");
   const [saved, setSaved] = useState(false);
   const [feeds, setFeeds] = useState<(Feed & { err?: string })[]>([]);
-  const [g, setG] = useState<GStatus>({ connected: false, configured: true, email: null });
+  const [g, setG] = useState<GStatus>({ connected: false, configured: true, email: null, can_write: true });
   const [gerr, setGerr] = useState("");
   const [bsUrl, setBsUrl] = useState("");
   const [icalUrl, setIcalUrl] = useState("");
@@ -125,10 +125,17 @@ export default function Settings({ petId }: { petId: PetId }) {
               <span className="avatar" aria-hidden="true">{(g.email ?? "G")[0].toUpperCase()}</span>
               <div className="grow">
                 <div className="t">{g.email ?? "Connected"}</div>
-                <div className="s">Read-only access to your calendar</div>
+                <div className="s">{g.can_write ? "Can read and add events" : "Read-only so far"}</div>
               </div>
               <button className="btn sm soft" onClick={() => invoke("google_disconnect").then(load)}>Sign out</button>
             </div>
+            {!g.can_write && (
+              <>
+                <p className="hint">LifePet can only read your calendar so far. Allow adding events so your pet can schedule things for you.</p>
+                <button className="btn" onClick={connectGoogle} aria-busy={busy === "google"}>Allow adding events{busy === "google" && <Spinner />}</button>
+                <Status where="google" />
+              </>
+            )}
             {gerr && <p className="note bad" role="status">Problem: {gerr} Sign out and back in to reconnect.</p>}
           </>
         ) : (
@@ -140,7 +147,7 @@ export default function Settings({ petId }: { petId: PetId }) {
               {busy === "google"
                 ? "Finish signing in in your browser. This waits up to 4 minutes."
                 : g.configured
-                  ? "Opens your browser. LifePet only asks to read your calendar."
+                  ? "Opens your browser. LifePet asks to see your calendar and add events you create."
                   : "Google sign-in isn’t set up in this build of LifePet."}
             </p>
             <Status where="google" />

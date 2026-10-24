@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { emitTo, listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { CalEvent, Task, eventsRange, fmtDay, fmtTime, nowSec, refreshEvents, startOfDay, tasks, untilLabel } from "../api";
+import { CalEvent, Task, addCalendarEvent, eventsRange, fmtDay, fmtTime, nowSec, refreshEvents, startOfDay, tasks, untilLabel } from "../api";
 
 export default function Today() {
   const [today, setToday] = useState<CalEvent[]>([]);
@@ -10,6 +11,10 @@ export default function Today() {
   const [title, setTitle] = useState("");
   const [hint, setHint] = useState("");
   const [syncing, setSyncing] = useState(false);
+  const [gs, setGs] = useState({ connected: false, can_write: false });
+  const [ev, setEv] = useState({ title: "", date: "", time: "", len: "60" });
+  const [adding, setAdding] = useState(false);
+  const [evNote, setEvNote] = useState<{ text: string; bad?: boolean } | null>(null);
 
   const load = useCallback(async () => {
     const d = startOfDay();
@@ -20,6 +25,12 @@ export default function Today() {
   }, []);
 
   useEffect(() => {
+    invoke<{ connected: boolean; can_write: boolean }>("google_status").then(setGs).catch(() => {});
+    const d = new Date();
+    d.setMinutes(0, 0, 0);
+    d.setHours(d.getHours() + 1);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    setEv((e) => ({ ...e, date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`, time: `${pad(d.getHours())}:00` }));
     load();
     const un = listen("events-updated", load);
     return () => { un.then((f) => f()); };
@@ -39,6 +50,25 @@ export default function Today() {
     load();
   };
   const sync = async () => { setSyncing(true); await refreshEvents(); await load(); setSyncing(false); };
+
+  const addEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ev.title.trim()) { setEvNote({ text: "Give the event a title first.", bad: true }); return; }
+    const allDay = ev.len === "allday";
+    const start = allDay ? startOfDay(new Date(`${ev.date}T00:00`)) : Math.floor(new Date(`${ev.date}T${ev.time || "09:00"}`).getTime() / 1000);
+    if (!Number.isFinite(start)) { setEvNote({ text: "Pick a date and time for the event.", bad: true }); return; }
+    setAdding(true); setEvNote(null);
+    try {
+      const made = await addCalendarEvent({ title: ev.title.trim(), start, end: allDay ? start : start + Number(ev.len) * 60, allDay });
+      setEv((x) => ({ ...x, title: "" }));
+      setEvNote({ text: `Added “${made.title}” for ${fmtDay(made.start)}${made.all_day ? "" : `, ${fmtTime(made.start)}`}.` });
+      emitTo("pet", "celebrate", null);
+      load();
+    } catch (err) {
+      setEvNote({ text: String(err), bad: true });
+    }
+    setAdding(false);
+  };
 
   const now = nowSec();
   return (
@@ -82,6 +112,31 @@ export default function Today() {
           </ul>
         </section>
       )}
+
+      <section aria-labelledby="h-add">
+        <h2 id="h-add">Add an event</h2>
+        {!gs.connected ? (
+          <p className="hint">Sign in with Google in Settings, and your pet can add events to your calendar.</p>
+        ) : !gs.can_write ? (
+          <p className="hint">LifePet can only read your calendar so far. <button className="link" onClick={() => invoke("toggle_panel", { tab: "settings", forceOpen: true })}>Open Settings</button> and choose Allow adding events.</p>
+        ) : (
+          <form className="stack" onSubmit={addEvent} noValidate>
+            <input value={ev.title} onChange={(e) => setEv({ ...ev, title: e.target.value })} placeholder="Dentist appointment…" aria-label="Event title" autoComplete="off" />
+            <div className="fields">
+              <input type="date" value={ev.date} onChange={(e) => setEv({ ...ev, date: e.target.value })} aria-label="Date" />
+              <input type="time" value={ev.time} onChange={(e) => setEv({ ...ev, time: e.target.value })} aria-label="Start time" disabled={ev.len === "allday"} />
+              <select value={ev.len} onChange={(e) => setEv({ ...ev, len: e.target.value })} aria-label="Length">
+                <option value="30">30 min</option>
+                <option value="60">1 hour</option>
+                <option value="120">2 hours</option>
+                <option value="allday">All day</option>
+              </select>
+            </div>
+            <button type="submit" className="btn" aria-busy={adding}>Add to Google Calendar{adding && <span className="spin" aria-hidden="true" />}</button>
+            <p className={`note ${evNote?.bad ? "bad" : "good"}`} role="status">{evNote ? `${evNote.bad ? "Problem: " : "Done: "}${evNote.text}` : ""}</p>
+          </form>
+        )}
+      </section>
 
       <section aria-labelledby="h-tasks">
         <h2 id="h-tasks">Tasks</h2>

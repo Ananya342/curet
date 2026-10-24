@@ -318,6 +318,8 @@ pub fn feed_remove(app: AppHandle, db: State<Db>, id: String) {
 /// One OAuth "Desktop app" client ships inside the app; every user signs in with their own Google
 /// account. Set both at build time: LIFEPET_GOOGLE_CLIENT_ID / LIFEPET_GOOGLE_CLIENT_SECRET.
 /// (Google doesn't treat an installed app's client secret as confidential.)
+/// See and edit events, list which calendars exist, and show which account is signed in.
+const GOOGLE_SCOPES: &str = "https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.calendarlist.readonly openid email";
 const GOOGLE_CLIENT_ID: Option<&str> = option_env!("LIFEPET_GOOGLE_CLIENT_ID");
 const GOOGLE_CLIENT_SECRET: Option<&str> = option_env!("LIFEPET_GOOGLE_CLIENT_SECRET");
 
@@ -333,6 +335,14 @@ pub struct GoogleStatus {
     connected: bool,
     configured: bool,
     email: Option<String>,
+    /// False for people who signed in when LifePet could only read; they need to allow editing.
+    can_write: bool,
+}
+
+fn can_write(db: &Db) -> bool {
+    db::get(db, "google_scope")
+        .map(|sc| sc.split_whitespace().any(|s| s.ends_with("/auth/calendar.events") || s.ends_with("/auth/calendar")))
+        .unwrap_or(false)
 }
 
 #[tauri::command]
@@ -341,6 +351,7 @@ pub fn google_status(db: State<Db>) -> GoogleStatus {
         connected: db::get(&db, "google_refresh").is_some(),
         configured: google_client().is_ok(),
         email: db::get(&db, "google_email"),
+        can_write: can_write(&db),
     }
 }
 
@@ -352,7 +363,7 @@ pub async fn google_disconnect(app: AppHandle) {
         let _ = http().post("https://oauth2.googleapis.com/revoke").form(&[("token", t.as_str())]).send().await;
     }
     let db = app.state::<Db>();
-    for k in ["google_refresh", "google_access", "google_expiry", "google_email", "err:google"] {
+    for k in ["google_refresh", "google_access", "google_expiry", "google_email", "google_scope", "err:google"] {
         db::set(&db, k, None);
     }
     db::replace_source(&db, "google", &[]);
@@ -381,7 +392,7 @@ pub async fn google_connect(app: AppHandle) -> Result<(), String> {
         .append_pair("client_id", &client_id)
         .append_pair("redirect_uri", &redirect)
         .append_pair("response_type", "code")
-        .append_pair("scope", "https://www.googleapis.com/auth/calendar.readonly openid email")
+        .append_pair("scope", GOOGLE_SCOPES)
         .append_pair("code_challenge", &challenge)
         .append_pair("code_challenge_method", "S256")
         .append_pair("access_type", "offline")
@@ -444,6 +455,7 @@ pub async fn google_connect(app: AppHandle) -> Result<(), String> {
     {
         let db = app.state::<Db>();
         db::set(&db, "google_refresh", Some(refresh_token));
+        db::set(&db, "google_scope", res["scope"].as_str());
         store_access(&db, &res);
     }
     // Show which account is connected (best effort).
@@ -580,6 +592,92 @@ async fn fetch_google(app: &AppHandle, from: i64, to: i64) -> Result<Vec<Event>,
         }
     }
     Ok(out)
+}
+
+// ---------------------------------------------------------------------------------------------
+// Adding events to Google Calendar
+// ---------------------------------------------------------------------------------------------
+
+#[derive(Deserialize)]
+pub struct NewEvent {
+    title: String,
+    start: i64,
+    end: i64,
+    all_day: bool,
+    location: Option<String>,
+    description: Option<String>,
+}
+
+#[tauri::command]
+pub async fn google_add_event(app: AppHandle, event: NewEvent) -> Result<Event, String> {
+    {
+        let db = app.state::<Db>();
+        if db::get(&db, "google_refresh").is_none() {
+            return Err("Google Calendar isn't connected. Sign in with Google in Settings first.".into());
+        }
+        if !can_write(&db) {
+            return Err("LifePet can only read your Google Calendar so far. Open Settings and choose Allow adding events.".into());
+        }
+    }
+    let title = event.title.trim();
+    if title.is_empty() {
+        return Err("Give the event a title first.".into());
+    }
+    let rfc = |ts: i64| Utc.timestamp_opt(ts, 0).unwrap().to_rfc3339();
+    let day = |ts: i64| Local.timestamp_opt(ts, 0).unwrap().format("%Y-%m-%d").to_string();
+    let (start, end) = if event.all_day {
+        // All-day events end on the day *after* their last day.
+        let last = if event.end > event.start { event.end } else { event.start };
+        (
+            serde_json::json!({ "date": day(event.start) }),
+            serde_json::json!({ "date": day(last + 86400) }),
+        )
+    } else {
+        let end = if event.end > event.start { event.end } else { event.start + 3600 };
+        (serde_json::json!({ "dateTime": rfc(event.start) }), serde_json::json!({ "dateTime": rfc(end) }))
+    };
+    let mut body = serde_json::json!({ "summary": title, "start": start, "end": end });
+    if let Some(l) = event.location.as_deref().filter(|l| !l.trim().is_empty()) {
+        body["location"] = l.into();
+    }
+    if let Some(d) = event.description.as_deref().filter(|d| !d.trim().is_empty()) {
+        body["description"] = d.into();
+    }
+
+    let token = google_access_token(&app).await?;
+    let res = http()
+        .post("https://www.googleapis.com/calendar/v3/calendars/primary/events")
+        .bearer_auth(&token)
+        .json(&body)
+        .send()
+        .await
+        .map_err(|e| format!("Couldn't reach Google ({e}). Check your connection and try again."))?;
+    let status = res.status();
+    let json: Value = res.json().await.map_err(|e| e.to_string())?;
+    if !status.is_success() {
+        let msg = json["error"]["message"].as_str().unwrap_or("unknown error");
+        return Err(if status.as_u16() == 403 {
+            "Google says LifePet isn't allowed to add events. Sign out and back in, and allow editing.".to_string()
+        } else {
+            format!("Google couldn't add the event: {msg}")
+        });
+    }
+    let (Some((s, all_day)), Some((e, _))) = (google_time(&json["start"]), google_time(&json["end"])) else {
+        return Err("Google added the event but sent back something unexpected.".into());
+    };
+    let created = Event {
+        id: json["id"].as_str().unwrap_or("").to_string(),
+        source: "google".into(),
+        title: json["summary"].as_str().unwrap_or(title).to_string(),
+        start: s,
+        end: e,
+        all_day,
+        location: json["location"].as_str().unwrap_or("").to_string(),
+        link: json["htmlLink"].as_str().unwrap_or("").to_string(),
+        kind: "event".into(),
+    };
+    refresh(&app).await;
+    Ok(created)
 }
 
 // ---------------------------------------------------------------------------------------------
