@@ -55,6 +55,7 @@ export default function Pet() {
   const physTok = useRef(0);
   const bubbleTimer = useRef<number>(0);
   const menuTimer = useRef<number>(0);
+  const lastClick = useRef(0);
   const fxId = useRef(1);
   const pokes = useRef<number[]>([]);
   const rub = useRef({ lastX: 0, dir: 0, flips: [] as number[] });
@@ -454,6 +455,13 @@ export default function Pet() {
     // A click.
     touch();
     if (modeRef.current === "sleeping") { wakeUp({ sleepy: true, text: pick(["mmf… I'm up!", "five more minutes…", "huh? oh, hi!"]) }); return; }
+    const clickNow = performance.now();
+    const isDouble = clickNow - lastClick.current < 350;
+    lastClick.current = isDouble ? 0 : clickNow;
+    if (isDouble) {
+      if (menu) closeMenu(); else openMenu("main");
+      return;
+    }
     const onNose = noseHit(e.clientX, e.clientY);
     if (onNose) {
       const d2 = petRef.current;
@@ -465,7 +473,6 @@ export default function Pet() {
       animate(sx, [1, 1.14, 0.97, 1], { duration: 0.35 });
       if (menu) { closeMenu(); return; }
       say(pick(d2.boops), { ms: 1500 });
-      window.setTimeout(() => openMenu("main"), 380);
       return;
     }
     // Poke the body.
