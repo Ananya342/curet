@@ -38,8 +38,14 @@ const STATUS: Record<string, string> = {
   recall: "Thinking back…",
 };
 
-/** `onStatus` reports what the pet is doing while it works, e.g. "Checking your calendar…". */
-export async function ask(history: Msg[], text: string, petId: PetId, onStatus?: (s: string) => void): Promise<string> {
+/**
+ * `onStatus` reports what the pet is doing while it works ("Checking your calendar…").
+ * `onText` receives the reply so far, streamed as Gemini writes it.
+ */
+export async function ask(
+  history: Msg[], text: string, petId: PetId,
+  onStatus?: (s: string) => void, onText?: (soFar: string) => void,
+): Promise<string> {
   onStatus?.("Thinking…");
   const key = await kvGet("gemini_key");
   if (!key) throw new Error("NO_KEY");
@@ -48,26 +54,43 @@ export async function ask(history: Msg[], text: string, petId: PetId, onStatus?:
   const contents: any[] = [...history, { role: "user", text }].map((m) => ({ role: m.role, parts: [{ text: m.text }] }));
   const systemInstruction = await context(petId);
 
+  const base = { systemInstruction, tools: [{ functionDeclarations: declarations as any }] };
+  // Thinking models reason silently before the first word, which is slow for a quick chat. Keep it minimal;
+  // if this model rejects the setting, fall back to its defaults.
+  let thinking: Record<string, unknown> | null = /2\.5/.test(model) ? { thinkingBudget: 0 } : { thinkingLevel: "low" };
+
   for (let round = 0; round < 6; round++) {
-    const res = await ai.models.generateContent({
-      model,
-      contents,
-      config: { systemInstruction, tools: [{ functionDeclarations: declarations as any }] },
-    });
-    const calls = res.functionCalls ?? [];
-    if (!calls.length) return (res.text ?? "").trim() || "…";
-    contents.push(res.candidates![0].content);
-    const parts = [];
+    const open = () => ai.models.generateContentStream({ model, contents, config: thinking ? { ...base, thinkingConfig: thinking as any } : base });
+    let stream;
+    try { stream = await open(); }
+    catch (e) {
+      if (thinking && /thinking/i.test(String(e))) { thinking = null; stream = await open(); } else throw e;
+    }
+
+    let soFar = "";
+    const parts: any[] = [];
+    const calls: { name?: string; args?: unknown }[] = [];
+    for await (const chunk of stream) {
+      for (const part of chunk.candidates?.[0]?.content?.parts ?? []) {
+        parts.push(part);
+        if (part.functionCall) calls.push(part.functionCall);
+        else if (part.text && !part.thought) { soFar += part.text; onText?.(soFar); }
+      }
+    }
+    if (!calls.length) return soFar.trim() || "…";
+
+    contents.push({ role: "model", parts });
+    const results = [];
     for (const c of calls) {
       let result: unknown;
       onStatus?.(STATUS[c.name ?? ""] ?? "Working on it…");
       try { result = await runTool(c.name!, (c.args ?? {}) as Record<string, any>); }
       catch (e) { result = { error: String(e) }; }
-      parts.push({ functionResponse: { name: c.name, response: { result } } });
+      results.push({ functionResponse: { name: c.name, response: { result } } });
     }
-    contents.push({ role: "user", parts });
+    contents.push({ role: "user", parts: results });
   }
-  return "Hmm, I got tangled up in my own paws. Try asking again?";
+  return "I got tangled up in my own paws. Try asking again.";
 }
 
 export const friendlyError = (e: unknown) => {

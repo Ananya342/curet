@@ -27,7 +27,7 @@ LifePet ships one OAuth client; every user signs in with their own account.
 1. In [Google Cloud Console](https://console.cloud.google.com/) create a project and enable the **Google Calendar API**.
 2. Google Auth Platform → configure the consent screen (External), add scopes `calendar.readonly`, `openid`, `email`, and a privacy-policy URL.
 3. Clients → **Create client** → type **Desktop app**.
-4. Build with the client baked in:
+4. Put the client in `.env.local` (copy `.env.example`, it is gitignored) or pass it on the command line, then build:
    ```bash
    LIFEPET_GOOGLE_CLIENT_ID=xxx.apps.googleusercontent.com LIFEPET_GOOGLE_CLIENT_SECRET=xxx npm run tauri build
    ```

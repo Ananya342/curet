@@ -43,7 +43,7 @@ export default function Panel() {
   };
 
   return (
-    <div className="panel">
+    <div className="panel" data-pet={petId}>
       <header data-tauri-drag-region>
         <img src={PETS[petId].src} alt="" draggable={false} data-tauri-drag-region />
         <h1 className="sr-only" translate="no">LifePet</h1>
@@ -58,6 +58,7 @@ export default function Panel() {
               aria-controls="panel-body"
               tabIndex={tab === t.id ? 0 : -1}
               className="tab"
+              data-tab={t.id}
               onClick={() => setTab(t.id)}
             >
               {t.label}
