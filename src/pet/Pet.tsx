@@ -388,21 +388,6 @@ export default function Pet() {
   }), [bounds, moveTo, rot, sx, sy]);
 
   // ---- poof away where the pet stands, and pop back in the same spot ------------------------------------------
-  const cloud = () => {
-    const d = petRef.current;
-    const w = d.w, h = d.w * d.ar;
-    const puffs = Array.from({ length: 13 }, (_, i) => {
-      const core = i < 4; // a few big ones in the middle hide the moment the pet vanishes
-      const a = (i / 13) * Math.PI * 2 + Math.random() * 0.5;
-      const dist = core ? 8 + Math.random() * 14 : w * (0.32 + Math.random() * 0.2);
-      return {
-        x: Math.cos(a) * dist, y: Math.sin(a) * dist * 0.75 - (core ? 6 : 0),
-        s: core ? 54 + Math.random() * 16 : 26 + Math.random() * 22, d: Math.random() * 90,
-      };
-    });
-    setPoof({ id: Date.now(), x: WIN_W / 2, y: WIN_H - FLOOR_PAD - h / 2, puffs });
-  };
-
   const hidePet = useCallback(async () => {
     if (["hiding", "hidden", "waking"].includes(modeRef.current)) return;
     walkTok.current++; physTok.current++;
@@ -410,24 +395,53 @@ export default function Pet() {
     setMode("hiding");
     await invoke("hide_panel").catch(() => {});
     animate(lid, 0, { duration: 0.1 });
-    // Crouch, then spring up and shrink into the cloud.
-    await Promise.all([animate(sy, 0.8, { duration: 0.14 }), animate(sx, 1.15, { duration: 0.14 })]);
+    const cat = petRef.current.id === "cat";
+    const bb = bounds();
+    const from = { ...pos.current };
+    const topY = bb.minY - 180;
     setFading(true);
-    cloud();
-    await Promise.all([
-      animate(sy, 1.3, { duration: 0.22, ease: "easeOut" }),
-      animate(sx, 0.75, { duration: 0.22, ease: "easeOut" }),
-      animate(ty, -26, { duration: 0.22, ease: "easeOut" }),
-      animate(fly, 0.15, { duration: 0.24, ease: "easeIn" }),
-      animate(op, 0, { duration: 0.2, delay: 0.04 }),
-    ]);
-    await sleep(520); // let the cloud drift apart
+    if (cat) {
+      // Let go like a balloon losing air: spin, zig-zag up, shrinking as it deflates.
+      await Promise.all([animate(sx, 1.18, { duration: 0.14 }), animate(sy, 0.85, { duration: 0.14 })]);
+      await animate(0, 1, {
+        duration: 1.15, ease: [0.55, 0, 0.85, 0.6],
+        onUpdate: (k) => {
+          const wob = Math.sin(k * 15) * 90 * (1 - k * 0.35);
+          moveTo(from.x + wob, from.y + (topY - from.y) * k);
+          rot.set(k * 1080);
+          const squeeze = 1 + Math.sin(k * 40) * 0.12;
+          sx.set(squeeze); sy.set(2 - squeeze);
+          fly.set(Math.max(0.08, 1 - k * 0.92));
+          op.set(k > 0.85 ? (1 - k) / 0.15 : 1);
+        },
+      });
+    } else {
+      // Swell up, hover with a tilt, then zip off toward the top of the screen.
+      await Promise.all([
+        animate(sx, [1, 1.2, 1.45, 1.4], { duration: 0.5, ease: "easeOut" }),
+        animate(sy, [1, 0.85, 1.45, 1.4], { duration: 0.5, ease: "easeOut" }),
+        animate(rot, [0, -5, 5, -3, 0], { duration: 0.5 }),
+      ]);
+      await animate(0, 1, { duration: 0.35, ease: "easeInOut", onUpdate: (k) => { moveTo(from.x + Math.sin(k * 6) * 24, from.y - 30 * k); rot.set(Math.sin(k * 8) * 9); } });
+      const hover = { x: pos.current.x, y: pos.current.y };
+      const dir = hover.x < bb.minX + (bb.maxX - bb.minX) / 2 ? 1 : -1;
+      await animate(0, 1, {
+        duration: 0.42, ease: [0.6, 0, 1, 0.5],
+        onUpdate: (k) => {
+          moveTo(hover.x + dir * 220 * k, hover.y + (topY - hover.y) * k);
+          rot.set(dir * 14 * k);
+          sx.set(1.4 - 0.75 * k); sy.set(1.4 + 0.5 * k);
+          fly.set(Math.max(0.05, 1 - k * 0.95));
+          op.set(k > 0.8 ? (1 - k) / 0.2 : 1);
+        },
+      });
+    }
     await invoke("set_pet_visible", { visible: false });
     setPoof(null); setFading(false);
     sx.set(1); sy.set(1); ty.set(0); rot.set(0); fly.set(1); op.set(1);
     setMode("hidden");
     await emitTo("panel", "pet-hidden", petRef.current.id);
-  }, [fly, lid, op, rot, sx, sy, ty]);
+  }, [bounds, fly, lid, moveTo, op, rot, sx, sy, ty]);
   const hidePetRef = useRef(hidePet);
   hidePetRef.current = hidePet;
 
