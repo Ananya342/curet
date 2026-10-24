@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LifePet — a tiny pet that keeps your deadlines</title>
+  <meta name="description" content="A desktop companion for macOS that reads your Google Calendar and Brightspace deadlines, and nudges you before things are due.">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="style.css">
+
+  <meta property="og:title" content="LifePet">
+  <meta property="og:description" content="A tiny pet that keeps your deadlines. For macOS.">
+  <meta property="og:type" content="website">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <a class="brand" href="/">
+      <img src="icon.svg" alt="" width="26" height="26">
+      LifePet
+    </a>
+    <nav>
+      <a href="#get">Download</a>
+      <a href="#what">What it does</a>
+      <a href="#setup">Setup</a>
+      <a href="https://github.com/Ananya342/yourassitant">Source</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <div>
+      <h1>A tiny pet that keeps<br>your <em>deadlines</em>.</h1>
+      <p class="lede">
+        LifePet floats on your desktop, reads your Google Calendar and Brightspace
+        deadlines, and nudges you before things are due. Boop its nose for a menu.
+        Tuck it into the notch when you need quiet.
+      </p>
+
+      <div class="cta">
+        <a class="btn primary" href="https://github.com/Ananya342/yourassitant/releases">
+          Download for macOS
+        </a>
+        <span class="cta-sub">Free &middot; macOS 11 or later</span>
+      </div>
+
+      <div class="meta">
+        <span>v0.1.0</span>
+        <span>Apple Silicon &amp; Intel</span>
+        <span>Tauri 2 + Rust</span>
+      </div>
+    </div>
+
+    <div class="stage">
+      <!-- Boo, drawn inline so it can blink. -->
+      <svg viewBox="0 0 1024 1024" role="img" aria-label="Boo, the ghost pet, floating and blinking">
+        <g class="float">
+          <path class="body" d="M283 630C283 415 385 235 512 235C639 235 741 415 741 630C741 745 589 745 589 630C589 745 436 745 436 630C436 745 283 745 283 630Z"/>
+          <ellipse class="blush" cx="362" cy="512" rx="44" ry="27"/>
+          <ellipse class="blush" cx="662" cy="512" rx="44" ry="27"/>
+          <g class="eye">
+            <ellipse cx="426" cy="440" rx="58" ry="69" fill="#2b2340"/>
+            <circle cx="447" cy="414" r="19" fill="#fff"/>
+          </g>
+          <g class="eye">
+            <ellipse cx="598" cy="440" rx="58" ry="69" fill="#2b2340"/>
+            <circle cx="619" cy="414" r="19" fill="#fff"/>
+          </g>
+          <path d="M478 541 Q512 592 546 541 Z" fill="#e8537a"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <section id="get">
+    <div class="section-head">
+      <h2>Download</h2>
+      <p class="note">One build, universal. Drag it to Applications and you're done.</p>
+    </div>
+
+    <div class="get-row">
+      <a class="btn primary big" href="https://github.com/Ananya342/yourassitant/releases">
+        Download LifePet for macOS
+      </a>
+      <a class="btn" href="https://github.com/Ananya342/yourassitant#develop">
+        Build from source
+      </a>
+    </div>
+
+    <div class="callout">
+      <b>First launch:</b> macOS will say the app is from an unidentified developer, because
+      this build isn't notarised. Right-click <code>LifePet.app</code> and choose
+      <b>Open</b>, then confirm. If it says the app is damaged, run
+      <code>xattr -dr com.apple.quarantine /Applications/LifePet.app</code> in Terminal once.
+    </div>
+  </section>
+
+  <section id="what">
+    <div class="section-head"><h2>What it does</h2></div>
+    <div class="feats">
+      <div class="feat">
+        <h3>Lives on your desktop</h3>
+        <p>Floats above your windows on every Space. Walks around, blinks, naps after ten idle
+        minutes, then wakes up with a stretch. Drag it, poke it, toss it &mdash; it bounces.</p>
+      </div>
+      <div class="feat">
+        <h3>Hides into the notch</h3>
+        <p>Send it away and it flies into the menu bar. Hover for your next events, click to
+        bring it back, or press <code>&#8997;&#8984;L</code>.</p>
+      </div>
+      <div class="feat">
+        <h3>Knows your calendar</h3>
+        <p>Google Calendar and Brightspace. Reminders arrive as speech bubbles with a Join
+        button when it spots a Meet, Zoom or Teams link. Deadlines warn you 24 hours and
+        2 hours ahead.</p>
+      </div>
+      <div class="feat">
+        <h3>Answers questions</h3>
+        <p>Ask what's due this week, find a free hour, add a task, or tell it something to
+        remember. Runs on Gemini with your own free API key.</p>
+      </div>
+      <div class="feat">
+        <h3>Five pets</h3>
+        <p>Boo the ghost, Mochi the cat, Jelly the blob, Ember the dragon and Maple the red
+        panda. Each has its own temperament. Swap any time.</p>
+      </div>
+      <div class="feat">
+        <h3>Stays on your machine</h3>
+        <p>Settings, keys, calendar links and chat live in a local SQLite file with
+        <code>0600</code> permissions. Nothing leaves except calls to Google and your own
+        calendar feeds.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="setup">
+    <div class="section-head">
+      <h2>After you install</h2>
+      <p class="note">Two minutes, and only the first one is required.</p>
+    </div>
+    <ol class="steps">
+      <li>
+        <h3>Open Settings</h3>
+        <p>Right-click the pet, or boop its nose and pick the gear.</p>
+      </li>
+      <li>
+        <h3>Add a Gemini key for chat</h3>
+        <p>Free at <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a>.
+        Paste it under Brain and leave the model field blank. Without a key everything else
+        still works &mdash; you just can't talk to it.</p>
+      </li>
+      <li>
+        <h3>Connect Brightspace</h3>
+        <p>In Brightspace: Calendar &rarr; Settings &rarr; tick <b>Enable Calendar Feeds</b>
+        &rarr; Subscribe &rarr; <b>All Calendars and Tasks</b>. Copy the link and paste it in.
+        The Subscribe button stays hidden until feeds are enabled.</p>
+      </li>
+      <li>
+        <h3>Connect Google Calendar</h3>
+        <p>Easiest route: Google Calendar settings &rarr; your calendar &rarr; Integrate
+        calendar &rarr; copy <b>Secret address in iCal format</b>. Or sign in with a Google
+        Cloud OAuth client if you want every calendar.</p>
+      </li>
+    </ol>
+  </section>
+
+  <footer>
+    <span>LifePet v0.1.0 &mdash; built with Tauri 2, Rust and React.</span>
+    <span><a href="https://github.com/Ananya342/yourassitant">Source on GitHub</a></span>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Netlify serves the static download page in site/.
+#
+# The override matters: this repo's root package.json is the Tauri app, so Netlify's
+# framework detection would otherwise run `npm run build` (Vite) and publish `dist/`,
+# which is the pet UI, not this landing page. There is nothing to compile here.
+[build]
+  publish = "site"
+  command = "echo 'static page - nothing to build'"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/icon.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
