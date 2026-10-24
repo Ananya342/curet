@@ -90,23 +90,26 @@ export default function Settings(_: { petId: PetId }) {
     <div className="scroll settings">
       <Rhythm />
 
-      <section aria-labelledby="h-bs">
-        <h2 id="h-bs">Brightspace deadlines</h2>
-        <details open={!feeds.some((f) => f.kind === "brightspace")}>
-          <summary>How to find your Brightspace link</summary>
-          <ol className="guide">
-            <li>In Brightspace, open <b>Calendar</b>.</li>
-            <li>Choose <b>Settings</b> (the gear) and turn on <b>Enable Calendar Feeds</b>. Save. <i>The Subscribe button stays hidden until you do.</i></li>
-            <li>Choose <b>Subscribe</b>, then <b>All Calendars and Tasks</b> (or a single course).</li>
-            <li>Copy the whole link. It ends in something like <code>feed.ics?token=…</code></li>
-          </ol>
-        </details>
-        <form className="inline-form" onSubmit={addFeed("bs", "Brightspace", bsUrl, "brightspace", "Paste your Brightspace calendar link first.", () => setBsUrl(""))} noValidate>
-          <input value={bsUrl} onChange={(e) => setBsUrl(e.target.value)} placeholder="https://school.brightspace.com/…/feed.ics" aria-label="Brightspace calendar link" autoComplete="off" spellCheck={false} inputMode="url" />
-          <button type="submit" className="btn" aria-busy={busy === "bs"}>Add link{busy === "bs" && <Spinner />}</button>
-        </form>
-        <Status where="bs" />
-      </section>
+      {/* Once a Brightspace link is connected it shows under Connected calendars, so the setup goes away. */}
+      {!feeds.some((f) => f.kind === "brightspace") && (
+        <section aria-labelledby="h-bs">
+          <h2 id="h-bs">Brightspace deadlines</h2>
+          <details open>
+            <summary>How to find your Brightspace link</summary>
+            <ol className="guide">
+              <li>In Brightspace, open <b>Calendar</b>.</li>
+              <li>Choose <b>Settings</b> (the gear) and turn on <b>Enable Calendar Feeds</b>. Save. <i>The Subscribe button stays hidden until you do.</i></li>
+              <li>Choose <b>Subscribe</b>, then <b>All Calendars and Tasks</b> (or a single course).</li>
+              <li>Copy the whole link. It ends in something like <code>feed.ics?token=…</code></li>
+            </ol>
+          </details>
+          <form className="inline-form" onSubmit={addFeed("bs", "Brightspace", bsUrl, "brightspace", "Paste your Brightspace calendar link first.", () => setBsUrl(""))} noValidate>
+            <input value={bsUrl} onChange={(e) => setBsUrl(e.target.value)} placeholder="https://school.brightspace.com/…/feed.ics" aria-label="Brightspace calendar link" autoComplete="off" spellCheck={false} inputMode="url" />
+            <button type="submit" className="btn" aria-busy={busy === "bs"}>Add link{busy === "bs" && <Spinner />}</button>
+          </form>
+          <Status where="bs" />
+        </section>
+      )}
 
       <section aria-labelledby="h-g">
         <h2 id="h-g">Google Calendar</h2>
@@ -182,17 +185,16 @@ export default function Settings(_: { petId: PetId }) {
         {ENV_GEMINI_KEY ? (
           <p className="hint">Your pet thinks with Gemini, using the key from <code>.env.local</code>.</p>
         ) : (
-          <p className="hint">Your pet thinks with Gemini. Get a free key at {link("https://aistudio.google.com/apikey", "aistudio.google.com/apikey")}. It stays on this Mac.</p>
+          <>
+            <p className="hint">Your pet thinks with Gemini. Get a free key at {link("https://aistudio.google.com/apikey", "aistudio.google.com/apikey")}. It stays on this Mac.</p>
+            <form className="stack" onSubmit={saveGemini} noValidate>
+              <input type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder="AIza…" aria-label="Gemini API key" autoComplete="off" spellCheck={false} />
+              <input value={model} onChange={(e) => setModel(e.target.value)} placeholder={DEFAULT_MODEL} aria-label="Model name (optional)" autoComplete="off" spellCheck={false} />
+              <button type="submit" className="btn">{saved ? "Saved" : "Save key"}</button>
+            </form>
+            <Status where="gemini" />
+          </>
         )}
-        <details open={!ENV_GEMINI_KEY}>
-          <summary>{ENV_GEMINI_KEY ? "Use a different key or model" : "Key and model"}</summary>
-          <form className="stack" onSubmit={saveGemini} noValidate>
-            <input type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder="AIza…" aria-label="Gemini API key" autoComplete="off" spellCheck={false} />
-            <input value={model} onChange={(e) => setModel(e.target.value)} placeholder={DEFAULT_MODEL} aria-label="Model name (optional)" autoComplete="off" spellCheck={false} />
-            <button type="submit" className="btn">{saved ? "Saved" : "Save key"}</button>
-          </form>
-          <Status where="gemini" />
-        </details>
       </section>
 
       <footer>

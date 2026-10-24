@@ -8,7 +8,7 @@ import { PETS, PET_IDS, PetId, pick } from "../pets";
 import { Area, Screen, fmtTime, getPetId, greeting, kvGet, kvSet, nowSec, setPetId } from "../api";
 import { startHitReporting } from "../hit";
 import { DEFAULT_OUTFIT, Outfit, getOutfit } from "../accessories";
-import Accessories from "./Accessories";
+import Accessories, { headroom } from "./Accessories";
 import { FocusIcon } from "../wellbeing/FocusIcon";
 import { Laptop } from "../wellbeing/FocusGear";
 import { useWellbeing } from "../wellbeing/useWellbeing";
@@ -830,12 +830,15 @@ export default function Pet() {
   // Props show while locked in, and stay for their pop-out; a drag, toss or hide puts them away at once.
   const showGear = gear !== null && (mode === "focusing" || gear === "out");
 
+  // A hat pokes up above the sprite; the speech bubble sits over it rather than on it.
+  const hatRoom = headroom(view, sw, sh, outfit);
+
   const breathClass = mode === "sleeping" ? "breath slow" : mode === "focusing" ? "breath work" : mode === "idle" || mode === "alert" ? "breath" : "";
 
   return (
     <div className="stage" data-mode={mode} data-fading={fading || undefined} style={{ width: WIN_W, height: WIN_H }}>
       {bubble && !menu && (
-        <div className={`bubble${bubble.rich ? " rich" : ""}`} role="status" aria-live="polite" data-hit style={{ bottom: FLOOR_PAD + sh + 12, maxHeight: WIN_H - (FLOOR_PAD + sh + 12) - 8, left: bubbleCx, ["--tail" as string]: `${tailShift}px` }} onClick={() => { touch(); hush(); setBadge(false); if (modeRef.current === "alert") setMode("idle"); }}>
+        <div className={`bubble${bubble.rich ? " rich" : ""}`} role="status" aria-live="polite" data-hit style={{ bottom: FLOOR_PAD + sh + hatRoom + 12, maxHeight: WIN_H - (FLOOR_PAD + sh + hatRoom + 12) - 8, left: bubbleCx, ["--tail" as string]: `${tailShift}px` }} onClick={() => { touch(); hush(); setBadge(false); if (modeRef.current === "alert") setMode("idle"); }}>
           <div className="bubble-text">{bubble.text}</div>
           {bubble.actions && (
             <div className="bubble-actions">

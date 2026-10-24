@@ -144,6 +144,18 @@ function Collar({ view, W, H, color, tag, side }: { view: PetView; W: number; H:
   </g>;
 }
 
+// How far each hat reaches above where it meets the head, in the same 100-unit drawing space.
+const HAT_RISE: Record<HatStyle, number> = { top: 88, party: 124, beanie: 73, crown: 59 };
+const CAP_RISE = 42;
+
+/** How many px the outfit sticks up above the top of a W×H sprite, so speech bubbles can clear it. */
+export function headroom(view: PetView, W: number, H: number, outfit: Outfit) {
+  const { hat, cap } = outfit;
+  if (!hat.on && !cap.on) return 0;
+  const scale = (hat.on ? HAT_SCALE[hat.style] : 0.8) * view.head.w * W / 100;
+  return Math.max(0, (hat.on ? HAT_RISE[hat.style] : CAP_RISE) * scale - view.head.y * H);
+}
+
 // Where sparkles twinkle, as fractions of the sprite; more of them show as the shine goes up.
 const SPARKLES = [[0.18, 0.2], [0.82, 0.32], [0.3, 0.72], [0.72, 0.62], [0.52, 0.08], [0.1, 0.5], [0.9, 0.78], [0.42, 0.42]];
 

@@ -72,6 +72,9 @@ export default function Today() {
   };
 
   const now = nowSec();
+  // Ticked-off tasks only keep the open ones company; with nothing left to do, the list is just empty.
+  const hasOpen = todo.some((t) => !t.done);
+
   return (
     <div className="scroll">
       <section aria-labelledby="h-today">
@@ -141,9 +144,9 @@ export default function Today() {
 
       <section aria-labelledby="h-tasks">
         <h2 id="h-tasks">To-do</h2>
-        {todo.length === 0 && <p className="hint">No open tasks. Add one below, or ask your pet to.</p>}
+        {!hasOpen && <p className="hint">No open tasks. Add one below, or ask your pet to.</p>}
         <ul className="tasks">
-          {todo.map((t) => (
+          {(hasOpen ? todo : []).map((t) => (
             <li key={t.id} className={`${t.done ? "done" : ""}${!t.done && t.due && t.due < now ? " overdue" : ""}`}>
               <label>
                 <input type="checkbox" checked={t.done} onChange={() => toggle(t)} />
