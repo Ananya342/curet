@@ -661,6 +661,29 @@ export default function Pet() {
     return () => { clearTimeout(t); clearInterval(tick); };
   }, [blink, fallAsleep, wander]);
 
+  // The usable screen changes under the pet: a full-screen app hides the Dock and menu bar, a display is plugged
+  // in, or the Dock moves. Re-measure every so often and glide onto the new floor, so the pet always sits on
+  // the bottom edge and the menu and bubble keep their bearings.
+  useEffect(() => {
+    let settling = false;
+    const t = window.setInterval(async () => {
+      const s = await invoke<Screen | null>("screen_info").catch(() => null);
+      if (!s || settling) return;
+      const a = screen.current, n = s.work;
+      if (a.x === n.x && a.y === n.y && a.w === n.w && a.h === n.h) return;
+      screen.current = n;
+      if (!["idle", "sleeping", "focusing", "alert"].includes(modeRef.current) || draggingRef.current) return;
+      const b = bounds();
+      const from = { ...pos.current }, to = { x: clamp(from.x, b.minX, b.maxX), y: b.floorY };
+      if (Math.hypot(to.x - from.x, to.y - from.y) < 1) return;
+      settling = true;
+      await animate(0, 1, { duration: 0.45, ease: "easeInOut", onUpdate: (k) => moveTo(from.x + (to.x - from.x) * k, from.y + (to.y - from.y) * k) });
+      homeX.current = to.x;
+      settling = false;
+    }, 1500);
+    return () => clearInterval(t);
+  }, [bounds, moveTo]);
+
   // While locked in: quick little typing taps, the eyes glancing across the screen, a determined nod now and
   // then and the odd thought drifting up.
   useEffect(() => {
