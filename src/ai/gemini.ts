@@ -16,15 +16,35 @@ async function context(petId: PetId) {
   const line = (e: (typeof evs)[number]) =>
     `- ${e.kind === "deadline" ? "[DEADLINE] " : ""}${e.title} — ${e.all_day ? fmtDay(e.start) + " (all day)" : `${fmtDay(e.start)} ${fmtTime(e.start)}–${fmtTime(e.end)}`}`;
   const pet = PETS[petId];
-  return `You are ${pet.name}, ${pet.personality}, a tiny desktop companion. Reply warmly in 1–3 short sentences, at most one emoji.
-The calendar below covers today and tomorrow; use get_events only for other dates. Never invent events. Use tools to find free time, add tasks, add events (only when asked) and remember lasting preferences.
-Now: ${now.toLocaleString([], { dateStyle: "full", timeStyle: "short" })}.
-Calendar:
-${evs.length ? evs.slice(0, 15).map(line).join("\n") : "(empty or not connected)"}
-Tasks:
-${open.length ? open.slice(0, 10).map((t) => `- #${t.id} ${t.title}${t.due ? ` (due ${fmtDay(t.due)})` : ""}`).join("\n") : "(none)"}
-Remembered:
-${mem.length ? mem.map((m) => `- ${m.fact}`).join("\n") : "(nothing)"}`;
+  return `You are ${pet.name}, a desktop assistant that helps the user with their calendar, deadlines and tasks.
+Write plainly and briefly (1–4 sentences unless asked for a plan). No roleplay: no sounds, no stage directions like *purr* or *yawn*, no baby talk, no emoji. Do not start a reply by announcing an action. Answer directly.
+Format replies in Markdown: **bold** for titles and times, "- " bullet lists for several items, one item per line.
+The calendar below is complete for the next 3 days: answer questions about those days straight from it, without calling a tool. Only call get_events for dates further out. Use the other tools to find free time, manage tasks and remember things. Never invent events — if the calendar is empty or not connected, say so and mention Settings.
+Call add_calendar_event only when the user clearly asks to schedule something, and include the exact title and time in the reply. Work out words like "tomorrow" or "Friday" from the current date and time below. When the user shares a lasting preference, goal or project, call remember. When they ask to be reminded or add something to do, call add_task.
+Now: ${now.toLocaleString([], { dateStyle: "full", timeStyle: "short" })} (${Intl.DateTimeFormat().resolvedOptions().timeZone}).
+Next 3 days:
+${evs.length ? evs.slice(0, 40).map(line).join("\n") : "(nothing on the calendar)"}
+Open tasks:
+${open.length ? open.map((t) => `- #${t.id} ${t.title}${t.due ? ` (due ${fmtDay(t.due)})` : ""}`).join("\n") : "(none)"}
+What you remember about the user:
+${mem.length ? mem.map((m) => `- ${m.fact}`).join("\n") : "(nothing yet)"}`;
+}
+
+/** Drops a leading "I'll check / let me add…" sentence so the reply starts with the answer. */
+const LEAD =
+  /^(?:(?:sure|okay|ok|alright|of course|got it|absolutely)[,!]?\s+)?(?:i['’]ll|i will|let me|lemme|i['’]m going to|i['’]m gonna|i am going to)\s+(?:just\s+)?(?:check|look|see|find|add|put|save|remember|pull|grab|get|take a look|take a peek|search|read|mark|tick)\b[^.:!?\n]*[.:!?…]+\s+/i;
+
+export function replyWithoutLead(text: string, done = true): string | null {
+  let rest = text.trim();
+  for (let i = 0; i < 2; i++) {
+    const next = rest.replace(LEAD, "").trim();
+    if (!next || next === rest) break;
+    rest = next;
+  }
+  if (rest !== text.trim()) return rest;
+  const announcing = /^(?:(?:sure|okay|ok|alright|of course|got it)[,!]?\s+)?(?:i['’]ll|i will|let me|lemme|i['’]m going to|i['’]m gonna)\b/i.test(rest);
+  if (!done && announcing && !/[.!?…]\s+\S/.test(rest)) return null;
+  return done ? rest : text;
 }
 
 const STATUS: Record<string, string> = {
@@ -104,11 +124,21 @@ export async function ask(
       for (const part of chunk.candidates?.[0]?.content?.parts ?? []) {
         parts.push(part);
         if (first) { first = false; timing(`round ${round + 1}: first output after ${Math.round(performance.now() - t0)} ms (${model})`); }
-        if (part.functionCall) calls.push(part.functionCall);
-        else if (part.text && !part.thought) { soFar += part.text; onText?.(soFar); }
+        if (part.functionCall) {
+          calls.push(part.functionCall);
+          // That text is the "I'll check your calendar" lead-in, not the answer.
+          if (soFar) { soFar = ""; onText?.(""); }
+        } else if (part.text && !part.thought && !calls.length) {
+          soFar += part.text;
+          const shown = replyWithoutLead(soFar, false);
+          if (shown != null) onText?.(shown);
+        }
       }
     }
-    if (!calls.length) { timing(`done in ${Math.round(performance.now() - t0)} ms, ${round + 1} round(s)`); return soFar.trim() || "…"; }
+    if (!calls.length) {
+      timing(`done in ${Math.round(performance.now() - t0)} ms, ${round + 1} round(s)`);
+      return replyWithoutLead(soFar, true) || "…";
+    }
 
     contents.push({ role: "model", parts });
     const results = [];

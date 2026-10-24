@@ -25,6 +25,8 @@ pub struct Task {
     pub due: Option<i64>,
     pub done: bool,
     pub created: i64,
+    /// When it was ticked off, so the to-do list can keep today's finished tasks struck through.
+    pub done_at: Option<i64>,
 }
 
 #[derive(Serialize)]
@@ -49,6 +51,8 @@ pub fn open(path: &Path) -> Db {
             link TEXT NOT NULL, kind TEXT NOT NULL, PRIMARY KEY (id, start));",
     )
     .expect("migrate");
+    // Added later: tasks remember when they were ticked off. Fails harmlessly once the column exists.
+    let _ = conn.execute("ALTER TABLE tasks ADD COLUMN done_at INTEGER", []);
     // The db holds API keys and calendar feed tokens, so keep it private to the user.
     #[cfg(unix)]
     {
@@ -138,20 +142,23 @@ pub fn task_add(db: State<Db>, title: String, due: Option<i64>) -> Task {
     let created = chrono::Utc::now().timestamp();
     c.execute("INSERT INTO tasks(title,due,created) VALUES(?1,?2,?3)", params![title, due, created])
         .unwrap();
-    Task { id: c.last_insert_rowid(), title, due, done: false, created }
+    Task { id: c.last_insert_rowid(), title, due, done: false, created, done_at: None }
 }
 
 #[tauri::command]
 pub fn task_list(db: State<Db>, include_done: bool) -> Vec<Task> {
     let c = db.0.lock().unwrap();
     let sql = if include_done {
-        "SELECT id,title,due,done,created FROM tasks ORDER BY done, COALESCE(due, 9e18), id"
+        "SELECT id,title,due,done,created,done_at FROM tasks ORDER BY done, COALESCE(due, 9e18), id"
     } else {
-        "SELECT id,title,due,done,created FROM tasks WHERE done=0 ORDER BY COALESCE(due, 9e18), id"
+        "SELECT id,title,due,done,created,done_at FROM tasks WHERE done=0 ORDER BY COALESCE(due, 9e18), id"
     };
     let mut st = c.prepare(sql).unwrap();
     st.query_map([], |r| {
-        Ok(Task { id: r.get(0)?, title: r.get(1)?, due: r.get(2)?, done: r.get(3)?, created: r.get(4)? })
+        Ok(Task {
+            id: r.get(0)?, title: r.get(1)?, due: r.get(2)?, done: r.get(3)?, created: r.get(4)?,
+            done_at: r.get(5)?,
+        })
     })
     .unwrap()
     .filter_map(Result::ok)
@@ -160,12 +167,13 @@ pub fn task_list(db: State<Db>, include_done: bool) -> Vec<Task> {
 
 #[tauri::command]
 pub fn task_done(db: State<Db>, id: i64, done: bool) {
+    let now = chrono::Utc::now().timestamp();
     {
         let c = db.0.lock().unwrap();
-        let _ = c.execute("UPDATE tasks SET done=?2 WHERE id=?1", params![id, done]);
+        let _ = c.execute("UPDATE tasks SET done=?2, done_at=?3 WHERE id=?1", params![id, done, done.then_some(now)]);
     }
     if done {
-        log_time(&db, "tasks_done_log", chrono::Utc::now().timestamp());
+        log_time(&db, "tasks_done_log", now);
     }
 }
 

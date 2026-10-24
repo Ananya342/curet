@@ -6,7 +6,8 @@ export interface CalEvent {
   id: string; source: string; title: string; start: number; end: number;
   all_day: boolean; location: string; link: string; kind: "event" | "deadline";
 }
-export interface Task { id: number; title: string; due: number | null; done: boolean; created: number }
+/** A to-do item; `done_at` keeps today's ticked-off tasks visible (struck through). */
+export interface Task { id: number; title: string; due: number | null; done: boolean; created: number; done_at: number | null }
 export interface Memory { id: number; fact: string; created: number }
 export interface Feed { id: string; name: string; url: string; kind: string }
 export interface Area { x: number; y: number; w: number; h: number }

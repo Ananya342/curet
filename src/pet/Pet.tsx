@@ -125,9 +125,10 @@ export default function Pet() {
     const b: Bubble = { id: Date.now(), text, actions: opts.actions, rich: opts.rich };
     setBubble(b);
     const ms = opts.ms ?? Math.max(3000, text.length * 70);
-    bubbleTimer.current = window.setTimeout(() => setBubble((cur) => (cur?.id === b.id ? null : cur)), ms);
+    // Back to 0 once the bubble is gone, so the idle loop knows the pet is free to wander again.
+    bubbleTimer.current = window.setTimeout(() => { bubbleTimer.current = 0; setBubble((cur) => (cur?.id === b.id ? null : cur)); }, ms);
   }, []);
-  const hush = () => { window.clearTimeout(bubbleTimer.current); setBubble(null); };
+  const hush = () => { window.clearTimeout(bubbleTimer.current); bubbleTimer.current = 0; setBubble(null); };
 
   const closeMenu = () => { window.clearTimeout(menuTimer.current); setMenu(null); };
   const openMenu = async (kind: "main" | "picker" = "main") => {
@@ -649,6 +650,9 @@ export default function Pet() {
     return () => { cancelled = true; unlisten.forEach((u) => u()); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Load the side profile ahead of the first walk so the turn doesn't flash.
+  useEffect(() => { if (def.side) new Image().src = def.side.src; }, [def]);
 
   // Eyelids should look like the skin around each eye, so sample the ring of pixels surrounding it.
   useEffect(() => {

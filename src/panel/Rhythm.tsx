@@ -26,13 +26,16 @@ export default function Rhythm() {
   const evening = useTimeSetting("briefing_evening", "20:00");
   const [brk, setBrk] = useState("50");
   useEffect(() => { kvGet("break_every").then((v) => v && setBrk(v)); }, []);
-  const preview = (type: "morning" | "evening" | "week" | "break") => emitTo("pet", "wellbeing-preview", { type });
+  const preview = (type: "morning" | "evening" | "week" | "break" | "nudge") => emitTo("pet", "wellbeing-preview", { type });
   const [eyes, setEyes] = useState("20");
   useEffect(() => { kvGet("eye_every").then((v) => v && setEyes(v)); }, []);
   const late = useToggle("late_nudge");
   const recap = useToggle("recap_on");
   const ahead = useToggle("week_ahead_on");
   const tryIt = (type: "eyes" | "late" | "recap" | "week") => emitTo("pet", "mindful-preview", { type });
+  const [nudges, setNudges] = useState(true);
+  useEffect(() => { kvGet("nudges_on").then((v) => setNudges(v !== "off")); }, []);
+  const setNudgesOn = (on: boolean) => { setNudges(on); kvSet("nudges_on", on ? null : "off"); };
 
   return (
     <section aria-labelledby="h-rhythm">
@@ -51,11 +54,15 @@ export default function Rhythm() {
           {BREAKS.map(([v, label]) => <option key={v} value={v}>{label}</option>)}
         </select>
       </div>
+      <div className="rrow">
+        <label className="check"><input type="checkbox" checked={nudges} onChange={(e) => setNudgesOn(e.target.checked)} /><span>Free-time nudges</span></label>
+      </div>
       <div className="row-btns">
         <button className="btn sm soft" onClick={() => preview("morning")}>Try morning</button>
         <button className="btn sm soft" onClick={() => preview("evening")}>Try evening</button>
         <button className="btn sm soft" onClick={() => preview("week")}>Try week</button>
         <button className="btn sm soft" onClick={() => preview("break")}>Try break</button>
+        <button className="btn sm soft" onClick={() => preview("nudge")}>Try nudge</button>
       </div>
       <div className="rrow">
         <span id="lbl-eyes" className="check-label">Rest your eyes (30s)</span>

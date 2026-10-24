@@ -15,7 +15,10 @@ const events = [
   { id: "3", source: "b", title: "Essay 2 - Due", start: now + 20 * 3600, end: now + 20 * 3600, all_day: false, location: "", link: "https://school.brightspace.com/x", kind: "deadline" },
   { id: "4", source: "b", title: "Quiz 4 - Availability Ends", start: now + 3 * 86400, end: now + 3 * 86400, all_day: false, location: "", link: "", kind: "deadline" },
 ];
-const tasks = [{ id: 1, title: "Finish lab report", due: null, done: false, created: now }];
+const tasks = [
+  { id: 1, title: "Finish lab report", due: null, done: false, created: now, done_at: null as number | null },
+  { id: 3, title: "Email TA about office hours", due: null, done: true, created: now, done_at: now - 3600 as number | null },
+];
 
 const emit = (event: string, payload: unknown) =>
   (handlers.get(event) ?? []).forEach(({ cb, id }) => (window as any)[`_${cb}`]?.({ event, id, payload }));
@@ -64,7 +67,8 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
       case "kv_set": args.value == null ? kv.delete(args.key) : kv.set(args.key, args.value); return;
       case "screen_info": return { work: { x: 0, y: 0, w: window.innerWidth, h: window.innerHeight }, tray: { x: window.innerWidth - 160, y: 12 } };
       case "events_range": return events.filter((e) => e.end >= args.from && e.start <= args.to);
-      case "task_list": return tasks;
+      case "task_list": return args.includeDone ? tasks : tasks.filter((t) => !t.done);
+      case "task_done": { const t = tasks.find((x) => x.id === args.id); if (t) { t.done = args.done; t.done_at = args.done ? Math.floor(Date.now() / 1000) : null; } return; }
       case "memory_list": case "feeds_list": return [];
       case "google_status": return { connected: false, configured: true, email: null };
       case "window_rect": return { x: 0, y: 0, w: 440, h: 180 };

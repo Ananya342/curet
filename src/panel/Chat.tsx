@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { PETS, PetId } from "../pets";
 import { kvGet, kvSet } from "../api";
-import { Msg, ask, friendlyError } from "../ai/gemini";
+import { Markdown } from "./Markdown";
+import { Msg, ask, friendlyError, replyWithoutLead } from "../ai/gemini";
 
 const SUGGESTIONS = ["What’s on today?", "When am I free tomorrow?", "Help me plan my day", "What’s due this week?"];
 
@@ -10,7 +11,6 @@ export default function Chat({ petId }: { petId: PetId }) {
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState("");
   const [draft, setDraft] = useState("");
   const [undo, setUndo] = useState<Msg[] | null>(null);
   const end = useRef<HTMLDivElement>(null);
@@ -21,7 +21,7 @@ export default function Chat({ petId }: { petId: PetId }) {
     kvGet("chat").then((s) => { try { s && setMsgs(JSON.parse(s)); } catch { /* ignore */ } });
     field.current?.focus();
   }, []);
-  useEffect(() => { end.current?.scrollIntoView({ block: "end" }); }, [msgs, busy, status, draft]);
+  useEffect(() => { end.current?.scrollIntoView({ block: "end" }); }, [msgs, busy, draft]);
 
   const grow = () => {
     const el = field.current;
@@ -42,11 +42,10 @@ export default function Chat({ petId }: { petId: PetId }) {
     setMsgs(next);
     setBusy(true);
     let reply: string;
-    try { reply = await ask(history, t, petId, setStatus, setDraft); } catch (e) { reply = friendlyError(e); }
+    try { reply = await ask(history, t, petId, undefined, setDraft); } catch (e) { reply = friendlyError(e); }
     const done = [...next, { role: "model" as const, text: reply }];
     setMsgs(done);
     setBusy(false);
-    setStatus("");
     setDraft("");
     kvSet("chat", JSON.stringify(done.slice(-40)));
     field.current?.focus();
@@ -95,7 +94,7 @@ export default function Chat({ petId }: { petId: PetId }) {
               <img src={pet.src} alt="" draggable={false} />
               <div>
                 <div className="who" translate="no">{pet.name}</div>
-                <p>{m.text}</p>
+                <Markdown text={replyWithoutLead(m.text) ?? m.text} />
               </div>
             </div>
           ),
@@ -105,8 +104,8 @@ export default function Chat({ petId }: { petId: PetId }) {
             <img src={pet.src} alt="" draggable={false} />
             <div>
               <div className="who" translate="no">{pet.name}</div>
-              {draft
-                ? <p className="typing">{draft}</p>
+              {draft && replyWithoutLead(draft, false)
+                ? <Markdown text={replyWithoutLead(draft, false)!} typing />
                 : <p className="status"><span className="paws" aria-hidden="true"><i /><i /><i /></span>{status || "Thinking…"}</p>}
             </div>
           </div>
