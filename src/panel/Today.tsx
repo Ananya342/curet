@@ -3,7 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { emitTo, listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { CalEvent, Task, addCalendarEvent, eventsRange, fmtDay, fmtTime, nowSec, refreshEvents, startOfDay, tasks, untilLabel } from "../api";
-import { StudyPlan, deadlineKey, deadlinesDone, setDeadlineDone, studyPlans } from "../study/plans";
+import { StudyPlan, deadlineKey, deadlinesDone, isExam, setDeadlineDone, studyPlans } from "../study/plans";
 import Syllabus from "./Syllabus";
 
 export default function Today() {
@@ -25,7 +25,8 @@ export default function Today() {
     // Deadlines from the last two days stay listed until ticked off, so a missed one can still be marked done.
     const [t, up, ts, dn0] = await Promise.all([eventsRange(d, d + 86400), eventsRange(nowSec() - 2 * 86400, nowSec() + 7 * 86400), tasks.list(true), deadlinesDone()]);
     setToday(t.filter((e) => e.kind === "event" || e.start < d + 86400));
-    setDeadlines(up.filter((e) => e.kind === "deadline" && (e.start > nowSec() || !dn0[deadlineKey(e)])));
+    // Exams from the calendar sit alongside deadlines (upcoming only), so they can get a study block too.
+    setDeadlines(up.filter((e) => (e.kind === "deadline" && (e.start > nowSec() || !dn0[deadlineKey(e)])) || (isExam(e) && e.start > nowSec())));
     // Open tasks, then whatever was ticked off today (struck through).
     setTodo(ts.filter((x) => !x.done || (x.done_at ?? 0) >= d));
     const [dn, ps] = await Promise.all([deadlinesDone(), studyPlans()]);
@@ -109,7 +110,7 @@ export default function Today() {
 
       {deadlines.length > 0 && (
         <section aria-labelledby="h-deadlines">
-          <h2 id="h-deadlines">Coming deadlines</h2>
+          <h2 id="h-deadlines">Deadlines & exams</h2>
           <ul className="items">
             {deadlines.map((e) => {
               const key = deadlineKey(e);
@@ -121,7 +122,7 @@ export default function Today() {
                   <div className="grow">
                     <div className="t">{e.title}</div>
                     <div className="s tnum">
-                      {fmtDay(e.start)}, {fmtTime(e.start)} · {e.start <= now ? (isDone ? "done" : <b className="missed">missed</b>) : `in ${untilLabel(e.start, now)}`}
+                      {isExam(e) && "Exam · "}{fmtDay(e.start)}, {fmtTime(e.start)} · {e.start <= now ? (isDone ? "done" : <b className="missed">missed</b>) : `in ${untilLabel(e.start, now)}`}
                       {plan && !isDone && <> · <b>study {fmtDay(plan.start)} {fmtTime(plan.start)}</b></>}
                     </div>
                   </div>

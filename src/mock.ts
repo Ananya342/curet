@@ -75,7 +75,6 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
       case "memory_list": case "feeds_list": return [];
       case "google_status": return { connected: false, configured: true, email: null };
       case "window_rect": return { x: 0, y: 0, w: 440, h: 180 };
-<<<<<<< Updated upstream
       case "google_add_event": {
         const e = args.event;
         const ev = { id: `m${Date.now()}`, source: "g", title: e.title, start: e.start, end: e.end, all_day: e.all_day, location: e.location ?? "", link: "", kind: "event" };
@@ -83,14 +82,12 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
         return ev;
       }
       case "frontmost_app": return new URLSearchParams(location.search).get("app"); // e.g. ?mock&app=YouTube
-=======
       case "quiet_state": return {
         dnd: quietAs === "dnd",
         muted: quietAs === "muted",
         volume: quietAs === "zero" ? 0 : 60,
         audio_known: true,
       };
->>>>>>> Stashed changes
       default: return null;
     }
   },

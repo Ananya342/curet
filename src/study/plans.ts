@@ -65,7 +65,9 @@ export interface Proposal { deadline: CalEvent; start: number; end: number }
 
 const BLOCK = 120 * 60;
 // Exams added from a syllabus (or by hand) are calendar events, not deadlines, but deserve a study block too.
-const EXAM = /\b(exam|midterm|final|quiz|test)\b/i;
+export const EXAM = /\b(exam(ination)?s?|midterms?|finals?|quiz(zes)?|tests?)\b/i;
+/** An exam on the calendar (not one of Curet's own "Study:" blocks). */
+export const isExam = (e: Pick<CalEvent, "kind" | "title">) => e.kind === "event" && EXAM.test(e.title) && !/^study:/i.test(e.title);
 
 /**
  * The first good study slot for `deadline`: a free stretch of 2 hours (or at least 1, cut to fit) on a day
@@ -98,7 +100,7 @@ export async function nextProposal(key?: string): Promise<Proposal | null> {
   const [evs, done, plans, seen] = await Promise.all([eventsRange(now, now + 7 * DAY), readDone(), studyPlans(), asked()]);
   const planned = new Set(plans.filter((p) => p.status !== "skipped").map((p) => p.key));
   const candidates = evs
-    .filter((e) => e.kind === "deadline" || (EXAM.test(e.title) && !/^study:/i.test(e.title)))
+    .filter((e) => e.kind === "deadline" || isExam(e))
     .filter((e) => (key ? deadlineKey(e) === key : e.start - now > 6 * 3600 && !seen[deadlineKey(e)]))
     .filter((e) => !done[deadlineKey(e)] && !planned.has(deadlineKey(e)))
     .sort((a, b) => a.start - b.start);
