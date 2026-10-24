@@ -1,0 +1,1751 @@
+{
+ "url": "site/index.html",
+ "at": "2026-10-24T06:29:35.717Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    0.37,
+    0.48,
+    0.16
+   ],
+   "motion": {
+    "elements": 6,
+    "css": 6,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 2250,
+     "screens": 2.5,
+     "words": 295,
+     "img": 1,
+     "video": 0,
+     "canvas": 0,
+     "svg": 7,
+     "sections": 5,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Never miss a deadline again.",
+     "words": 5,
+     "chars": 28,
+     "lines": 2,
+     "size": 56,
+     "vw": 3.9,
+     "font": "Plus Jakarta Sans",
+     "weight": 800,
+     "tracking": -0.035,
+     "leading": 1.15,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "left",
+     "widthRatio": 0.38,
+     "top": 165,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Never miss a deadline again.",
+     "words": 5,
+     "lines": 2,
+     "size": 56,
+     "font": "Plus Jakarta Sans"
+    },
+    "headings": [
+     {
+      "text": "Never miss a deadline again.",
+      "words": 5,
+      "chars": 28,
+      "lines": 2,
+      "size": 56,
+      "vw": 3.9,
+      "font": "Plus Jakarta Sans",
+      "weight": 800,
+      "tracking": -0.035,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.38,
+      "top": 165,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Built for a semester",
+      "words": 4,
+      "chars": 20,
+      "lines": 1,
+      "size": 33.6,
+      "vw": 2.3,
+      "font": "Plus Jakarta Sans",
+      "weight": 800,
+      "tracking": -0.02,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.47,
+      "top": 763,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Running in two minutes",
+      "words": 4,
+      "chars": 22,
+      "lines": 1,
+      "size": 33.6,
+      "vw": 2.3,
+      "font": "Plus Jakarta Sans",
+      "weight": 800,
+      "tracking": -0.02,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.47,
+      "top": 1337,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Start the semester ahead of it.",
+      "words": 6,
+      "chars": 31,
+      "lines": 1,
+      "size": 36.8,
+      "vw": 2.6,
+      "font": "Plus Jakarta Sans",
+      "weight": 800,
+      "tracking": -0.02,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.43,
+      "top": 1951,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 4,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 1,
+     "medianWords": 4,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Plus Jakarta Sans",
+       "share": 0.96,
+       "mono": false
+      },
+      {
+       "family": "IBM Plex Mono",
+       "share": 0.04,
+       "mono": true
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      11,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      34,
+      37,
+      56
+     ],
+     "sizeCount": 10,
+     "notLoaded": [],
+     "body": {
+      "font": "Plus Jakarta Sans",
+      "size": 15,
+      "leading": 1.6,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 7.6
+     },
+     "measureChars": 38,
+     "max": {
+      "size": 56,
+      "vw": 3.9,
+      "font": "Plus Jakarta Sans",
+      "text": "Never miss a deadline again."
+     },
+     "monoShare": 0.04,
+     "monoProseShare": 0,
+     "monoFamilies": [
+      "IBM Plex Mono"
+     ],
+     "monoSamples": [],
+     "microLabels": 4,
+     "microLabelShare": 0.026,
+     "microSamples": [
+      "For students · macOS",
+      "Due soon",
+      "Starting",
+      "Tomorrow"
+     ],
+     "upperShare": 0.03,
+     "centerShare": 0.06,
+     "smallText": 1
+    },
+    "eyebrows": [
+     {
+      "text": "For students · macOS",
+      "above": "Never miss a deadline again.",
+      "upper": true,
+      "tracked": true,
+      "mono": false,
+      "pill": false,
+      "size": 12.8,
+      "top": 129
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#0b1f1d",
+     "bodyBgHsl": {
+      "h": 174,
+      "s": 0.48,
+      "l": 0.08
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#12302c",
+       "top": 699,
+       "hsl": {
+        "h": 172,
+        "s": 0.45,
+        "l": 0.13
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#a7c4c0",
+       "share": 0.69
+      },
+      {
+       "color": "#e6fffa",
+       "share": 0.24
+      },
+      {
+       "color": "#5eead4",
+       "share": 0.03
+      },
+      {
+       "color": "#04201d",
+       "share": 0.02
+      },
+      {
+       "color": "#1f1300",
+       "share": 0.02
+      }
+     ],
+     "button": {
+      "bg": "#2dd4bf",
+      "hsl": {
+       "h": 172,
+       "s": 0.66,
+       "l": 0.5
+      },
+      "fg": "#04201d"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 1,
+     "radius": 10,
+     "height": 51,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Download for macOS"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 5,
+     "hairlineSamples": [
+      "header.top 1440px",
+      "section.value 1440px",
+      "p.aside 733px",
+      "section.closer 1440px",
+      "footer 1440px"
+     ],
+     "outlinedBoxes": 9,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 9,
+     "boxRadius": 10,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 6,
+       "iconTopped": true,
+       "rounded": true,
+       "top": 834
+      }
+     ]
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 4,
+     "fixed": true,
+     "height": 65,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "ibm plex mono",
+     "plus jakarta sans"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 2250,
+    "margins": {
+     "left": 200,
+     "right": 200
+    },
+    "sections": [
+     {
+      "sel": "section.hero",
+      "tag": "section",
+      "top": 65,
+      "height": 485,
+      "words": 32,
+      "media": 0,
+      "middle": 64,
+      "heading": {
+       "text": "Never miss a deadline again.",
+       "size": 56,
+       "tag": "h1"
+      },
+      "left": 200,
+      "right": 537,
+      "textLeft": 200,
+      "textRight": 705,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.value",
+      "tag": "section",
+      "top": 550,
+      "height": 149,
+      "words": 27,
+      "media": 0,
+      "middle": 46,
+      "heading": {
+       "text": "One timeline",
+       "size": 18,
+       "tag": "h2"
+      },
+      "left": 200,
+      "right": 302,
+      "textLeft": 200,
+      "textRight": 302,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section#features.band",
+      "tag": "section",
+      "top": 699,
+      "height": 574,
+      "words": 93,
+      "media": 0,
+      "middle": 89,
+      "heading": {
+       "text": "Built for a semester",
+       "size": 34,
+       "tag": "h2"
+      },
+      "left": 200,
+      "right": 248,
+      "textLeft": 200,
+      "textRight": 248,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section#setup",
+      "tag": "section",
+      "top": 1273,
+      "height": 613,
+      "words": 74,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Running in two minutes",
+       "size": 34,
+       "tag": "h2"
+      },
+      "left": 200,
+      "right": 507,
+      "textLeft": 200,
+      "textRight": 507,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.closer",
+      "tag": "section",
+      "top": 1886,
+      "height": 276,
+      "words": 17,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Start the semester ahead of it.",
+       "size": 37,
+       "tag": "h2"
+      },
+      "left": 459,
+      "right": 459,
+      "textLeft": 459,
+      "textRight": 459,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Never miss a deadline again.",
+      "size": 56,
+      "top": 165,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 200,
+      "n": 4
+     },
+     {
+      "x": 219,
+      "n": 4
+     },
+     {
+      "x": 577,
+      "n": 3
+     },
+     {
+      "x": 929,
+      "n": 3
+     }
+    ],
+    "leftBlocks": 14,
+    "bodySize": 15,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0.18,
+    "voidBox": {
+     "x": 1140,
+     "y": 120,
+     "w": 300,
+     "h": 780
+    }
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    0.33,
+    0.69,
+    0.27
+   ],
+   "motion": {
+    "elements": 6,
+    "css": 6,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 2651,
+     "screens": 2.6,
+     "words": 295,
+     "img": 1,
+     "video": 0,
+     "canvas": 0,
+     "svg": 7,
+     "sections": 5,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Never miss a deadline again.",
+     "words": 5,
+     "chars": 28,
+     "lines": 1,
+     "size": 43,
+     "vw": 5.6,
+     "font": "Plus Jakarta Sans",
+     "weight": 800,
+     "tracking": -0.035,
+     "leading": 1.15,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.95,
+     "top": 361,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Never miss a deadline again.",
+     "words": 5,
+     "lines": 1,
+     "size": 43,
+     "font": "Plus Jakarta Sans"
+    },
+    "headings": [
+     {
+      "text": "Never miss a deadline again.",
+      "words": 5,
+      "chars": 28,
+      "lines": 1,
+      "size": 43,
+      "vw": 5.6,
+      "font": "Plus Jakarta Sans",
+      "weight": 800,
+      "tracking": -0.035,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.95,
+      "top": 361,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Built for a semester",
+      "words": 4,
+      "chars": 20,
+      "lines": 1,
+      "size": 27.6,
+      "vw": 3.6,
+      "font": "Plus Jakarta Sans",
+      "weight": 800,
+      "tracking": -0.02,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.88,
+      "top": 1001,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Running in two minutes",
+      "words": 4,
+      "chars": 22,
+      "lines": 1,
+      "size": 27.6,
+      "vw": 3.6,
+      "font": "Plus Jakarta Sans",
+      "weight": 800,
+      "tracking": -0.02,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.88,
+      "top": 1727,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Start the semester ahead of it.",
+      "words": 6,
+      "chars": 31,
+      "lines": 1,
+      "size": 30.7,
+      "vw": 4,
+      "font": "Plus Jakarta Sans",
+      "weight": 800,
+      "tracking": -0.02,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.8,
+      "top": 2359,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 4,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 1,
+     "medianWords": 4,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Plus Jakarta Sans",
+       "share": 0.96,
+       "mono": false
+      },
+      {
+       "family": "IBM Plex Mono",
+       "share": 0.04,
+       "mono": true
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      11,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      28,
+      31,
+      43
+     ],
+     "sizeCount": 10,
+     "notLoaded": [],
+     "body": {
+      "font": "Plus Jakarta Sans",
+      "size": 15,
+      "leading": 1.6,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 7.6
+     },
+     "measureChars": 41,
+     "max": {
+      "size": 43,
+      "vw": 5.6,
+      "font": "Plus Jakarta Sans",
+      "text": "Never miss a deadline again."
+     },
+     "monoShare": 0.04,
+     "monoProseShare": 0,
+     "monoFamilies": [
+      "IBM Plex Mono"
+     ],
+     "monoSamples": [],
+     "microLabels": 4,
+     "microLabelShare": 0.026,
+     "microSamples": [
+      "For students · macOS",
+      "Due soon",
+      "Starting",
+      "Tomorrow"
+     ],
+     "upperShare": 0.03,
+     "centerShare": 0.06,
+     "smallText": 1
+    },
+    "eyebrows": [
+     {
+      "text": "For students · macOS",
+      "above": "Never miss a deadline again.",
+      "upper": true,
+      "tracked": true,
+      "mono": false,
+      "pill": false,
+      "size": 12.8,
+      "top": 325
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#0b1f1d",
+     "bodyBgHsl": {
+      "h": 174,
+      "s": 0.48,
+      "l": 0.08
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#12302c",
+       "top": 937,
+       "hsl": {
+        "h": 172,
+        "s": 0.45,
+        "l": 0.13
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#a7c4c0",
+       "share": 0.69
+      },
+      {
+       "color": "#e6fffa",
+       "share": 0.24
+      },
+      {
+       "color": "#5eead4",
+       "share": 0.03
+      },
+      {
+       "color": "#04201d",
+       "share": 0.02
+      },
+      {
+       "color": "#1f1300",
+       "share": 0.02
+      }
+     ],
+     "button": {
+      "bg": "#2dd4bf",
+      "hsl": {
+       "h": 172,
+       "s": 0.66,
+       "l": 0.5
+      },
+      "fg": "#04201d"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 1,
+     "radius": 10,
+     "height": 51,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Download for macOS"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 5,
+     "hairlineSamples": [
+      "header.top 768px",
+      "section.value 768px",
+      "p.aside 728px",
+      "section.closer 768px",
+      "footer 768px"
+     ],
+     "outlinedBoxes": 9,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 9,
+     "boxRadius": 10,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 6,
+       "iconTopped": true,
+       "rounded": true,
+       "top": 1065
+      }
+     ]
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 4,
+     "fixed": true,
+     "height": 65,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "ibm plex mono",
+     "plus jakarta sans"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 2651,
+    "margins": {
+     "left": 20,
+     "right": 20
+    },
+    "sections": [
+     {
+      "sel": "section.hero",
+      "tag": "section",
+      "top": 65,
+      "height": 574,
+      "words": 32,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Never miss a deadline again.",
+       "size": 43,
+       "tag": "h1"
+      },
+      "left": 20,
+      "right": 175,
+      "textLeft": 20,
+      "textRight": 175,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.value",
+      "tag": "section",
+      "top": 639,
+      "height": 298,
+      "words": 27,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "One timeline",
+       "size": 18,
+       "tag": "h2"
+      },
+      "left": 20,
+      "right": 435,
+      "textLeft": 20,
+      "textRight": 435,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section#features.band",
+      "tag": "section",
+      "top": 937,
+      "height": 726,
+      "words": 93,
+      "media": 0,
+      "middle": 79,
+      "heading": {
+       "text": "Built for a semester",
+       "size": 28,
+       "tag": "h2"
+      },
+      "left": 20,
+      "right": 46,
+      "textLeft": 20,
+      "textRight": 46,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section#setup",
+      "tag": "section",
+      "top": 1663,
+      "height": 631,
+      "words": 74,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Running in two minutes",
+       "size": 28,
+       "tag": "h2"
+      },
+      "left": 20,
+      "right": 90,
+      "textLeft": 20,
+      "textRight": 90,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.closer",
+      "tag": "section",
+      "top": 2294,
+      "height": 269,
+      "words": 17,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Start the semester ahead of it.",
+       "size": 31,
+       "tag": "h2"
+      },
+      "left": 166,
+      "right": 166,
+      "textLeft": 166,
+      "textRight": 166,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Never miss a deadline again.",
+      "size": 43,
+      "top": 361,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 39,
+      "n": 6
+     },
+     {
+      "x": 20,
+      "n": 4
+     },
+     {
+      "x": 417,
+      "n": 4
+     }
+    ],
+    "leftBlocks": 14,
+    "bodySize": 15,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 5,
+   "filled": [
+    0.4,
+    0.89,
+    0.79,
+    0.36,
+    0.43
+   ],
+   "motion": {
+    "elements": 6,
+    "css": 6,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 3466,
+     "screens": 4.1,
+     "words": 295,
+     "img": 1,
+     "video": 0,
+     "canvas": 0,
+     "svg": 7,
+     "sections": 5,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Never miss a deadline again.",
+     "words": 5,
+     "chars": 28,
+     "lines": 2,
+     "size": 35.2,
+     "vw": 9,
+     "font": "Plus Jakarta Sans",
+     "weight": 800,
+     "tracking": -0.035,
+     "leading": 1.15,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.9,
+     "top": 361,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Never miss a deadline again.",
+     "words": 5,
+     "lines": 2,
+     "size": 35.2,
+     "font": "Plus Jakarta Sans"
+    },
+    "headings": [
+     {
+      "text": "Never miss a deadline again.",
+      "words": 5,
+      "chars": 28,
+      "lines": 2,
+      "size": 35.2,
+      "vw": 9,
+      "font": "Plus Jakarta Sans",
+      "weight": 800,
+      "tracking": -0.035,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 361,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Built for a semester",
+      "words": 4,
+      "chars": 20,
+      "lines": 1,
+      "size": 25.6,
+      "vw": 6.6,
+      "font": "Plus Jakarta Sans",
+      "weight": 800,
+      "tracking": -0.02,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 1060,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Running in two minutes",
+      "words": 4,
+      "chars": 22,
+      "lines": 1,
+      "size": 25.6,
+      "vw": 6.6,
+      "font": "Plus Jakarta Sans",
+      "weight": 800,
+      "tracking": -0.02,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 2310,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Start the semester ahead of it.",
+      "words": 6,
+      "chars": 31,
+      "lines": 2,
+      "size": 27.2,
+      "vw": 7,
+      "font": "Plus Jakarta Sans",
+      "weight": 800,
+      "tracking": -0.02,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 3109,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 4,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 1,
+     "medianWords": 4,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Plus Jakarta Sans",
+       "share": 0.96,
+       "mono": false
+      },
+      {
+       "family": "IBM Plex Mono",
+       "share": 0.04,
+       "mono": true
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      11,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      26,
+      27,
+      35
+     ],
+     "sizeCount": 10,
+     "notLoaded": [],
+     "body": {
+      "font": "Plus Jakarta Sans",
+      "size": 15,
+      "leading": 1.6,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 7.6
+     },
+     "measureChars": 40,
+     "max": {
+      "size": 35.2,
+      "vw": 9,
+      "font": "Plus Jakarta Sans",
+      "text": "Never miss a deadline again."
+     },
+     "monoShare": 0.04,
+     "monoProseShare": 0,
+     "monoFamilies": [
+      "IBM Plex Mono"
+     ],
+     "monoSamples": [],
+     "microLabels": 4,
+     "microLabelShare": 0.026,
+     "microSamples": [
+      "For students · macOS",
+      "Due soon",
+      "Starting",
+      "Tomorrow"
+     ],
+     "upperShare": 0.03,
+     "centerShare": 0.06,
+     "smallText": 1
+    },
+    "eyebrows": [
+     {
+      "text": "For students · macOS",
+      "above": "Never miss a deadline again.",
+      "upper": true,
+      "tracked": true,
+      "mono": false,
+      "pill": false,
+      "size": 12.8,
+      "top": 325
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#0b1f1d",
+     "bodyBgHsl": {
+      "h": 174,
+      "s": 0.48,
+      "l": 0.08
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#12302c",
+       "top": 996,
+       "hsl": {
+        "h": 172,
+        "s": 0.45,
+        "l": 0.13
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#a7c4c0",
+       "share": 0.69
+      },
+      {
+       "color": "#e6fffa",
+       "share": 0.24
+      },
+      {
+       "color": "#5eead4",
+       "share": 0.03
+      },
+      {
+       "color": "#04201d",
+       "share": 0.02
+      },
+      {
+       "color": "#1f1300",
+       "share": 0.02
+      }
+     ],
+     "button": {
+      "bg": "#2dd4bf",
+      "hsl": {
+       "h": 172,
+       "s": 0.66,
+       "l": 0.5
+      },
+      "fg": "#04201d"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 1,
+     "radius": 10,
+     "height": 51,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Download for macOS"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 5,
+     "hairlineSamples": [
+      "header.top 390px",
+      "section.value 390px",
+      "p.aside 350px",
+      "section.closer 390px",
+      "footer 390px"
+     ],
+     "outlinedBoxes": 9,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 10,
+     "boxRadius": 10,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 6,
+       "iconTopped": true,
+       "rounded": true,
+       "top": 1122
+      }
+     ]
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 4,
+     "fixed": true,
+     "height": 65,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "ibm plex mono",
+     "plus jakarta sans"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 3466,
+    "margins": {
+     "left": 20,
+     "right": 22
+    },
+    "sections": [
+     {
+      "sel": "section.hero",
+      "tag": "section",
+      "top": 65,
+      "height": 634,
+      "words": 45,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Never miss a deadline again.",
+       "size": 35,
+       "tag": "h1"
+      },
+      "left": 20,
+      "right": 37,
+      "textLeft": 20,
+      "textRight": 37,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.value",
+      "tag": "section",
+      "top": 699,
+      "height": 298,
+      "words": 27,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "One timeline",
+       "size": 18,
+       "tag": "h2"
+      },
+      "left": 20,
+      "right": 57,
+      "textLeft": 20,
+      "textRight": 57,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#features.band",
+      "tag": "section",
+      "top": 996,
+      "height": 1250,
+      "words": 93,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Built for a semester",
+       "size": 26,
+       "tag": "h2"
+      },
+      "left": 20,
+      "right": 51,
+      "textLeft": 20,
+      "textRight": 51,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#setup",
+      "tag": "section",
+      "top": 2246,
+      "height": 797,
+      "words": 74,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Running in two minutes",
+       "size": 26,
+       "tag": "h2"
+      },
+      "left": 20,
+      "right": 22,
+      "textLeft": 20,
+      "textRight": 22,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.closer",
+      "tag": "section",
+      "top": 3044,
+      "height": 296,
+      "words": 17,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Start the semester ahead of it.",
+       "size": 27,
+       "tag": "h2"
+      },
+      "left": 48,
+      "right": 48,
+      "textLeft": 48,
+      "textRight": 48,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "footer",
+      "tag": "footer",
+      "top": 3340,
+      "height": 126,
+      "words": 11,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 20,
+      "right": 111,
+      "textLeft": 20,
+      "textRight": 111,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Never miss a deadline again.",
+      "size": 35,
+      "top": 361,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 39,
+      "n": 10
+     },
+     {
+      "x": 20,
+      "n": 4
+     }
+    ],
+    "leftBlocks": 14,
+    "bodySize": 15,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "FAIL",
+   "id": "eyebrow",
+   "width": 1440,
+   "message": "1 eyebrow/kicker label(s) above headings: \"For students · macOS\" above \"Never miss a deadline again.\"",
+   "fix": "Delete them. If the label carried real information, fold it into the headline or the supporting sentence.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "micro-label",
+   "width": 1440,
+   "message": "4 tiny uppercase letter-spaced labels (e.g. \"For students · macOS\", \"Due soon\", \"Starting\", \"Tomorrow\").",
+   "fix": "Use sentence-case text at a readable size, or delete the label.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "hairline",
+   "width": 1440,
+   "message": "5 thin rule(s)/divider line(s): header.top 1440px | section.value 1440px | p.aside 733px | section.closer 1440px",
+   "fix": "Delete. Separate with space, a tone change, or scale. Lines are only for real tables and form fields.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "outlined-box",
+   "width": 1440,
+   "message": "9 boxes drawn with a 1px outline.",
+   "fix": "Define a surface by its fill (one tone step from the page) or leave the content unboxed.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "icon-cards",
+   "width": 1440,
+   "message": "1 row(s) of identical cards each topped with a small icon (6 cards).",
+   "fix": "Replace with one composed section from the direction: a narrative split, a list set in large type, or real imagery per item.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "size-count",
+   "width": 1440,
+   "message": "10 different font sizes (11, 13, 14, 15, 16, 17, 18, 34, 37, 56).",
+   "fix": "A page needs about five: display, heading, lead, body, small.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "body-size",
+   "width": 1440,
+   "message": "Body text is 15px.",
+   "fix": "Body copy 16–20px.",
+   "alsoAt": [
+    768
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "few-pictures",
+   "width": 1440,
+   "message": "Only 0 picture(s) on the page (0 photographs, footage or raster images, 0 interface fragments). Drawings in SVG do not count.",
+   "fix": "Find real pictures of the subject's world with scripts/assets.mjs (photographs, archival images, maps, engravings, footage), download them to assets/ and give them room: a hero picture, one per section that has a subject, a full-width band. At least four, usually six to twelve."
+  },
+  {
+   "level": "WARN",
+   "id": "no-footage",
+   "width": 1440,
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  },
+  {
+   "level": "WARN",
+   "id": "small-text",
+   "width": 1440,
+   "message": "1 text block(s) under 13px.",
+   "fix": "Nothing meant to be read goes below 13px.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "focal-point",
+   "width": 1440,
+   "message": "The first screen has no dominant element: the largest type is 56px (3.9vw) and no single picture holds a third of the viewport.",
+   "fix": "Make one thing lead: the headline at display size, or one large picture. A grid of many small pictures is not one thing; in blind tests jurors marked a first screen without a headline down every time. On the strongest studied sites the largest type has a median of 8.4vw."
+  },
+  {
+   "level": "WARN",
+   "id": "font-not-dealt",
+   "width": 1440,
+   "message": "The sheet dealt Bodoni Moda and Jost, but the page renders Plus Jakarta Sans, IBM Plex Mono.",
+   "fix": "Load the dealt face (the link on the sheet) and put it first in font-family. A build that falls back to a default face lands on the default look."
+  },
+  {
+   "level": "FAIL",
+   "id": "still-page",
+   "width": 1440,
+   "message": "Only 6 element(s) moved while the page loaded and scrolled.",
+   "fix": "Build the motion layer (SKILL.md step 9, references/motion.md): the signature move, an entrance for the parts of every section, feedback on every control, and one moving picture. Transform and opacity only, with a reduced-motion fallback."
+  },
+  {
+   "level": "WARN",
+   "id": "lopsided",
+   "width": 768,
+   "message": "A section keeps its content on one side and leaves 435px of the width empty: \"One timeline\".",
+   "fix": "Fill the other side with what the section has (its picture, a second column, the figure), or defend the void in one sentence."
+  },
+  {
+   "level": "FAIL",
+   "id": "reduced-hidden",
+   "width": 1440,
+   "message": "With reduced motion requested, 8 text block(s) on the first screen stay invisible: \"Starting\", \"CS 241 Lecture in 10 min\", \"Siebel 1404 · Google Meet\", \"Join\"",
+   "fix": "Put every hidden starting state inside @media (prefers-reduced-motion: no-preference); the reduced page is the finished page (references/motion.md §8)."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "/home/knaramdev/yourassitant/.taste-skill/before/desktop-fold.jpg",
+   "pages": [
+    "/home/knaramdev/yourassitant/.taste-skill/before/desktop-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "/home/knaramdev/yourassitant/.taste-skill/before/tablet-fold.jpg",
+   "pages": [
+    "/home/knaramdev/yourassitant/.taste-skill/before/tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "/home/knaramdev/yourassitant/.taste-skill/before/mobile-fold.jpg",
+   "pages": [
+    "/home/knaramdev/yourassitant/.taste-skill/before/mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

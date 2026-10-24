@@ -1,176 +1,272 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>LifePet — a tiny pet that keeps your deadlines</title>
-  <meta name="description" content="A desktop companion for macOS that reads your Google Calendar and Brightspace deadlines, and nudges you before things are due.">
-  <link rel="icon" type="image/svg+xml" href="icon.svg">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="style.css">
-
-  <meta property="og:title" content="LifePet">
-  <meta property="og:description" content="A tiny pet that keeps your deadlines. For macOS.">
-  <meta property="og:type" content="website">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LifePet — your deadlines find you</title>
+<meta name="description" content="A small creature that lives on your Mac, reads your Brightspace and Google calendars, and warns you before coursework is due.">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;1,6..96,500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<meta property="og:title" content="LifePet">
+<meta property="og:description" content="Your deadlines find you. A desktop creature for students, on macOS.">
+<meta property="og:type" content="website">
 </head>
 <body>
-<div class="wrap">
 
-  <header class="top">
-    <a class="brand" href="/">
-      <img src="icon.svg" alt="" width="26" height="26">
-      LifePet
-    </a>
-    <nav>
-      <a href="#get">Download</a>
-      <a href="#what">What it does</a>
-      <a href="#setup">Setup</a>
-      <a href="https://github.com/Ananya342/yourassitant">Source</a>
-    </nav>
-  </header>
+<div class="split">
 
-  <div class="hero">
-    <div>
-      <h1>A tiny pet that keeps<br>your <em>deadlines</em>.</h1>
-      <p class="lede">
-        LifePet floats on your desktop, reads your Google Calendar and Brightspace
-        deadlines, and nudges you before things are due. Boop its nose for a menu.
-        Tuck it into the notch when you need quiet.
+  <!-- The live thing: choose the creature. Drives the fixed half. -->
+  <input class="pick" type="radio" name="pet" id="p-ghost" checked>
+  <input class="pick" type="radio" name="pet" id="p-cat">
+  <input class="pick" type="radio" name="pet" id="p-blob">
+  <input class="pick" type="radio" name="pet" id="p-dragon">
+  <input class="pick" type="radio" name="pet" id="p-redpanda">
+
+  <!-- The half that never scrolls: the desktop the creature lives on. -->
+  <aside class="stage" aria-label="LifePet running on a desktop">
+    <div class="desk" data-ui>
+
+      <div class="island">
+        <span class="island-dot"></span>
+        <span class="island-next">CS 241 Lecture</span>
+        <span class="island-when">2:55 pm</span>
+      </div>
+
+      <div class="cards">
+        <article class="card">
+          <p class="card-when">in 2 hours</p>
+          <p class="card-what">Essay 2</p>
+          <p class="card-where">ENGL 210 · Brightspace</p>
+          <span class="card-do">Open</span>
+        </article>
+        <article class="card">
+          <p class="card-when">in 10 minutes</p>
+          <p class="card-what">CS 241 Lecture</p>
+          <p class="card-where">Siebel 1404 · Google Meet</p>
+          <span class="card-do">Join</span>
+        </article>
+        <article class="card">
+          <p class="card-when">tomorrow, 11:59 pm</p>
+          <p class="card-what">Quiz 4 closes</p>
+          <p class="card-where">MATH 220 · Brightspace</p>
+          <span class="card-do">Open</span>
+        </article>
+      </div>
+
+      <div class="creature">
+        <img class="pet pet-ghost" src="assets/ghost.png" width="420" height="404" alt="Boo, a small round white ghost with large dark eyes">
+        <img class="pet pet-cat" src="assets/cat.png" width="353" height="420" alt="Mochi, a sleepy orange cat" loading="lazy">
+        <img class="pet pet-blob" src="assets/blob.png" width="420" height="350" alt="Jelly, a bouncy purple blob" loading="lazy">
+        <img class="pet pet-dragon" src="assets/dragon.png" width="328" height="420" alt="Ember, a small green baby dragon" loading="lazy">
+        <img class="pet pet-redpanda" src="assets/redpanda.png" width="389" height="420" alt="Maple, a red panda" loading="lazy">
+      </div>
+
+      <p class="says">
+        <span class="say say-ghost">boo! good morning</span>
+        <span class="say say-cat">mrrrow… morning</span>
+        <span class="say say-blob">boing! good morning!</span>
+        <span class="say say-dragon">rawr! morning, hero</span>
+        <span class="say say-redpanda">good morning! snacks?</span>
       </p>
 
-      <div class="cta">
-        <a class="btn primary" href="https://github.com/Ananya342/yourassitant/releases">
-          Download for macOS
-        </a>
-        <span class="cta-sub">Free &middot; macOS 11 or later</span>
-      </div>
+    </div>
+  </aside>
 
-      <div class="meta">
-        <span>v0.1.0</span>
-        <span>Apple Silicon &amp; Intel</span>
-        <span>Tauri 2 + Rust</span>
-      </div>
+  <!-- The half that scrolls. -->
+  <main class="column">
+
+    <nav class="bar" aria-label="Primary">
+      <a class="mark" href="/">LifePet</a>
+      <a href="#day">The day</a>
+      <a href="#pets">Pets</a>
+      <a href="https://github.com/Ananya342/yourassitant">Source</a>
+    </nav>
+
+    <div class="opening">
+      <h1>Your deadlines find you.</h1>
+      <p class="lead rise">LifePet is a small creature that lives on your Mac. It reads your
+      Brightspace coursework and your Google calendar, and tells you what is coming before
+      it is late.</p>
+      <a class="act rise" href="https://github.com/Ananya342/yourassitant/releases">Download for macOS</a>
+      <p class="under rise">Free and open source. macOS 11 or later, Apple Silicon and Intel.</p>
     </div>
 
-    <div class="stage">
-      <!-- Boo, drawn inline so it can blink. -->
-      <svg viewBox="0 0 1024 1024" role="img" aria-label="Boo, the ghost pet, floating and blinking">
-        <g class="float">
-          <path class="body" d="M283 630C283 415 385 235 512 235C639 235 741 415 741 630C741 745 589 745 589 630C589 745 436 745 436 630C436 745 283 745 283 630Z"/>
-          <ellipse class="blush" cx="362" cy="512" rx="44" ry="27"/>
-          <ellipse class="blush" cx="662" cy="512" rx="44" ry="27"/>
-          <g class="eye">
-            <ellipse cx="426" cy="440" rx="58" ry="69" fill="#2b2340"/>
-            <circle cx="447" cy="414" r="19" fill="#fff"/>
-          </g>
-          <g class="eye">
-            <ellipse cx="598" cy="440" rx="58" ry="69" fill="#2b2340"/>
-            <circle cx="619" cy="414" r="19" fill="#fff"/>
-          </g>
-          <path d="M478 541 Q512 592 546 541 Z" fill="#e8537a"/>
-        </g>
-      </svg>
-    </div>
-  </div>
+    <section id="day">
+      <h2 class="rise">One Tuesday</h2>
 
-  <section id="get">
-    <div class="section-head">
-      <h2>Download</h2>
-      <p class="note">One build, universal. Drag it to Applications and you're done.</p>
-    </div>
+      <div class="stages">
+        <input class="st" type="radio" name="stage" id="s1" checked>
+        <input class="st" type="radio" name="stage" id="s2">
+        <input class="st" type="radio" name="stage" id="s3">
+        <input class="st" type="radio" name="stage" id="s4">
 
-    <div class="get-row">
-      <a class="btn primary big" href="https://github.com/Ananya342/yourassitant/releases">
-        Download LifePet for macOS
-      </a>
-      <a class="btn" href="https://github.com/Ananya342/yourassitant#develop">
-        Build from source
-      </a>
-    </div>
+        <div class="clauses">
+          <p class="clause c1">It wakes when you do, and says what the day holds.</p>
+          <p class="clause c2">Two hours before an essay is due, it walks over.</p>
+          <p class="clause c3">Ten minutes before a lecture, it brings the link.</p>
+          <p class="clause c4">You work. After ten quiet minutes, it naps.</p>
+        </div>
 
-    <div class="callout">
-      <b>First launch:</b> macOS will say the app is from an unidentified developer, because
-      this build isn't notarised. Right-click <code>LifePet.app</code> and choose
-      <b>Open</b>, then confirm. If it says the app is damaged, run
-      <code>xattr -dr com.apple.quarantine /Applications/LifePet.app</code> in Terminal once.
-    </div>
-  </section>
-
-  <section id="what">
-    <div class="section-head"><h2>What it does</h2></div>
-    <div class="feats">
-      <div class="feat">
-        <h3>Lives on your desktop</h3>
-        <p>Floats above your windows on every Space. Walks around, blinks, naps after ten idle
-        minutes, then wakes up with a stretch. Drag it, poke it, toss it &mdash; it bounces.</p>
+        <div class="track">
+          <label class="stop" for="s1">8:40 am</label>
+          <label class="stop" for="s2">1:00 pm</label>
+          <label class="stop" for="s3">2:45 pm</label>
+          <label class="stop" for="s4">4:20 pm</label>
+        </div>
       </div>
-      <div class="feat">
-        <h3>Hides into the notch</h3>
-        <p>Send it away and it flies into the menu bar. Hover for your next events, click to
-        bring it back, or press <code>&#8997;&#8984;L</code>.</p>
-      </div>
-      <div class="feat">
-        <h3>Knows your calendar</h3>
-        <p>Google Calendar and Brightspace. Reminders arrive as speech bubbles with a Join
-        button when it spots a Meet, Zoom or Teams link. Deadlines warn you 24 hours and
-        2 hours ahead.</p>
-      </div>
-      <div class="feat">
-        <h3>Answers questions</h3>
-        <p>Ask what's due this week, find a free hour, add a task, or tell it something to
-        remember. Runs on Gemini with your own free API key.</p>
-      </div>
-      <div class="feat">
-        <h3>Five pets</h3>
-        <p>Boo the ghost, Mochi the cat, Jelly the blob, Ember the dragon and Maple the red
-        panda. Each has its own temperament. Swap any time.</p>
-      </div>
-      <div class="feat">
-        <h3>Stays on your machine</h3>
-        <p>Settings, keys, calendar links and chat live in a local SQLite file with
-        <code>0600</code> permissions. Nothing leaves except calls to Google and your own
-        calendar feeds.</p>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="setup">
-    <div class="section-head">
-      <h2>After you install</h2>
-      <p class="note">Two minutes, and only the first one is required.</p>
-    </div>
-    <ol class="steps">
-      <li>
-        <h3>Open Settings</h3>
-        <p>Right-click the pet, or boop its nose and pick the gear.</p>
-      </li>
-      <li>
-        <h3>Add a Gemini key for chat</h3>
-        <p>Free at <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a>.
-        Paste it under Brain and leave the model field blank. Without a key everything else
-        still works &mdash; you just can't talk to it.</p>
-      </li>
-      <li>
-        <h3>Connect Brightspace</h3>
-        <p>In Brightspace: Calendar &rarr; Settings &rarr; tick <b>Enable Calendar Feeds</b>
-        &rarr; Subscribe &rarr; <b>All Calendars and Tasks</b>. Copy the link and paste it in.
-        The Subscribe button stays hidden until feeds are enabled.</p>
-      </li>
-      <li>
-        <h3>Connect Google Calendar</h3>
-        <p>Easiest route: Google Calendar settings &rarr; your calendar &rarr; Integrate
-        calendar &rarr; copy <b>Secret address in iCal format</b>. Or sign in with a Google
-        Cloud OAuth client if you want every calendar.</p>
-      </li>
-    </ol>
-  </section>
+    <section id="pets">
+      <h2 class="rise">Five of them</h2>
+      <p class="rise">Each has its own temper, its own greeting, and its own way of being
+      annoying about a deadline. You can swap whenever you like.</p>
 
-  <footer>
-    <span>LifePet v0.1.0 &mdash; built with Tauri 2, Rust and React.</span>
-    <span><a href="https://github.com/Ananya342/yourassitant">Source on GitHub</a></span>
-  </footer>
+      <ul class="index">
+        <li><label class="name n-ghost" for="p-ghost"><img class="thumb" src="assets/ghost.png" width="420" height="404" alt="" loading="lazy"><span>Boo</span></label>
+            <span class="trait">a shy little ghost who giggles easily</span></li>
+        <li><label class="name n-cat" for="p-cat"><img class="thumb" src="assets/cat.png" width="353" height="420" alt="" loading="lazy"><span>Mochi</span></label>
+            <span class="trait">a sleepy, slightly sassy orange cat</span></li>
+        <li><label class="name n-blob" for="p-blob"><img class="thumb" src="assets/blob.png" width="420" height="350" alt="" loading="lazy"><span>Jelly</span></label>
+            <span class="trait">a bouncy purple blob, endlessly upbeat</span></li>
+        <li><label class="name n-dragon" for="p-dragon"><img class="thumb" src="assets/dragon.png" width="328" height="420" alt="" loading="lazy"><span>Ember</span></label>
+            <span class="trait">a baby dragon who takes your schedule very seriously</span></li>
+        <li><label class="name n-redpanda" for="p-redpanda"><img class="thumb" src="assets/redpanda.png" width="389" height="420" alt="" loading="lazy"><span>Maple</span></label>
+            <span class="trait">a curious red panda who is mostly thinking about snacks</span></li>
+      </ul>
+    </section>
 
+    <section id="what">
+      <h2 class="rise">What it does</h2>
+
+      <div class="proof rise">
+        <div class="demo" data-ui>
+          <p class="demo-head">Brightspace</p>
+          <p class="demo-row">Essay 2 <span>Fri 11:59 pm</span></p>
+          <p class="demo-row">Quiz 4 closes <span>Wed 11:59 pm</span></p>
+          <p class="demo-row">Lab report 3 <span>Mon 9:00 am</span></p>
+        </div>
+        <div class="said">
+          <h3>It reads the place your coursework really lives</h3>
+          <p>Paste one calendar link from Brightspace and every due date, quiz window and
+          course task arrives on its own. Each one still links back to the submission page.</p>
+        </div>
+      </div>
+
+      <div class="proof rise">
+        <div class="demo" data-ui>
+          <p class="demo-head">Tuesday</p>
+          <p class="demo-row">11:00 — 12:20 <span>CS 241</span></p>
+          <p class="demo-free">1 hour 40 minutes free</p>
+          <p class="demo-row">2:00 — 2:50 <span>ENGL 210</span></p>
+        </div>
+        <div class="said">
+          <h3>It can find the gap you did not know you had</h3>
+          <p>Ask when you are free on Thursday, or what is due this week, and it answers from
+          the real calendar rather than guessing. Chat runs on Gemini with your own free key.</p>
+        </div>
+      </div>
+
+      <div class="proof rise">
+        <div class="demo" data-ui>
+          <p class="demo-head">Today</p>
+          <p class="demo-done">Finish lab report</p>
+          <p class="demo-row">Draft essay intro <span></span></p>
+          <p class="demo-row">Email Dr. Reyes <span></span></p>
+        </div>
+        <div class="said">
+          <h3>Tasks you tick off in front of it</h3>
+          <p>Add a to-do by typing or by asking. Tick one off and the creature throws confetti,
+          which is a small thing that turns out to matter at eleven at night.</p>
+        </div>
+      </div>
+
+      <div class="proof rise">
+        <div class="demo" data-ui>
+          <p class="demo-head">⌥⌘L</p>
+          <div class="demo-island"><span></span>Essay 2 · in 2 hours</div>
+          <p class="demo-note">The creature is in the notch.</p>
+        </div>
+        <div class="said">
+          <h3>Gone the moment you need the screen</h3>
+          <p>One shortcut tucks it into the notch, where it becomes a thin strip that still
+          shows what is next. Press it again and the creature drops back onto the desktop.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="setup">
+      <h2 class="giant rise">Setup</h2>
+
+      <details class="bar-row" open>
+        <summary>Install it</summary>
+        <p>Drag <b>LifePet.app</b> into Applications. The first time, right-click it and choose
+        <b>Open</b>: the build is not notarised, so a double-click will be refused. If macOS says
+        the app is damaged, that is quarantine rather than a bad download — run
+        <code>xattr -dr com.apple.quarantine /Applications/LifePet.app</code> once.</p>
+      </details>
+
+      <details class="bar-row">
+        <summary>Connect Brightspace</summary>
+        <p>In Brightspace open <b>Calendar</b>, then <b>Settings</b>, and tick
+        <b>Enable Calendar Feeds</b>. Only then does <b>Subscribe</b> appear — this is where
+        almost everyone gets stuck. Choose <b>All Calendars and Tasks</b>, copy the link, and
+        paste it into LifePet.</p>
+      </details>
+
+      <details class="bar-row">
+        <summary>Add your classes</summary>
+        <p>In Google Calendar settings, open your calendar, choose <b>Integrate calendar</b> and
+        copy the <b>secret address in iCal format</b>. Or sign in with Google if you would rather
+        have every calendar at once.</p>
+      </details>
+
+      <details class="bar-row">
+        <summary>Turn on chat, if you want it</summary>
+        <p>A free key from <a href="https://aistudio.google.com/apikey">aistudio.google.com</a>
+        goes under <b>Brain</b>. Everything else works without one; you simply cannot ask it
+        questions.</p>
+      </details>
+    </section>
+
+  </main>
 </div>
+
+<!-- The one section that breaks the split. -->
+<section class="band">
+  <img class="band-pic" src="assets/astrology-almanac-utrecht-1655-letterpress.webp" width="1024" height="793"
+       alt="A 1655 almanac broadside printed in Utrecht: dense columns of dates in red and black letterpress" loading="lazy" decoding="async">
+  <div class="band-say">
+    <h2>Printed deadlines, since 1655</h2>
+    <p>This is an almanac printed in Utrecht in 1655: every date of the year set in red and
+    black, so that a person could see what was coming. LifePet is the same idea, except it
+    already knows your courses and it comes to find you.</p>
+  </div>
+</section>
+
+<section class="closer">
+  <div class="closer-in">
+    <h2>It is waiting.</h2>
+    <p>Download it, paste one calendar link, and the rest of the semester arrives on its own.</p>
+    <a class="act act-light" href="https://github.com/Ananya342/yourassitant/releases">Download for macOS</a>
+  </div>
+  <img class="closer-pic" src="assets/almanac-scroll.jpg" width="500" height="625"
+       alt="An Ottoman calendar-almanac scroll from 1810, its ruled grid of dates picked out in gold and red" loading="lazy" decoding="async">
+</section>
+
+<footer>
+  <span>LifePet, a desktop companion for coursework</span>
+  <span class="foot-links">
+    <a href="https://github.com/Ananya342/yourassitant">Source</a>
+    <a href="https://github.com/Ananya342/yourassitant/releases">Releases</a>
+    <a href="#setup">Setup</a>
+  </span>
+  <span>2026</span>
+</footer>
+
+<p class="credits">Pictures: <a href="https://www.rawpixel.com/image/13979101/astrology-almanac-for-utrecht-for-1655-letterpress-with-woodcuts-1654">“Astrology: almanac Utrecht 1655. Letterpress”</a>, <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>, via rawpixel; <a href="https://www.metmuseum.org/art/collection/search/453320">“Calendar-Almanac in Scroll Form”</a> by Katib Muhammad Ma'ruf Na'ili, 1224 AH/1810 CE, <a href="https://creativecommons.org/publicdomain/zero/1.0/">public domain (CC0)</a>, via The Metropolitan Museum of Art.</p>
+
 </body>
 </html>

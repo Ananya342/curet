@@ -1,0 +1,2211 @@
+{
+ "url": "site/index.html",
+ "at": "2026-10-24T07:04:05.809Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 9,
+   "filled": [
+    0.59,
+    0.65,
+    0.61,
+    0.76,
+    0.71,
+    0.74,
+    1,
+    0.99,
+    0.77
+   ],
+   "motion": {
+    "elements": 31,
+    "css": 31,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 7629,
+     "screens": 8.5,
+     "words": 570,
+     "img": 12,
+     "video": 0,
+     "canvas": 0,
+     "svg": 0,
+     "sections": 6,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 5,
+     "uiAbuse": false,
+     "realPictures": 7,
+     "videoCount": 0,
+     "uiPictures": 5,
+     "pictureSamples": [
+      "ghost.png",
+      "cat.png",
+      "blob.png",
+      "dragon.png",
+      "redpanda.png",
+      "astrology-almanac-utrecht-1655-letterpress.webp",
+      "almanac-scroll.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Your deadlines find you.",
+     "words": 4,
+     "chars": 24,
+     "lines": 2,
+     "size": 87.8,
+     "vw": 6.1,
+     "font": "Bodoni Moda",
+     "weight": 500,
+     "tracking": -0.02,
+     "leading": 0.9,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "right",
+     "widthRatio": 0.46,
+     "top": 202,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Your deadlines find you.",
+     "words": 4,
+     "lines": 2,
+     "size": 87.8,
+     "font": "Bodoni Moda"
+    },
+    "headings": [
+     {
+      "text": "Your deadlines find you.",
+      "words": 4,
+      "chars": 24,
+      "lines": 2,
+      "size": 87.8,
+      "vw": 6.1,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.9,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.46,
+      "top": 202,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "One Tuesday",
+      "words": 2,
+      "chars": 11,
+      "lines": 1,
+      "size": 64,
+      "vw": 4.4,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.95,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.46,
+      "top": 836,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Five of them",
+      "words": 3,
+      "chars": 12,
+      "lines": 1,
+      "size": 64,
+      "vw": 4.4,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.95,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.46,
+      "top": 1260,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Boo",
+      "words": 1,
+      "chars": 3,
+      "lines": 1,
+      "size": 64,
+      "vw": 4.4,
+      "font": "Bodoni Moda",
+      "weight": 400,
+      "tracking": 0.003,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.44,
+      "top": 1489,
+      "tag": "label",
+      "kind": "statement"
+     },
+     {
+      "text": "Mochi",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 64,
+      "vw": 4.4,
+      "font": "Bodoni Moda",
+      "weight": 400,
+      "tracking": 0.003,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.44,
+      "top": 1729,
+      "tag": "label",
+      "kind": "statement"
+     },
+     {
+      "text": "Jelly",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 64,
+      "vw": 4.4,
+      "font": "Bodoni Moda",
+      "weight": 400,
+      "tracking": 0.003,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.44,
+      "top": 1968,
+      "tag": "label",
+      "kind": "statement"
+     },
+     {
+      "text": "Ember",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 64,
+      "vw": 4.4,
+      "font": "Bodoni Moda",
+      "weight": 400,
+      "tracking": 0.003,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.44,
+      "top": 2208,
+      "tag": "label",
+      "kind": "statement"
+     },
+     {
+      "text": "Maple",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 64,
+      "vw": 4.4,
+      "font": "Bodoni Moda",
+      "weight": 400,
+      "tracking": 0.003,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.44,
+      "top": 2447,
+      "tag": "label",
+      "kind": "statement"
+     },
+     {
+      "text": "What it does",
+      "words": 3,
+      "chars": 12,
+      "lines": 1,
+      "size": 64,
+      "vw": 4.4,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.95,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.46,
+      "top": 2799,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Setup",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 87.8,
+      "vw": 6.1,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.8,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.46,
+      "top": 4649,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Printed deadlines, since 1655",
+      "words": 4,
+      "chars": 29,
+      "lines": 2,
+      "size": 64,
+      "vw": 4.4,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.95,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.4,
+      "top": 5788,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "It is waiting.",
+      "words": 3,
+      "chars": 14,
+      "lines": 1,
+      "size": 87.8,
+      "vw": 6.1,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.9,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.49,
+      "top": 6979,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 12,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 5,
+     "centered": 0,
+     "medianWords": 1,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Jost",
+       "share": 0.89,
+       "mono": false
+      },
+      {
+       "family": "Bodoni Moda",
+       "share": 0.11,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      14,
+      19,
+      26,
+      64,
+      88
+     ],
+     "sizeCount": 5,
+     "notLoaded": [],
+     "body": {
+      "font": "Jost",
+      "size": 19,
+      "leading": 1.6,
+      "weight": 400,
+      "tracking": 0.01,
+      "contrast": 11.4
+     },
+     "measureChars": 50,
+     "max": {
+      "size": 87.8,
+      "vw": 6.1,
+      "font": "Bodoni Moda",
+      "text": "Your deadlines find you."
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#dfdedb",
+     "bodyBgHsl": {
+      "h": 45,
+      "s": 0.06,
+      "l": 0.87
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#26251e",
+       "top": 0,
+       "hsl": {
+        "h": 53,
+        "s": 0.12,
+        "l": 0.13
+       }
+      },
+      {
+       "color": "#2456d6",
+       "top": 6448,
+       "hsl": {
+        "h": 223,
+        "s": 0.71,
+        "l": 0.49
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#26251e",
+       "share": 0.64
+      },
+      {
+       "color": "#46443d",
+       "share": 0.21
+      },
+      {
+       "color": "#a8a79f",
+       "share": 0.06
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.04
+      },
+      {
+       "color": "#1b43ad",
+       "share": 0.03
+      }
+     ],
+     "button": {
+      "bg": "#2456d6",
+      "hsl": {
+       "h": 223,
+       "s": 0.71,
+       "l": 0.49
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 1,
+     "radius": 0,
+     "height": 62,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Download for macOS"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 4,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 4,
+     "fixed": false,
+     "height": 30,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "bodoni moda",
+     "jost"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 7629,
+    "margins": {
+     "left": 63,
+     "right": 83
+    },
+    "sections": [
+     {
+      "sel": "div.split",
+      "tag": "div",
+      "top": 0,
+      "height": 5355,
+      "words": 531,
+      "media": 6,
+      "middle": 284,
+      "heading": {
+       "text": "Your deadlines find you.",
+       "size": 88,
+       "tag": "h1"
+      },
+      "left": 184,
+      "right": 63,
+      "textLeft": 184,
+      "textRight": 63,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": true
+     },
+     {
+      "sel": "section.band",
+      "tag": "section",
+      "top": 5355,
+      "height": 1093,
+      "words": 43,
+      "media": 1,
+      "middle": 63,
+      "heading": {
+       "text": "Printed deadlines, since 1655",
+       "size": 64,
+       "tag": "h2"
+      },
+      "left": 63,
+      "right": 131,
+      "textLeft": 795,
+      "textRight": 131,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.closer",
+      "tag": "section",
+      "top": 6448,
+      "height": 925,
+      "words": 21,
+      "media": 1,
+      "middle": 575,
+      "heading": {
+       "text": "It is waiting.",
+       "size": 88,
+       "tag": "h2"
+      },
+      "left": 63,
+      "right": 63,
+      "textLeft": 63,
+      "textRight": 909,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "footer",
+      "tag": "footer",
+      "top": 7373,
+      "height": 158,
+      "words": 10,
+      "media": 0,
+      "middle": 293,
+      "heading": null,
+      "left": 63,
+      "right": 578,
+      "textLeft": 63,
+      "textRight": 578,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [
+     {
+      "top": 6320,
+      "height": 296
+     }
+    ],
+    "h1s": [
+     {
+      "text": "Your deadlines find you.",
+      "size": 88,
+      "top": 202,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 711,
+      "n": 16
+     },
+     {
+      "x": 731,
+      "n": 4
+     },
+     {
+      "x": 63,
+      "n": 2
+     },
+     {
+      "x": 795,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 24,
+    "bodySize": 19,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0.11,
+    "voidBox": {
+     "x": 0,
+     "y": 120,
+     "w": 180,
+     "h": 780
+    }
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 8,
+   "filled": [
+    0.55,
+    0.28,
+    0.38,
+    0.64,
+    0.7,
+    1,
+    1,
+    0.69
+   ],
+   "motion": {
+    "elements": 31,
+    "css": 31,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 7522,
+     "screens": 7.3,
+     "words": 570,
+     "img": 12,
+     "video": 0,
+     "canvas": 0,
+     "svg": 0,
+     "sections": 6,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 5,
+     "uiAbuse": false,
+     "realPictures": 3,
+     "videoCount": 0,
+     "uiPictures": 5,
+     "pictureSamples": [
+      "ghost.png",
+      "astrology-almanac-utrecht-1655-letterpress.webp",
+      "almanac-scroll.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Your deadlines find you.",
+     "words": 4,
+     "chars": 24,
+     "lines": 1,
+     "size": 46.8,
+     "vw": 6.1,
+     "font": "Bodoni Moda",
+     "weight": 500,
+     "tracking": -0.02,
+     "leading": 0.9,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.91,
+     "top": 633,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Your deadlines find you.",
+     "words": 4,
+     "lines": 1,
+     "size": 46.8,
+     "font": "Bodoni Moda"
+    },
+    "headings": [
+     {
+      "text": "Your deadlines find you.",
+      "words": 4,
+      "chars": 24,
+      "lines": 1,
+      "size": 46.8,
+      "vw": 6.1,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.9,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 633,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "One Tuesday",
+      "words": 2,
+      "chars": 11,
+      "lines": 1,
+      "size": 45.4,
+      "vw": 5.9,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.95,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 1079,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Five of them",
+      "words": 3,
+      "chars": 12,
+      "lines": 1,
+      "size": 45.4,
+      "vw": 5.9,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.95,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 1402,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Boo",
+      "words": 1,
+      "chars": 3,
+      "lines": 1,
+      "size": 45.4,
+      "vw": 5.9,
+      "font": "Bodoni Moda",
+      "weight": 400,
+      "tracking": 0.004,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.88,
+      "top": 1605,
+      "tag": "label",
+      "kind": "statement"
+     },
+     {
+      "text": "Mochi",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 45.4,
+      "vw": 5.9,
+      "font": "Bodoni Moda",
+      "weight": 400,
+      "tracking": 0.004,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.88,
+      "top": 1802,
+      "tag": "label",
+      "kind": "statement"
+     },
+     {
+      "text": "Jelly",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 45.4,
+      "vw": 5.9,
+      "font": "Bodoni Moda",
+      "weight": 400,
+      "tracking": 0.004,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.88,
+      "top": 2000,
+      "tag": "label",
+      "kind": "statement"
+     },
+     {
+      "text": "Ember",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 45.4,
+      "vw": 5.9,
+      "font": "Bodoni Moda",
+      "weight": 400,
+      "tracking": 0.004,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.88,
+      "top": 2197,
+      "tag": "label",
+      "kind": "statement"
+     },
+     {
+      "text": "Maple",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 45.4,
+      "vw": 5.9,
+      "font": "Bodoni Moda",
+      "weight": 400,
+      "tracking": 0.004,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.88,
+      "top": 2395,
+      "tag": "label",
+      "kind": "statement"
+     },
+     {
+      "text": "What it does",
+      "words": 3,
+      "chars": 12,
+      "lines": 1,
+      "size": 45.4,
+      "vw": 5.9,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.95,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 2637,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Setup",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 46.8,
+      "vw": 6.1,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.8,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 4399,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Printed deadlines, since 1655",
+      "words": 4,
+      "chars": 29,
+      "lines": 1,
+      "size": 45.4,
+      "vw": 5.9,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.95,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 5084,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "It is waiting.",
+      "words": 3,
+      "chars": 14,
+      "lines": 1,
+      "size": 46.8,
+      "vw": 6.1,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.9,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 6255,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 12,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 5,
+     "centered": 0,
+     "medianWords": 1,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Jost",
+       "share": 0.89,
+       "mono": false
+      },
+      {
+       "family": "Bodoni Moda",
+       "share": 0.11,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      13,
+      18,
+      23,
+      45,
+      47
+     ],
+     "sizeCount": 5,
+     "notLoaded": [],
+     "body": {
+      "font": "Jost",
+      "size": 17.9,
+      "leading": 1.6,
+      "weight": 400,
+      "tracking": 0.01,
+      "contrast": 11.4
+     },
+     "measureChars": 50,
+     "max": {
+      "size": 46.8,
+      "vw": 6.1,
+      "font": "Bodoni Moda",
+      "text": "Your deadlines find you."
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#dfdedb",
+     "bodyBgHsl": {
+      "h": 45,
+      "s": 0.06,
+      "l": 0.87
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#26251e",
+       "top": 0,
+       "hsl": {
+        "h": 53,
+        "s": 0.12,
+        "l": 0.13
+       }
+      },
+      {
+       "color": "#2456d6",
+       "top": 6151,
+       "hsl": {
+        "h": 223,
+        "s": 0.71,
+        "l": 0.49
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#26251e",
+       "share": 0.64
+      },
+      {
+       "color": "#46443d",
+       "share": 0.21
+      },
+      {
+       "color": "#a8a79f",
+       "share": 0.06
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.04
+      },
+      {
+       "color": "#1b43ad",
+       "share": 0.03
+      }
+     ],
+     "button": {
+      "bg": "#2456d6",
+      "hsl": {
+       "h": 223,
+       "s": 0.71,
+       "l": 0.49
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 1,
+     "radius": 0,
+     "height": 61,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Download for macOS"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 2,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 0,
+     "fixed": false,
+     "height": 29,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "bodoni moda",
+     "jost"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 7522,
+    "margins": {
+     "left": 34,
+     "right": 34
+    },
+    "sections": [
+     {
+      "sel": "aside.stage",
+      "tag": "aside",
+      "top": 0,
+      "height": 471,
+      "words": 20,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 243,
+      "right": 299,
+      "textLeft": 243,
+      "textRight": 299,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.opening",
+      "tag": "div",
+      "top": 633,
+      "height": 341,
+      "words": 45,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 34,
+      "right": 310,
+      "textLeft": 34,
+      "textRight": 310,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#day",
+      "tag": "section",
+      "top": 1059,
+      "height": 239,
+      "words": 13,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "One Tuesday",
+       "size": 45,
+       "tag": "h2"
+      },
+      "left": 34,
+      "right": 183,
+      "textLeft": 34,
+      "textRight": 183,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#pets",
+      "tag": "section",
+      "top": 1382,
+      "height": 1150,
+      "words": 59,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Five of them",
+       "size": 45,
+       "tag": "h2"
+      },
+      "left": 34,
+      "right": 251,
+      "textLeft": 34,
+      "textRight": 251,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#what",
+      "tag": "section",
+      "top": 2617,
+      "height": 1678,
+      "words": 180,
+      "media": 0,
+      "middle": 108,
+      "heading": {
+       "text": "What it does",
+       "size": 45,
+       "tag": "h2"
+      },
+      "left": 34,
+      "right": 54,
+      "textLeft": 34,
+      "textRight": 54,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#setup",
+      "tag": "section",
+      "top": 4379,
+      "height": 510,
+      "words": 102,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Setup",
+       "size": 47,
+       "tag": "h2"
+      },
+      "left": 34,
+      "right": 271,
+      "textLeft": 34,
+      "textRight": 271,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.band",
+      "tag": "section",
+      "top": 4979,
+      "height": 1172,
+      "words": 43,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Printed deadlines, since 1655",
+       "size": 45,
+       "tag": "h2"
+      },
+      "left": 34,
+      "right": 34,
+      "textLeft": 34,
+      "textRight": 157,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.closer",
+      "tag": "section",
+      "top": 6151,
+      "height": 1043,
+      "words": 21,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "It is waiting.",
+       "size": 47,
+       "tag": "h2"
+      },
+      "left": 34,
+      "right": 34,
+      "textLeft": 34,
+      "textRight": 328,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "footer",
+      "tag": "footer",
+      "top": 7194,
+      "height": 234,
+      "words": 10,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 34,
+      "right": 472,
+      "textLeft": 34,
+      "textRight": 472,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Your deadlines find you.",
+      "size": 47,
+      "top": 633,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 34,
+      "n": 19
+     },
+     {
+      "x": 54,
+      "n": 4
+     }
+    ],
+    "leftBlocks": 23,
+    "bodySize": 18,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 9,
+   "filled": [
+    0.61,
+    0.52,
+    0.33,
+    0.62,
+    0.73,
+    0.78,
+    1,
+    0.99,
+    0.77
+   ],
+   "motion": {
+    "elements": 31,
+    "css": 31,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 7502,
+     "screens": 8.9,
+     "words": 570,
+     "img": 12,
+     "video": 0,
+     "canvas": 0,
+     "svg": 0,
+     "sections": 6,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 5,
+     "uiAbuse": false,
+     "realPictures": 3,
+     "videoCount": 0,
+     "uiPictures": 5,
+     "pictureSamples": [
+      "ghost.png",
+      "astrology-almanac-utrecht-1655-letterpress.webp",
+      "almanac-scroll.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Your deadlines find you.",
+     "words": 4,
+     "chars": 24,
+     "lines": 2,
+     "size": 40,
+     "vw": 10.3,
+     "font": "Bodoni Moda",
+     "weight": 500,
+     "tracking": -0.02,
+     "leading": 0.9,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.88,
+     "top": 523,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Your deadlines find you.",
+     "words": 4,
+     "lines": 2,
+     "size": 40,
+     "font": "Bodoni Moda"
+    },
+    "headings": [
+     {
+      "text": "Your deadlines find you.",
+      "words": 4,
+      "chars": 24,
+      "lines": 2,
+      "size": 40,
+      "vw": 10.3,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.9,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.88,
+      "top": 523,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "One Tuesday",
+      "words": 2,
+      "chars": 11,
+      "lines": 1,
+      "size": 33.3,
+      "vw": 8.5,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.95,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.88,
+      "top": 987,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Five of them",
+      "words": 3,
+      "chars": 12,
+      "lines": 1,
+      "size": 33.3,
+      "vw": 8.5,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.95,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.88,
+      "top": 1386,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Boo",
+      "words": 1,
+      "chars": 3,
+      "lines": 1,
+      "size": 33.3,
+      "vw": 8.5,
+      "font": "Bodoni Moda",
+      "weight": 400,
+      "tracking": 0.005,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.81,
+      "top": 1560,
+      "tag": "label",
+      "kind": "statement"
+     },
+     {
+      "text": "Mochi",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 33.3,
+      "vw": 8.5,
+      "font": "Bodoni Moda",
+      "weight": 400,
+      "tracking": 0.005,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.81,
+      "top": 1752,
+      "tag": "label",
+      "kind": "statement"
+     },
+     {
+      "text": "Jelly",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 33.3,
+      "vw": 8.5,
+      "font": "Bodoni Moda",
+      "weight": 400,
+      "tracking": 0.005,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.81,
+      "top": 1944,
+      "tag": "label",
+      "kind": "statement"
+     },
+     {
+      "text": "Ember",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 33.3,
+      "vw": 8.5,
+      "font": "Bodoni Moda",
+      "weight": 400,
+      "tracking": 0.005,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.81,
+      "top": 2136,
+      "tag": "label",
+      "kind": "statement"
+     },
+     {
+      "text": "Maple",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 33.3,
+      "vw": 8.5,
+      "font": "Bodoni Moda",
+      "weight": 400,
+      "tracking": 0.005,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.81,
+      "top": 2329,
+      "tag": "label",
+      "kind": "statement"
+     },
+     {
+      "text": "What it does",
+      "words": 3,
+      "chars": 12,
+      "lines": 1,
+      "size": 33.3,
+      "vw": 8.5,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.95,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.88,
+      "top": 2578,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Setup",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 40,
+      "vw": 10.3,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.8,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.88,
+      "top": 4420,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Printed deadlines, since 1655",
+      "words": 4,
+      "chars": 29,
+      "lines": 2,
+      "size": 33.3,
+      "vw": 8.5,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.95,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.88,
+      "top": 5112,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "It is waiting.",
+      "words": 3,
+      "chars": 14,
+      "lines": 1,
+      "size": 40,
+      "vw": 10.3,
+      "font": "Bodoni Moda",
+      "weight": 500,
+      "tracking": -0.02,
+      "leading": 0.9,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.88,
+      "top": 6286,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 12,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 5,
+     "centered": 0,
+     "medianWords": 1,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Jost",
+       "share": 0.89,
+       "mono": false
+      },
+      {
+       "family": "Bodoni Moda",
+       "share": 0.11,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      13,
+      17,
+      20,
+      33,
+      40
+     ],
+     "sizeCount": 5,
+     "notLoaded": [],
+     "body": {
+      "font": "Jost",
+      "size": 17,
+      "leading": 1.6,
+      "weight": 400,
+      "tracking": 0.01,
+      "contrast": 11.4
+     },
+     "measureChars": 40,
+     "max": {
+      "size": 40,
+      "vw": 10.3,
+      "font": "Bodoni Moda",
+      "text": "Your deadlines find you."
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#dfdedb",
+     "bodyBgHsl": {
+      "h": 45,
+      "s": 0.06,
+      "l": 0.87
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#26251e",
+       "top": 0,
+       "hsl": {
+        "h": 53,
+        "s": 0.12,
+        "l": 0.13
+       }
+      },
+      {
+       "color": "#d3d2ce",
+       "top": 4462,
+       "hsl": {
+        "h": 48,
+        "s": 0.05,
+        "l": 0.82
+       }
+      },
+      {
+       "color": "#2456d6",
+       "top": 6194,
+       "hsl": {
+        "h": 223,
+        "s": 0.71,
+        "l": 0.49
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#26251e",
+       "share": 0.64
+      },
+      {
+       "color": "#46443d",
+       "share": 0.21
+      },
+      {
+       "color": "#a8a79f",
+       "share": 0.06
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.04
+      },
+      {
+       "color": "#1b43ad",
+       "share": 0.03
+      }
+     ],
+     "button": {
+      "bg": "#2456d6",
+      "hsl": {
+       "h": 223,
+       "s": 0.71,
+       "l": 0.49
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 1,
+     "radius": 0,
+     "height": 59,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Download for macOS"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 2,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 0,
+     "fixed": false,
+     "height": 27,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "bodoni moda",
+     "jost"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 7502,
+    "margins": {
+     "left": 24,
+     "right": 24
+    },
+    "sections": [
+     {
+      "sel": "aside.stage",
+      "tag": "aside",
+      "top": 0,
+      "height": 388,
+      "words": 20,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 54,
+      "right": 112,
+      "textLeft": 54,
+      "textRight": 112,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.opening",
+      "tag": "div",
+      "top": 523,
+      "height": 372,
+      "words": 45,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 24,
+      "right": 24,
+      "textLeft": 24,
+      "textRight": 24,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#day",
+      "tag": "section",
+      "top": 967,
+      "height": 299,
+      "words": 17,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "One Tuesday",
+       "size": 33,
+       "tag": "h2"
+      },
+      "left": 24,
+      "right": 67,
+      "textLeft": 24,
+      "textRight": 67,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#pets",
+      "tag": "section",
+      "top": 1366,
+      "height": 1120,
+      "words": 59,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Five of them",
+       "size": 33,
+       "tag": "h2"
+      },
+      "left": 24,
+      "right": 46,
+      "textLeft": 24,
+      "textRight": 46,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#what",
+      "tag": "section",
+      "top": 2558,
+      "height": 1770,
+      "words": 180,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "What it does",
+       "size": 33,
+       "tag": "h2"
+      },
+      "left": 24,
+      "right": 26,
+      "textLeft": 24,
+      "textRight": 26,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#setup",
+      "tag": "section",
+      "top": 4400,
+      "height": 542,
+      "words": 79,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Setup",
+       "size": 40,
+       "tag": "h2"
+      },
+      "left": 24,
+      "right": 45,
+      "textLeft": 24,
+      "textRight": 45,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.band",
+      "tag": "section",
+      "top": 5020,
+      "height": 1173,
+      "words": 43,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Printed deadlines, since 1655",
+       "size": 33,
+       "tag": "h2"
+      },
+      "left": 24,
+      "right": 24,
+      "textLeft": 24,
+      "textRight": 29,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.closer",
+      "tag": "section",
+      "top": 6194,
+      "height": 988,
+      "words": 21,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "It is waiting.",
+       "size": 40,
+       "tag": "h2"
+      },
+      "left": 24,
+      "right": 24,
+      "textLeft": 24,
+      "textRight": 32,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "footer",
+      "tag": "footer",
+      "top": 7182,
+      "height": 207,
+      "words": 10,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 24,
+      "right": 111,
+      "textLeft": 24,
+      "textRight": 111,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Your deadlines find you.",
+      "size": 40,
+      "top": 523,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 24,
+      "n": 19
+     },
+     {
+      "x": 44,
+      "n": 4
+     }
+    ],
+    "leftBlocks": 23,
+    "bodySize": 17,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "no-footage",
+   "width": 1440,
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  },
+  {
+   "level": "WARN",
+   "id": "off-centre",
+   "width": 1440,
+   "message": "The margins differ: 63px on the left, 83px on the right, at 1440px.",
+   "fix": "Put the navigation and the content on one pair of margins; check for padding on one side only, a scrollbar gutter, or a header on another inset than the page."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "/home/knaramdev/yourassitant/.taste-skill/after/desktop-fold.jpg",
+   "pages": [
+    "/home/knaramdev/yourassitant/.taste-skill/after/desktop-page-01.jpg",
+    "/home/knaramdev/yourassitant/.taste-skill/after/desktop-page-02.jpg",
+    "/home/knaramdev/yourassitant/.taste-skill/after/desktop-page-03.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "/home/knaramdev/yourassitant/.taste-skill/after/tablet-fold.jpg",
+   "pages": [
+    "/home/knaramdev/yourassitant/.taste-skill/after/tablet-page-01.jpg",
+    "/home/knaramdev/yourassitant/.taste-skill/after/tablet-page-02.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "/home/knaramdev/yourassitant/.taste-skill/after/mobile-fold.jpg",
+   "pages": [
+    "/home/knaramdev/yourassitant/.taste-skill/after/mobile-page-01.jpg",
+    "/home/knaramdev/yourassitant/.taste-skill/after/mobile-page-02.jpg"
+   ],
+   "film": []
+  }
+ ]
+}
