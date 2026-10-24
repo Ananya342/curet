@@ -57,6 +57,7 @@ export default function Pet() {
   const menuTimer = useRef<number>(0);
   const fxId = useRef(1);
   const pokes = useRef<number[]>([]);
+  const lastBoop = useRef(0);
   const rub = useRef({ lastX: 0, dir: 0, flips: [] as number[] });
   const petRef = useRef(def);
   petRef.current = def;
@@ -460,6 +461,10 @@ export default function Pet() {
       spawnFx("star", 4, { x: nx, y: ny });
       animate(sy, [1, 0.8, 1.06, 1], { duration: 0.35 });
       animate(sx, [1, 1.14, 0.97, 1], { duration: 0.35 });
+      // A quick second click (double-click) shouldn't toggle the menu away.
+      const quick = Date.now() - lastBoop.current < 600;
+      lastBoop.current = Date.now();
+      if (quick) return;
       if (menu) { closeMenu(); return; }
       say(pick(d2.boops), { ms: 1500 });
       window.setTimeout(() => openMenu("main"), 380);
@@ -608,12 +613,48 @@ export default function Pet() {
     return { x: cx + Math.cos(a) * radius, y: cy + Math.sin(a) * radius };
   };
 
+  // Keep every orb on screen and apart, however close the pet is to an edge.
+  const layout = (n: number, r: number) => {
+    const w = screen.current, px = pos.current.x, py = pos.current.y;
+    const xmin = Math.max(r + 2, w.x - px + r + 6);
+    const xmax = Math.max(xmin, Math.min(WIN_W - r - 2, w.x + w.w - px - r - 6));
+    const ymin = Math.max(r + 2, w.y - py + r + 6);
+    const ymax = Math.max(ymin, WIN_H - r - 22);
+    const fit = (p: { x: number; y: number }) => { p.x = clamp(p.x, xmin, xmax); p.y = clamp(p.y, ymin, ymax); };
+    const pts = Array.from({ length: n }, (_, i) => arc(i, n));
+    pts.forEach(fit);
+    for (let it = 0; it < 60; it++) {
+      for (let a = 0; a < n; a++) for (let b = a + 1; b < n; b++) {
+        const dx = pts[b].x - pts[a].x, dy = pts[b].y - pts[a].y, d = Math.hypot(dx, dy) || 0.01, min = 2 * r + 12;
+        if (d < min) { const k = (min - d) / 2 / d; pts[a].x -= dx * k; pts[a].y -= dy * k; pts[b].x += dx * k; pts[b].y += dy * k; }
+      }
+      // The pet's body is an obstacle too: lift orbs up over its silhouette.
+      for (const p of pts) {
+        const ex = sw / 2 + r * 0.7, ey = sh / 2 + r * 0.7;
+        const dx = p.x - cx;
+        if (Math.abs(dx) < ex) {
+          const top = cy - ey * Math.sqrt(1 - (dx / ex) ** 2);
+          if (p.y > top) p.y = top;
+        }
+      }
+      pts.forEach(fit);
+    }
+    return pts;
+  };
+  const mainOrbs = menu === "main" ? layout(menuItems.length, 25) : [];
+  const pickOrbs = menu === "picker" ? layout(PET_IDS.length, 27) : [];
+
+  // Same for the speech bubble: slide it back inside the visible part of the window.
+  const visLo = screen.current.x - pos.current.x, visHi = screen.current.x + screen.current.w - pos.current.x;
+  const bubbleCx = clamp(cx, visLo + 156, Math.max(visLo + 156, visHi - 156));
+  const tailShift = clamp(cx - bubbleCx, -110, 110);
+
   const breathClass = mode === "sleeping" ? "breath slow" : mode === "idle" || mode === "alert" ? "breath" : "";
 
   return (
     <div className="stage" data-mode={mode} style={{ width: WIN_W, height: WIN_H }}>
       {bubble && !menu && (
-        <div className="bubble" data-hit style={{ bottom: FLOOR_PAD + sh + 12 }} onClick={() => { touch(); hush(); setBadge(false); if (modeRef.current === "alert") setMode("idle"); }}>
+        <div className="bubble" data-hit style={{ bottom: FLOOR_PAD + sh + 12, left: bubbleCx, ["--tail" as string]: `${tailShift}px` }} onClick={() => { touch(); hush(); setBadge(false); if (modeRef.current === "alert") setMode("idle"); }}>
           <div className="bubble-text">{bubble.text}</div>
           {bubble.actions && (
             <div className="bubble-actions">
@@ -626,7 +667,7 @@ export default function Pet() {
       )}
 
       {menu === "main" && menuItems.map((it, i) => {
-        const p = arc(i, menuItems.length);
+        const p = mainOrbs[i];
         return (
           <button key={it.key} data-hit className="orb" style={{ left: p.x - 25, top: p.y - 25, animationDelay: `${i * 40}ms` }}
             onClick={() => { touch(); it.run(); }}>
@@ -635,7 +676,7 @@ export default function Pet() {
         );
       })}
       {menu === "picker" && PET_IDS.map((id, i) => {
-        const p = arc(i, PET_IDS.length);
+        const p = pickOrbs[i];
         return (
           <button key={id} data-hit className={`orb pick ${id === petId ? "on" : ""}`} style={{ left: p.x - 27, top: p.y - 27, animationDelay: `${i * 40}ms` }}
             onClick={() => { touch(); closeMenu(); setPetId(id); }}>

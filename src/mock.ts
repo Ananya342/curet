@@ -3,6 +3,8 @@
 const handlers = new Map<string, { cb: number; id: number }[]>();
 let nextId = 1;
 const kv = new Map<string, string>(Object.entries({ pet_id: "ghost" }));
+const startX = new URLSearchParams(location.search).get("x");
+if (startX) kv.set("pet_x", startX); // e.g. ?mock&x=-80 pins the pet to the left screen edge
 const now = Math.floor(Date.now() / 1000);
 const events = [
   { id: "1", source: "g", title: "CS 241 Lecture", start: now + 25 * 60, end: now + 85 * 60, all_day: false, location: "Siebel 1404", link: "https://zoom.us/j/123", kind: "event" },
