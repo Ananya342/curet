@@ -1,6 +1,7 @@
 import { Type } from "@google/genai";
 import { emitTo } from "@tauri-apps/api/event";
 import { addCalendarEvent, eventsRange, memories, nowSec, startOfDay, tasks } from "../api";
+import { freeGaps } from "../wellbeing/gaps";
 
 export const declarations = [
   {
@@ -96,21 +97,10 @@ export async function runTool(name: string, args: Record<string, any>): Promise<
     }
     case "find_free_time": {
       const day = parseDay(args.date);
-      const min = (args.min_minutes ?? 30) * 60;
-      const dayStart = startOfDay(day);
-      let cursor = Math.max(dayStart + 8 * 3600, dayStart === startOfDay() ? nowSec() : 0);
-      const end = dayStart + 22 * 3600;
-      const busy = (await eventsRange(dayStart, dayStart + 86400))
-        .filter((e) => !e.all_day && e.end > e.start)
-        .sort((a, b) => a.start - b.start);
-      const free: { from: string; to: string; minutes: number }[] = [];
+      const floor = startOfDay(day) === startOfDay() ? nowSec() : undefined;
+      const gaps = await freeGaps(day, args.min_minutes ?? 30, floor);
       const t = (s: number) => new Date(s * 1000).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-      for (const e of busy) {
-        if (e.start - cursor >= min) free.push({ from: t(cursor), to: t(e.start), minutes: Math.round((e.start - cursor) / 60) });
-        cursor = Math.max(cursor, e.end);
-      }
-      if (end - cursor >= min) free.push({ from: t(cursor), to: t(end), minutes: Math.round((end - cursor) / 60) });
-      return free;
+      return gaps.map((g) => ({ from: t(g.start), to: t(g.end), minutes: g.minutes }));
     }
     case "add_calendar_event": {
       const allDay = Boolean(args.all_day) || String(args.start).length <= 10;

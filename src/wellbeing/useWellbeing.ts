@@ -3,7 +3,11 @@ import { listen } from "@tauri-apps/api/event";
 import { fmtTime, kvGet, kvSet, nowSec } from "../api";
 import { BriefingKind, briefingText, composeBriefing, todayKey } from "./briefing";
 import { FOCUS_CHOICES, getFocusUntil, minutesLeft, setFocusUntil } from "./focus";
+<<<<<<< Updated upstream
 import { logFocus } from "./log";
+=======
+import { findNudge } from "./nudge";
+>>>>>>> Stashed changes
 
 type Action = { label: string; run: () => void };
 export interface WellbeingCtx {
@@ -137,6 +141,32 @@ export function useWellbeing(c: WellbeingCtx) {
     });
   }, []);
 
+  /**
+   * Free-time nudges: "you've got 90 min before your 3pm — want to start Essay 2?" Timed client
+   * side with a poll, unlike briefings/breaks which Rust decides on its tick — this is the one
+   * wellbeing path with no Rust half, so it needs no Mac build to test.
+   */
+  const deliverNudge = useCallback(async (preview = false) => {
+    if (!preview) {
+      if (unavailable() || focusActive()) return;
+      if ((await kvGet("nudges_on")) === "off") return;
+      const last = Number(await kvGet("nudge_at")) || 0;
+      if (nowSec() - last < 90 * 60) return;
+    }
+    const n = await findNudge({ preview });
+    if (!n) return;
+    if (!preview) await kvSet("nudge_at", String(nowSec()));
+    const { say, hush, wakeUp, openPanel, modeRef } = ctx.current;
+    if (modeRef.current === "sleeping") await wakeUp({ text: "", sleepy: true });
+    say(`You’ve got about ${n.minutes} min free ${n.until}. Want to start “${n.task}”?`, {
+      ms: 20000,
+      actions: [
+        { label: "Start it", run: () => { openPanel("today"); hush(); } },
+        { label: "Not now", run: hush },
+      ],
+    });
+  }, []);
+
   useEffect(() => {
     // Resume a focus block that was running when the app last closed.
     getFocusUntil().then((until) => {
@@ -150,11 +180,20 @@ export function useWellbeing(c: WellbeingCtx) {
       listen<{ kind: BriefingKind }>("briefing", (e) => deliverBriefing(e.payload.kind)),
       listen<{ minutes: number }>("break-due", (e) => deliverBreak(e.payload.minutes)),
       // Settings → "Try it" buttons.
+<<<<<<< Updated upstream
       listen<{ type: BriefingKind | "break" }>("wellbeing-preview", (e) =>
         e.payload.type === "break" ? deliverBreak(50, true) : deliverBriefing(e.payload.type, true),
+=======
+      listen<{ type: "morning" | "evening" | "break" | "nudge" }>("wellbeing-preview", (e) =>
+        e.payload.type === "break" ? deliverBreak(50, true)
+          : e.payload.type === "nudge" ? deliverNudge(true)
+          : deliverBriefing(e.payload.type, true),
+>>>>>>> Stashed changes
       ),
     ];
-    return () => { un.forEach((p) => p.then((f) => f())); window.clearTimeout(endTimer.current); };
+    // Checked client-side on a poll, not via a Rust emit like the others (see deliverNudge).
+    const nudgeTimer = window.setInterval(deliverNudge, 60_000);
+    return () => { un.forEach((p) => p.then((f) => f())); window.clearTimeout(endTimer.current); window.clearInterval(nudgeTimer); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
