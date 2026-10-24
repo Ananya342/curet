@@ -1,4 +1,4 @@
-use crate::{calendar, db::{self, Db}};
+use crate::{calendar, db::{self, Db}, tray};
 use chrono::Utc;
 use serde::Serialize;
 use std::{collections::HashSet, time::Duration};
@@ -65,6 +65,7 @@ pub fn spawn(app: AppHandle) {
                 }
                 db::set(&app.state::<Db>(), "fired", Some(&serde_json::to_string(&fired).unwrap()));
             }
+            tray::update(&app);
             tokio::time::sleep(Duration::from_secs(20)).await;
         }
     });

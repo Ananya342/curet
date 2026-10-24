@@ -10,7 +10,7 @@ export interface Task { id: number; title: string; due: number | null; done: boo
 export interface Memory { id: number; fact: string; created: number }
 export interface Feed { id: string; name: string; url: string; kind: string }
 export interface Area { x: number; y: number; w: number; h: number }
-export interface Screen { work: Area; island_x: number }
+export interface Screen { work: Area; tray: { x: number; y: number } }
 
 export const kvGet = (key: string) => invoke<string | null>("kv_get", { key });
 export const kvSet = (key: string, value: string | null) => invoke<void>("kv_set", { key, value });
@@ -22,7 +22,6 @@ export const getPetId = async (): Promise<PetId> => {
 export const setPetId = async (id: PetId) => {
   await kvSet("pet_id", id);
   await emitTo("pet", "pet-changed", id);
-  await emitTo("island", "pet-changed", id);
   await emitTo("panel", "pet-changed", id);
 };
 

@@ -28,21 +28,6 @@
         "acceptFirstMouse": true
       },
       {
-        "label": "island",
-        "title": "LifePet Island",
-        "url": "index.html#/island",
-        "width": 440,
-        "height": 180,
-        "transparent": true,
-        "decorations": false,
-        "shadow": false,
-        "alwaysOnTop": true,
-        "skipTaskbar": true,
-        "resizable": false,
-        "focus": false,
-        "acceptFirstMouse": true
-      },
-      {
         "label": "panel",
         "title": "LifePet Panel",
         "url": "index.html#/panel",
@@ -55,6 +40,22 @@
         "skipTaskbar": true,
         "resizable": false,
         "visible": false,
+        "acceptFirstMouse": true
+      },
+      {
+        "label": "popover",
+        "title": "LifePet Popover",
+        "url": "index.html#/popover",
+        "width": 440,
+        "height": 140,
+        "transparent": true,
+        "decorations": false,
+        "shadow": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "resizable": false,
+        "visible": false,
+        "focus": false,
         "acceptFirstMouse": true
       }
     ],

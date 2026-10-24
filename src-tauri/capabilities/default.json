@@ -2,7 +2,7 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the LifePet windows",
-  "windows": ["pet", "island", "panel"],
+  "windows": ["pet", "panel", "popover"],
   "permissions": [
     "core:default",
     "core:window:allow-start-dragging",
