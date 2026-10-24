@@ -6,6 +6,8 @@ const kv = new Map<string, string>(Object.entries({ pet_id: "ghost" }));
 kv.set("gemini_key", "mock-key");
 const startX = new URLSearchParams(location.search).get("x");
 if (startX) kv.set("pet_x", startX); // e.g. ?mock&x=-80 pins the pet to the left screen edge
+const focusMin = new URLSearchParams(location.search).get("focus");
+if (focusMin) kv.set("focus_until", String(Math.floor(Date.now() / 1000) + Number(focusMin) * 60)); // ?mock&focus=18 starts mid-session
 const now = Math.floor(Date.now() / 1000);
 const events = [
   { id: "1", source: "g", title: "CS 241 Lecture", start: now + 25 * 60, end: now + 85 * 60, all_day: false, location: "Siebel 1404", link: "https://zoom.us/j/123", kind: "event" },

@@ -42,7 +42,7 @@ export default function Rhythm() {
         <button className="btn sm soft" onClick={() => preview("evening")}>Try evening</button>
         <button className="btn sm soft" onClick={() => preview("break")}>Try break</button>
       </div>
-      <p className="hint">Briefings show up when your pet is awake and out. For quiet time, open your pet’s menu and choose Focus: it naps, holds your reminders, and tells you what it held when the timer ends.</p>
+      <p className="hint">Briefings show up when your pet is awake and out. For quiet time, open your pet’s menu and choose Focus: it locks in, holds your reminders, and tells you what it held when the timer ends.</p>
     </section>
   );
 }
