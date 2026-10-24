@@ -1,7 +1,15 @@
+@font-face {
+  font-family: "Playfair Display";
+  src: url("assets/fonts/PlayfairDisplay-VariableFont_wght.ttf") format("truetype-variations");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* LifePet — download page.
    Direction: The split stage (seed 105213017). Half the screen never moves.
    Idea: the pet that never leaves your desktop becomes the half that never scrolls.
-   Type: Bodoni Moda / Jost.  Palette: Stone and blueprint.
+   Type: Playfair Display (self-hosted) / system sans.  Palette: Stone and blueprint.
    No JavaScript. The pet picker and the day stepper are :checked. */
 
 :root {
@@ -13,15 +21,15 @@
   --accent:     #2456d6;
   --accent-ink: #ffffff;
 
-  --display: "Bodoni Moda", Georgia, "Times New Roman", serif;
-  --text:    "Jost", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --text:    -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 
   /* five steps, no sixth */
   --small:   clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
   --body:    clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
   --lead:    clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
   --head:    clamp(2rem, 1.3rem + 3.2vw, 4rem);
-  --giant:   clamp(2.5rem, 6.1vw, 5.5rem);
+  --giant:   clamp(2.1rem, 6.1vw, 5.5rem);
 
   --gap:  clamp(72px, 11vw, 150px);
   --pad:  clamp(24px, 4.4vw, 72px);
@@ -50,7 +58,7 @@ p { margin: 0; }
 h1, h2, h3 {
   margin: 0;
   font-family: var(--display);
-  font-weight: 500;
+  font-weight: 600;
   font-optical-sizing: auto;
   letter-spacing: -0.02em;
   line-height: 0.95;
@@ -94,7 +102,7 @@ code {
 .desk {
   height: 100%;
   display: grid;
-  grid-template-rows: auto 1fr auto auto;
+  grid-template-rows: auto 1fr auto;
   gap: clamp(14px, 1.6vw, 22px);
   align-content: center;
   padding: var(--pad);
@@ -148,27 +156,12 @@ code {
 .creature { justify-self: center; align-self: end; height: clamp(150px, 22vh, 240px); }
 .pet { height: 100%; width: auto; display: none; }
 
-.says {
-  justify-self: center;
-  color: #b9b8b1;
-  font-size: var(--body);
-  min-height: 1.6em;
-  text-align: center;
-}
-.say { display: none; }
-
 /* the live thing: the chosen creature and its line */
 #p-ghost:checked    ~ .stage .pet-ghost,
 #p-cat:checked      ~ .stage .pet-cat,
 #p-blob:checked     ~ .stage .pet-blob,
 #p-dragon:checked   ~ .stage .pet-dragon,
 #p-redpanda:checked ~ .stage .pet-redpanda { display: block; }
-
-#p-ghost:checked    ~ .stage .say-ghost,
-#p-cat:checked      ~ .stage .say-cat,
-#p-blob:checked     ~ .stage .say-blob,
-#p-dragon:checked   ~ .stage .say-dragon,
-#p-redpanda:checked ~ .stage .say-redpanda { display: inline; }
 
 /* ────────────────────────────────────────────────────────────
    The reading column
@@ -180,7 +173,8 @@ code {
 }
 
 /* Running text keeps a readable measure; headings use the whole half. */
-.lead, .under, .column section > p, .said p, .bar-row p, .trait { max-width: 46ch; }
+.lead, .under, .column section > p, .said p, .bar-row p { max-width: 46ch; }
+.demo p { max-width: none; }
 
 .bar {
   display: flex;
@@ -289,8 +283,6 @@ section > p  { color: var(--ink); }
 .name:hover { color: var(--ink); transform: translateX(5px); }
 .thumb { height: clamp(124px, 14vw, 168px); width: auto; flex: none; }
 
-.trait { display: block; font-size: var(--small); color: var(--muted); margin-top: 2px; }
-
 #p-ghost:checked    ~ .column .n-ghost,
 #p-cat:checked      ~ .column .n-cat,
 #p-blob:checked     ~ .column .n-blob,
@@ -318,11 +310,11 @@ section > p  { color: var(--ink); }
 
 .demo {
   background: var(--surface);
-  padding: 18px 20px;
-  font-size: var(--small);
+  padding: 20px 22px;
+  font-size: var(--body);
   display: grid;
   align-content: center;
-  gap: 9px;
+  gap: 10px;
   min-height: 210px;
 }
 
@@ -374,52 +366,16 @@ section > p  { color: var(--ink); }
 .bar-row summary:hover { background: #c7c6c1; }
 .bar-row p { padding: 0 20px 20px; color: var(--ink); }
 
-/* ────────────────────────────────────────────────────────────
-   Full-width band — the one section that breaks the split
-   ──────────────────────────────────────────────────────────── */
-.band {
-  margin-top: 0;
-  background: var(--ink);
-  color: var(--bg);
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  align-items: center;
-  gap: var(--pad);
-  padding: var(--gap) var(--pad);
-}
-
-.band-pic {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  object-position: 50% 42%;
-}
-.band-say h2 { font-size: var(--head); margin-bottom: 0.4em; }
-.band-say p  { color: #a8a79f; max-width: 42ch; }
-
 /* ── closing ── */
 .closer {
   margin-top: 0;
   background: var(--accent);
   color: var(--accent-ink);
-  display: grid;
-  grid-template-columns: 1.3fr 1fr;
-  align-items: end;
-  gap: var(--pad);
   padding: var(--gap) var(--pad);
 }
 
 .closer h2 { font-size: var(--giant); line-height: 0.9; margin-bottom: 0.3em; }
 .closer p { max-width: 40ch; }
-.closer-pic {
-  width: 100%;
-  max-width: 270px;
-  justify-self: end;
-  aspect-ratio: 1 / 3.1;
-  object-fit: cover;
-  object-position: 50% 34%;
-}
-
 .act-light { background: var(--bg); color: var(--ink); }
 .act-light:hover { background: var(--ink); color: var(--bg); }
 
@@ -437,14 +393,6 @@ footer {
 .foot-links { display: flex; gap: 24px; justify-content: center; }
 footer a { color: var(--ink); text-decoration: none; }
 footer a:hover { text-decoration: underline; }
-
-.credits {
-  padding: 0 var(--pad) 30px;
-  font-size: var(--small);
-  color: var(--muted);
-  max-width: 90ch;
-}
-.credits a { color: var(--accent-text); }
 
 /* ────────────────────────────────────────────────────────────
    Motion. Everything below is additive: the page is complete
@@ -467,8 +415,6 @@ footer a:hover { text-decoration: underline; }
   .pet { animation: bob 4.4s ease-in-out infinite; }
   @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-11px); } }
 
-  .says { animation: breathe 4.4s ease-in-out infinite; }
-  @keyframes breathe { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
 
   .opening h1 { animation: rise 900ms 80ms both cubic-bezier(.22,.61,.36,1); }
   .lead       { animation: rise 900ms 220ms both cubic-bezier(.22,.61,.36,1); }
@@ -485,8 +431,7 @@ footer a:hover { text-decoration: underline; }
     section > p,
     .stages, .index, .proof,
     .bar-row,
-    .band-pic, .band-say,
-    .closer-in, .closer-pic {
+    .closer-in {
       animation: slide linear both;
       animation-timeline: view();
       animation-range: entry 6% entry 44%;
@@ -495,7 +440,7 @@ footer a:hover { text-decoration: underline; }
     .opening h1, .lead, .act, .under, .bar { animation-timeline: auto; }
   }
 
-  .pet, .card, .band-pic, .closer-pic { will-change: transform; }
+  .pet, .card { will-change: transform; }
 }
 
 /* ────────────────────────────────────────────────────────────
@@ -505,22 +450,29 @@ footer a:hover { text-decoration: underline; }
   .split { grid-template-columns: 1fr; }
 
   .stage { height: 46svh; position: static; }
+
   .desk { gap: 14px; }
   .cards { height: 150px; }
   .creature { height: 78px; }
 
   .column { max-width: none; padding-top: clamp(32px, 7vw, 56px); }
+  /* One column: let the text use the width it has rather than leaving a void. */
+  .lead, .under, .column section > p, .said p, .bar-row p { max-width: none; }
   .bar { margin-bottom: clamp(40px, 9vh, 80px); }
 
-  .band, .closer { grid-template-columns: 1fr; }
-  .band-pic { order: 2; }
-  .closer-pic { max-width: none; width: 100%; aspect-ratio: 16 / 7; object-position: 50% 30%; justify-self: stretch; }
-
-  footer { grid-template-columns: 1fr; gap: 8px; }
+  .closer { grid-template-columns: 1fr; }
+      footer { grid-template-columns: 1fr; gap: 8px; }
   .foot-links { justify-content: flex-start; }
 }
 
 @media (max-width: 560px) {
+  .stage { height: 40svh; }
+  .creature { height: 72px; }
+  .thumb { height: 76px; }
+  .name { font-size: var(--lead); gap: 12px; }
+  .index li { padding: 8px 10px; }
+  /* the setup list must not end flush against the closing heading */
+  #setup { padding-bottom: clamp(48px, 10vh, 80px); }
   .clauses { min-height: 6.4em; }
   .stages { margin-bottom: clamp(60px, 13vh, 100px); }
   .track { grid-template-columns: repeat(2, 1fr); gap: 10px 16px; }

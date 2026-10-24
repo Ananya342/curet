@@ -6,9 +6,7 @@
 <title>LifePet — your deadlines find you</title>
 <meta name="description" content="A small creature that lives on your Mac, reads your Brightspace and Google calendars, and warns you before coursework is due.">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;1,6..96,500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preload" href="assets/fonts/PlayfairDisplay-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="style.css">
 <meta property="og:title" content="LifePet">
 <meta property="og:description" content="Your deadlines find you. A desktop creature for students, on macOS.">
@@ -64,13 +62,6 @@
         <img class="pet pet-redpanda" src="assets/redpanda.png" width="389" height="420" alt="Maple, a red panda" loading="lazy">
       </div>
 
-      <p class="says">
-        <span class="say say-ghost">boo! good morning</span>
-        <span class="say say-cat">mrrrow… morning</span>
-        <span class="say say-blob">boing! good morning!</span>
-        <span class="say say-dragon">rawr! morning, hero</span>
-        <span class="say say-redpanda">good morning! snacks?</span>
-      </p>
 
     </div>
   </aside>
@@ -86,16 +77,15 @@
     </nav>
 
     <div class="opening">
-      <h1>Your deadlines find you.</h1>
-      <p class="lead rise">LifePet is a small creature that lives on your Mac. It reads your
-      Brightspace coursework and your Google calendar, and tells you what is coming before
-      it is late.</p>
+      <h1>No more guessing</h1>
+      <p class="lead rise">LifePet sits on your Mac, reads your Brightspace and Google calendars,
+      and tells you what's due before you forget about it.</p>
       <a class="act rise" href="https://github.com/Ananya342/yourassitant/releases">Download for macOS</a>
-      <p class="under rise">Free and open source. macOS 11 or later, Apple Silicon and Intel.</p>
+      <p class="under rise">Free and open source. macOS 11 or later.</p>
     </div>
 
     <section id="day">
-      <h2 class="rise">One Tuesday</h2>
+      <h2 class="rise">Typically...</h2>
 
       <div class="stages">
         <input class="st" type="radio" name="stage" id="s1" checked>
@@ -104,10 +94,10 @@
         <input class="st" type="radio" name="stage" id="s4">
 
         <div class="clauses">
-          <p class="clause c1">It wakes when you do, and says what the day holds.</p>
-          <p class="clause c2">Two hours before an essay is due, it walks over.</p>
+          <p class="clause c1">It wakes up when you do and runs through your day.</p>
+          <p class="clause c2">Two hours before your essay is due, it reminds you.</p>
           <p class="clause c3">Ten minutes before a lecture, it brings the link.</p>
-          <p class="clause c4">You work. After ten quiet minutes, it naps.</p>
+          <p class="clause c4">It's a lil shy! It falls asleep after ten quiet minutes.</p>
         </div>
 
         <div class="track">
@@ -120,21 +110,15 @@
     </section>
 
     <section id="pets">
-      <h2 class="rise">Five of them</h2>
-      <p class="rise">Each has its own temper, its own greeting, and its own way of being
-      annoying about a deadline. You can swap whenever you like.</p>
+      <h2 class="rise">Meet them!</h2>
+      <p class="rise">They all nag you a bit differently. Swap any time.</p>
 
       <ul class="index">
-        <li><label class="name n-ghost" for="p-ghost"><img class="thumb" src="assets/ghost.png" width="420" height="404" alt="" loading="lazy"><span>Boo</span></label>
-            <span class="trait">a shy little ghost who giggles easily</span></li>
-        <li><label class="name n-cat" for="p-cat"><img class="thumb" src="assets/cat.png" width="353" height="420" alt="" loading="lazy"><span>Mochi</span></label>
-            <span class="trait">a sleepy, slightly sassy orange cat</span></li>
-        <li><label class="name n-blob" for="p-blob"><img class="thumb" src="assets/blob.png" width="420" height="350" alt="" loading="lazy"><span>Jelly</span></label>
-            <span class="trait">a bouncy purple blob, endlessly upbeat</span></li>
-        <li><label class="name n-dragon" for="p-dragon"><img class="thumb" src="assets/dragon.png" width="328" height="420" alt="" loading="lazy"><span>Ember</span></label>
-            <span class="trait">a baby dragon who takes your schedule very seriously</span></li>
-        <li><label class="name n-redpanda" for="p-redpanda"><img class="thumb" src="assets/redpanda.png" width="389" height="420" alt="" loading="lazy"><span>Maple</span></label>
-            <span class="trait">a curious red panda who is mostly thinking about snacks</span></li>
+        <li><label class="name n-ghost" for="p-ghost"><img class="thumb" src="assets/ghost.png" width="420" height="404" alt="" loading="lazy"><span>Boo</span></label></li>
+        <li><label class="name n-cat" for="p-cat"><img class="thumb" src="assets/cat.png" width="353" height="420" alt="" loading="lazy"><span>Mochi</span></label></li>
+        <li><label class="name n-blob" for="p-blob"><img class="thumb" src="assets/blob.png" width="420" height="350" alt="" loading="lazy"><span>Jelly</span></label></li>
+        <li><label class="name n-dragon" for="p-dragon"><img class="thumb" src="assets/dragon.png" width="328" height="420" alt="" loading="lazy"><span>Ember</span></label></li>
+        <li><label class="name n-redpanda" for="p-redpanda"><img class="thumb" src="assets/redpanda.png" width="389" height="420" alt="" loading="lazy"><span>Maple</span></label></li>
       </ul>
     </section>
 
@@ -149,9 +133,9 @@
           <p class="demo-row">Lab report 3 <span>Mon 9:00 am</span></p>
         </div>
         <div class="said">
-          <h3>It reads the place your coursework really lives</h3>
-          <p>Paste one calendar link from Brightspace and every due date, quiz window and
-          course task arrives on its own. Each one still links back to the submission page.</p>
+          <h3>Brightspace, without opening Brightspace</h3>
+          <p>Paste one calendar link and every due date, quiz window and course task shows up.
+          Each one still opens the submission page.</p>
         </div>
       </div>
 
@@ -163,9 +147,9 @@
           <p class="demo-row">2:00 — 2:50 <span>ENGL 210</span></p>
         </div>
         <div class="said">
-          <h3>It can find the gap you did not know you had</h3>
-          <p>Ask when you are free on Thursday, or what is due this week, and it answers from
-          the real calendar rather than guessing. Chat runs on Gemini with your own free key.</p>
+          <h3>It knows when you're free</h3>
+          <p>Ask what's due Friday, or when you've got a gap on Thursday. It answers from your
+          actual calendar instead of guessing. Chat needs a free Gemini key.</p>
         </div>
       </div>
 
@@ -177,9 +161,9 @@
           <p class="demo-row">Email Dr. Reyes <span></span></p>
         </div>
         <div class="said">
-          <h3>Tasks you tick off in front of it</h3>
-          <p>Add a to-do by typing or by asking. Tick one off and the creature throws confetti,
-          which is a small thing that turns out to matter at eleven at night.</p>
+          <h3>Tasks, and confetti</h3>
+          <p>Type a to-do, or just ask for one. Tick it off and it throws confetti. Sounds
+          silly. Helps at 11pm.</p>
         </div>
       </div>
 
@@ -190,9 +174,9 @@
           <p class="demo-note">The creature is in the notch.</p>
         </div>
         <div class="said">
-          <h3>Gone the moment you need the screen</h3>
-          <p>One shortcut tucks it into the notch, where it becomes a thin strip that still
-          shows what is next. Press it again and the creature drops back onto the desktop.</p>
+          <h3>Gone in one keystroke</h3>
+          <p>⌥⌘L tucks it into the notch, where it shrinks to a strip that still shows what's
+          next. Press it again and it drops back onto the desktop.</p>
         </div>
       </div>
     </section>
@@ -202,62 +186,48 @@
 
       <details class="bar-row" open>
         <summary>Install it</summary>
-        <p>Drag <b>LifePet.app</b> into Applications. The first time, right-click it and choose
-        <b>Open</b>: the build is not notarised, so a double-click will be refused. If macOS says
-        the app is damaged, that is quarantine rather than a bad download — run
+        <p>Drag <b>LifePet.app</b> into Applications. First time, right-click it and choose
+        <b>Open</b>. A double-click won't work, because the build isn't notarised. If macOS
+        claims the app is damaged, that's quarantine, not a bad download. Run
         <code>xattr -dr com.apple.quarantine /Applications/LifePet.app</code> once.</p>
       </details>
 
       <details class="bar-row">
         <summary>Connect Brightspace</summary>
         <p>In Brightspace open <b>Calendar</b>, then <b>Settings</b>, and tick
-        <b>Enable Calendar Feeds</b>. Only then does <b>Subscribe</b> appear — this is where
-        almost everyone gets stuck. Choose <b>All Calendars and Tasks</b>, copy the link, and
-        paste it into LifePet.</p>
+        <b>Enable Calendar Feeds</b>. <b>Subscribe</b> only appears after you do, which is
+        where most people get stuck. Choose <b>All Calendars and Tasks</b>, copy the link,
+        paste it in.</p>
       </details>
 
       <details class="bar-row">
         <summary>Add your classes</summary>
-        <p>In Google Calendar settings, open your calendar, choose <b>Integrate calendar</b> and
-        copy the <b>secret address in iCal format</b>. Or sign in with Google if you would rather
-        have every calendar at once.</p>
+        <p>In Google Calendar settings, open your calendar, choose <b>Integrate calendar</b>,
+        and copy the <b>secret address in iCal format</b>. Or sign in with Google to get the
+        lot at once.</p>
       </details>
 
       <details class="bar-row">
         <summary>Turn on chat, if you want it</summary>
         <p>A free key from <a href="https://aistudio.google.com/apikey">aistudio.google.com</a>
-        goes under <b>Brain</b>. Everything else works without one; you simply cannot ask it
-        questions.</p>
+        goes under <b>Brain</b>. Everything else works without one. You just can't ask it
+        anything.</p>
       </details>
     </section>
 
   </main>
 </div>
 
-<!-- The one section that breaks the split. -->
-<section class="band">
-  <img class="band-pic" src="assets/astrology-almanac-utrecht-1655-letterpress.webp" width="1024" height="793"
-       alt="A 1655 almanac broadside printed in Utrecht: dense columns of dates in red and black letterpress" loading="lazy" decoding="async">
-  <div class="band-say">
-    <h2>Printed deadlines, since 1655</h2>
-    <p>This is an almanac printed in Utrecht in 1655: every date of the year set in red and
-    black, so that a person could see what was coming. LifePet is the same idea, except it
-    already knows your courses and it comes to find you.</p>
-  </div>
-</section>
-
 <section class="closer">
   <div class="closer-in">
-    <h2>It is waiting.</h2>
-    <p>Download it, paste one calendar link, and the rest of the semester arrives on its own.</p>
+    <h2>Put it on your desktop.</h2>
+    <p>Download it, paste a calendar link, and you're done.</p>
     <a class="act act-light" href="https://github.com/Ananya342/yourassitant/releases">Download for macOS</a>
   </div>
-  <img class="closer-pic" src="assets/almanac-scroll.jpg" width="500" height="625"
-       alt="An Ottoman calendar-almanac scroll from 1810, its ruled grid of dates picked out in gold and red" loading="lazy" decoding="async">
 </section>
 
 <footer>
-  <span>LifePet, a desktop companion for coursework</span>
+  <span>LifePet, a desktop pet that watches your deadlines</span>
   <span class="foot-links">
     <a href="https://github.com/Ananya342/yourassitant">Source</a>
     <a href="https://github.com/Ananya342/yourassitant/releases">Releases</a>
@@ -266,7 +236,6 @@
   <span>2026</span>
 </footer>
 
-<p class="credits">Pictures: <a href="https://www.rawpixel.com/image/13979101/astrology-almanac-for-utrecht-for-1655-letterpress-with-woodcuts-1654">“Astrology: almanac Utrecht 1655. Letterpress”</a>, <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>, via rawpixel; <a href="https://www.metmuseum.org/art/collection/search/453320">“Calendar-Almanac in Scroll Form”</a> by Katib Muhammad Ma'ruf Na'ili, 1224 AH/1810 CE, <a href="https://creativecommons.org/publicdomain/zero/1.0/">public domain (CC0)</a>, via The Metropolitan Museum of Art.</p>
 
 </body>
 </html>
