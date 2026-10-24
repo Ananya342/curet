@@ -229,7 +229,7 @@ section, footer { position: relative; }
 .foot-top .wordmark { grid-column: 1 / span 2; }
 .foot-top p { grid-column: span 3; }
 .foot-top .textlink { grid-column: 11 / span 2; justify-self: end; }
-.foot-line { margin-top: auto; font-size: clamp(36px, 7.2vw, 120px); font-weight: 900; letter-spacing: -0.04em; line-height: 0.95; }
+.foot-line { margin-top: auto; font-size: clamp(40px, 10.6vw, 200px); font-weight: 900; letter-spacing: -0.04em; line-height: 0.95; }
 .foot-line a { text-decoration: none; display: inline-block; transition: transform 0.25s var(--ease); }
 .foot-line a:hover { transform: translateX(10px); }
 .foot-meta { margin-top: 40px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; font-size: 14px; font-weight: 700; }
@@ -290,7 +290,7 @@ section, footer { position: relative; }
   .foot { padding: 40px var(--margin) 32px; }
   .foot-top { grid-template-columns: 1fr; row-gap: 8px; }
   .foot-top .wordmark, .foot-top p, .foot-top .textlink { grid-column: 1; justify-self: start; }
-  .foot-line { font-size: 10.5vw; margin-top: 56px; }
+  .foot-line { font-size: 15vw; margin-top: 56px; }
   .foot-meta { flex-direction: column; font-size: 13px; }
 }
 
