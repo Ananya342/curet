@@ -10,6 +10,7 @@ import { startHitReporting } from "../hit";
 import { FocusIcon } from "../wellbeing/FocusIcon";
 import { Laptop } from "../wellbeing/FocusGear";
 import { useWellbeing } from "../wellbeing/useWellbeing";
+import { useMindful } from "../wellbeing/useMindful";
 
 const WIN_W = 340;
 const WIN_H = 400;
@@ -49,6 +50,10 @@ export default function Pet() {
   const [gear, setGear] = useState<null | "in" | "out">(null);
   const [thought, setThought] = useState<null | { id: number; e: string }>(null);
   const [streak, setStreak] = useState(0);
+  // Eye rest: seconds left while the pet closes its eyes with you.
+  const [eyeRest, setEyeRest] = useState<null | { left: number; total: number }>(null);
+  const eyeTimer = useRef<number>(0);
+  const eyesResting = useRef(false); // keeps blinks from opening the eyes mid-rest
   const streakRef = useRef(0);
   streakRef.current = streak;
 
@@ -150,7 +155,7 @@ export default function Pet() {
   }, [sx, sy, ty]);
 
   const blink = useCallback(async () => {
-    if (modeRef.current === "sleeping") return;
+    if (modeRef.current === "sleeping" || eyesResting.current) return;
     if (modeRef.current === "focusing") {
       await animate(lid, [0, 1, 0], { duration: 0.17 });
       return;
@@ -406,6 +411,30 @@ export default function Pet() {
 
   // Briefings, focus mode and break reminders live in wellbeing/useWellbeing.ts.
   const wb = useWellbeing({ modeRef, say, hush, lockIn, unlock, wakeUp, celebrate, openPanel: panel });
+
+  // Look away together: the pet shuts its eyes and counts down, then opens them again.
+  const endEyeRest = useCallback((finished: boolean) => {
+    window.clearInterval(eyeTimer.current);
+    eyesResting.current = false;
+    setEyeRest(null);
+    if (modeRef.current !== "sleeping") animate(lid, 0, { duration: 0.3, ease: "easeOut" });
+    if (finished) { spawnFx("star", 4); say(pick(["Ahh, fresh eyes ✨", "Much better! 👀", "Eyes rested. Back to it!"]), { ms: 2400 }); }
+  }, [lid, say, spawnFx]);
+  const restEyes = useCallback((seconds: number) => {
+    window.clearInterval(eyeTimer.current);
+    hush(); closeMenu(); touch();
+    eyesResting.current = true;
+    setEyeRest({ left: seconds, total: seconds });
+    if (modeRef.current !== "sleeping") animate(lid, 1, { duration: 0.5, ease: "easeInOut" });
+    eyeTimer.current = window.setInterval(() => {
+      setEyeRest((r) => {
+        if (!r) return r;
+        if (r.left <= 1) { window.setTimeout(() => endEyeRest(true), 0); return { ...r, left: 0 }; }
+        return { ...r, left: r.left - 1 };
+      });
+    }, 1000);
+  }, [endEyeRest, lid]);
+  useMindful({ modeRef, say, hush, wakeUp, fallAsleep, restEyes, openPanel: panel, openFocusMenu: wb.openFocusMenu });
 
   const menuItems = [
     { key: "chat", icon: <ChatIcon />, label: "Chat", run: () => panel("chat") },
@@ -823,6 +852,14 @@ export default function Pet() {
           {poof.puffs.map((p, i) => (
             <i key={i} style={{ ["--x" as string]: `${p.x}px`, ["--y" as string]: `${p.y}px`, ["--s" as string]: `${p.s}px`, animationDelay: `${p.d}ms` }} />
           ))}
+        </div>
+      )}
+      {eyeRest && !menu && (
+        <div className="eye-rest" data-hit role="timer" aria-live="polite" style={{ bottom: FLOOR_PAD + sh + 10, left: WIN_W / 2, ["--p" as string]: 1 - eyeRest.left / eyeRest.total }}>
+          <svg viewBox="0 0 36 36" aria-hidden="true"><circle className="track" cx="18" cy="18" r="15" /><circle className="done" cx="18" cy="18" r="15" /></svg>
+          <b>{eyeRest.left}</b>
+          <span>Look at something far away 👀</span>
+          <button onClick={() => endEyeRest(false)}>Skip</button>
         </div>
       )}
       {thought && mode === "focusing" && !bubble && !menu && (

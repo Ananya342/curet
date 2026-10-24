@@ -7,13 +7,15 @@ import { getPetId } from "../api";
 import Chat from "./Chat";
 import Today from "./Today";
 import Settings from "./Settings";
+import Week from "./Week";
 import Glance, { Reminder } from "./Glance";
 
-type Tab = "chat" | "today" | "settings";
+type Tab = "chat" | "today" | "week" | "settings";
 type Mode = "compact" | "full";
 const TABS: { id: Tab; label: string }[] = [
   { id: "chat", label: "Chat" },
   { id: "today", label: "Today" },
+  { id: "week", label: "Week" },
   { id: "settings", label: "Settings" },
 ];
 
@@ -21,6 +23,8 @@ const TABS: { id: Tab; label: string }[] = [
  * LifePet's one pop-up. From the menu bar icon it opens as a compact glance (what's due, wake/tuck in, pets);
  * choosing Chat or Settings grows the same window into the full tabbed view. The pet's menu opens it full.
  */
+const GEAR = <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" fillRule="evenodd" d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87a.49.49 0 0 0 .12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 0 0-.12-.61l-2.01-1.58zM12 15.6a3.6 3.6 0 1 1 0-7.2 3.6 3.6 0 0 1 0 7.2z" /></svg>;
+
 export default function Panel() {
   const [mode, setMode] = useState<Mode>("full");
   const [tab, setTab] = useState<Tab>("chat");
@@ -102,7 +106,7 @@ export default function Panel() {
           <img src={PETS[petId].src} alt="" draggable={false} />
           <h1 className="grow">{reminder ? (reminder.kind === "deadline" ? "Due soon" : "Starting soon") : "Up next"}</h1>
           <button className="icon-btn" onClick={() => expand("settings")} aria-label="Settings" title="Settings">
-            <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" fillRule="evenodd" d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87a.49.49 0 0 0 .12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 0 0-.12-.61l-2.01-1.58zM12 15.6a3.6 3.6 0 1 1 0-7.2 3.6 3.6 0 0 1 0 7.2z" /></svg>
+            {GEAR}
           </button>
           {closeBtn}
         </header>
@@ -130,8 +134,10 @@ export default function Panel() {
               className="tab"
               data-tab={t.id}
               onClick={() => setTab(t.id)}
+              aria-label={t.id === "settings" ? t.label : undefined}
+              title={t.id === "settings" ? t.label : undefined}
             >
-              {t.label}
+              {t.id === "settings" ? GEAR : t.label}
             </button>
           ))}
         </div>
@@ -140,6 +146,7 @@ export default function Panel() {
       <main id="panel-body" role="tabpanel" aria-labelledby={`tab-${tab}`}>
         {tab === "chat" && <Chat petId={petId} />}
         {tab === "today" && <Today />}
+        {tab === "week" && <Week />}
         {tab === "settings" && <Settings petId={petId} />}
       </main>
     </div>

@@ -1,8 +1,9 @@
 import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
-import { fmtTime, kvSet, nowSec } from "../api";
+import { fmtTime, kvGet, kvSet, nowSec } from "../api";
 import { BriefingKind, briefingText, composeBriefing, todayKey } from "./briefing";
 import { FOCUS_CHOICES, getFocusUntil, minutesLeft, setFocusUntil } from "./focus";
+import { logFocus } from "./log";
 
 type Action = { label: string; run: () => void };
 export interface WellbeingCtx {
@@ -37,6 +38,8 @@ export function useWellbeing(c: WellbeingCtx) {
   // ---- focus ------------------------------------------------------------------------------------
   const endFocus = useCallback(async (completed: boolean) => {
     window.clearTimeout(endTimer.current);
+    const from = Number(await kvGet("focus_from")) || 0;
+    if (from) logFocus({ from, to: completed ? focusUntil.current : nowSec(), done: completed });
     focusUntil.current = 0;
     setFocusing(false);
     await setFocusUntil(0);
@@ -66,6 +69,7 @@ export function useWellbeing(c: WellbeingCtx) {
     held.current = [];
     setFocusing(true);
     await setFocusUntil(until);
+    await kvSet("focus_from", String(nowSec()));
     armTimer(until);
     ctx.current.say(`Let's lock in. I'll stay quiet for ${minutes} min.`, { ms: 2600 });
     window.setTimeout(() => { if (focusActive()) ctx.current.lockIn(); }, 2800);

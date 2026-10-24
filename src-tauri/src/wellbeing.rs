@@ -1,10 +1,11 @@
-//! Daily rhythm: morning/evening briefings and break reminders.
+//! Daily rhythm: morning/evening briefings, break and eye-rest reminders, a late-night wind-down nudge,
+//! the Sunday weekly recap and the Monday week-ahead heads-up.
 //!
-//! Briefings are re-announced every tick until the pet window acknowledges them by writing
-//! `last_briefing_<kind>` (so one sent while the pet is hidden or still starting isn't lost).
-//! Breaks are based on how long the keyboard/mouse has been in continuous use.
+//! Briefings, the recap and the heads-up are re-announced every tick until the pet window acknowledges them
+//! (`last_briefing_<kind>`, `last_recap`, `last_week_ahead`), so one sent while the pet is hidden or still
+//! starting isn't lost. Breaks and eye rest are based on how long the keyboard/mouse has been in continuous use.
 use crate::db::{self, Db};
-use chrono::{Local, NaiveTime, Utc};
+use chrono::{Datelike, Local, NaiveTime, Timelike, Utc, Weekday};
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager};
 
@@ -12,6 +13,7 @@ use tauri::{AppHandle, Emitter, Manager};
 pub struct State {
     active_since: Option<i64>,
     last_break_prompt: i64,
+    eyes_since: Option<i64>,
 }
 
 #[derive(Serialize, Clone)]
@@ -22,6 +24,11 @@ struct Briefing {
 #[derive(Serialize, Clone)]
 struct BreakDue {
     minutes: i64,
+}
+
+#[derive(Serialize, Clone)]
+struct Week {
+    week: String,
 }
 
 /// Seconds since the last keyboard or mouse event (needs no special permission).
@@ -76,6 +83,52 @@ pub fn tick(app: &AppHandle, st: &mut State) {
         if every > 0 && !focusing && now - since >= every * 60 && now - st.last_break_prompt >= 10 * 60 {
             st.last_break_prompt = now;
             let _ = app.emit("break-due", BreakDue { minutes: (now - since) / 60 });
+        }
+    }
+
+    // ---- eye rest: look away for 30 seconds after a stretch of screen time ----------------------------
+    let eyes: i64 = setting(&db, "eye_every", "20").parse().unwrap_or(0);
+    if idle >= 30.0 {
+        st.eyes_since = None; // looked away long enough
+    } else {
+        st.eyes_since.get_or_insert(now);
+    }
+    if let Some(since) = st.eyes_since {
+        if eyes > 0 && now - since >= eyes * 60 {
+            st.eyes_since = Some(now);
+            let _ = app.emit("eye-break", ());
+        }
+    }
+
+    // ---- late night: one gentle wind-down nudge per night, and a note for the weekly recap -------------
+    let local = Local::now();
+    let (h, m) = (local.hour(), local.minute());
+    let night = (h == 0 && m >= 30) || (1..4).contains(&h);
+    let tonight = local.format("%Y-%m-%d").to_string();
+    if night && idle < 120.0 && db::get(&db, "last_late_night").as_deref() != Some(&tonight) {
+        db::set(&db, "last_late_night", Some(&tonight));
+        db::log_time(&db, "late_nights_log", now);
+        if !focusing && setting(&db, "late_nudge", "on") == "on" {
+            let _ = app.emit("late-night", ());
+        }
+    }
+
+    // ---- Sunday evening recap, Monday morning heads-up ------------------------------------------------
+    if !focusing {
+        let week = local.format("%G-W%V").to_string();
+        let t = local.time();
+        let due = |weekday, from: (u32, u32), to: (u32, u32), on_key: &str, seen_key: &str| {
+            local.weekday() == weekday
+                && t >= NaiveTime::from_hms_opt(from.0, from.1, 0).unwrap()
+                && t < NaiveTime::from_hms_opt(to.0, to.1, 0).unwrap()
+                && setting(&db, on_key, "on") == "on"
+                && db::get(&db, seen_key).as_deref() != Some(&week)
+        };
+        if due(Weekday::Sun, (18, 0), (23, 59), "recap_on", "last_recap") {
+            let _ = app.emit("weekly-recap", Week { week: week.clone() });
+        }
+        if due(Weekday::Mon, (8, 0), (12, 0), "week_ahead_on", "last_week_ahead") {
+            let _ = app.emit("week-ahead", Week { week });
         }
     }
 }
