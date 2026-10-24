@@ -3,7 +3,8 @@ import { invoke } from "@tauri-apps/api/core";
 import { emitTo, listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { CalEvent, fmtTime, nowSec, untilLabel, upcoming } from "../api";
+import { CalEvent, fmtTime, getPetId, nowSec, setPetId, untilLabel, upcoming } from "../api";
+import { PETS, PET_IDS, PetId } from "../pets";
 
 interface Reminder { id: string; title: string; start: number; link: string; kind: string }
 
@@ -14,6 +15,8 @@ export default function Popover() {
   const [reminder, setReminder] = useState<Reminder | null>(null);
   const [now, setNow] = useState(nowSec());
   const [opened, setOpened] = useState(0);
+  const [picking, setPicking] = useState(false);
+  const [petId, setPet] = useState<PetId>("ghost");
   const reminderTimer = useRef<number>(0);
   const hiddenRef = useRef(false);
   hiddenRef.current = hidden;
@@ -25,12 +28,14 @@ export default function Popover() {
 
   useEffect(() => {
     refresh();
+    getPetId().then(setPet);
     const t = setInterval(() => { setNow(nowSec()); refresh(); }, 30000);
     const un: Promise<() => void>[] = [
       listen("pet-hidden", () => setHidden(true)),
       listen("pet-shown", () => setHidden(false)),
       listen("events-updated", refresh),
-      listen("popover-shown", () => { setOpened((n) => n + 1); setNow(nowSec()); refresh(); }),
+      listen<string>("pet-changed", (e) => setPet(e.payload as PetId)),
+      listen("popover-shown", () => { setOpened((n) => n + 1); setPicking(false); getPetId().then(setPet); setNow(nowSec()); refresh(); }),
       listen<Reminder>("reminder", (e) => {
         // The pet handles reminders itself while it's on screen; the popover steps in when it's tucked away.
         if (!hiddenRef.current) return;
@@ -70,6 +75,15 @@ export default function Popover() {
         </div>
       ) : (
         <>
+          {picking ? (
+            <div className="pop-pets">
+              {PET_IDS.map((id) => (
+                <button key={id} className={id === petId ? "on" : ""} title={PETS[id].name} onClick={() => { setPetId(id); setPicking(false); }}>
+                  <img src={PETS[id].src} alt={PETS[id].name} draggable={false} />
+                </button>
+              ))}
+            </div>
+          ) : (
           <div className="pop-list">
             {events.length === 0 && <div className="muted small">Nothing coming up 🌿</div>}
             {events.slice(0, 2).map((e) => (
@@ -80,10 +94,12 @@ export default function Popover() {
               </div>
             ))}
           </div>
+          )}
           <div className="row">
             <button className="pill go" onClick={toggle}>{hidden ? "Wake pet 🐾" : "Tuck in 🏝️"}</button>
             <button className="pill" onClick={() => panel("chat")}>Chat</button>
             <button className="pill" onClick={() => panel("today")}>Today</button>
+            <button className="pill" onClick={() => setPicking((v) => !v)}>Pets</button>
           </div>
         </>
       )}

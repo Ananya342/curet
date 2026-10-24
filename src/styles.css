@@ -111,6 +111,10 @@ img { -webkit-user-drag: none; }
 .pop-row { display: flex; align-items: center; gap: 8px; font-size: 13px; }
 .pop-row .t { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pop-row .w { color: #a9a3bd; font-variant-numeric: tabular-nums; font-size: 12px; }
+.pop-pets { flex: 1; display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+.pop-pets button { flex: 1; height: 100%; max-height: 48px; border: 0; border-radius: 12px; background: #1d1b26; cursor: pointer; padding: 4px; }
+.pop-pets button.on { background: var(--violet); }
+.pop-pets img { width: 100%; height: 100%; object-fit: contain; }
 .pop .row { display: flex; gap: 8px; }
 .pop .pill { border: 0; border-radius: 999px; padding: 7px 14px; font-size: 12.5px; font-weight: 600; background: #26232f; color: #fff; cursor: pointer; font-family: inherit; }
 .pop .pill:hover { background: #3a3647; }
@@ -289,3 +293,8 @@ svg.spinning { animation: spin 0.8s linear infinite; }
 .avatar { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); font-weight: 700; flex: none; }
 .settings footer { padding-top: 14px; border-top: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
 kbd { background: var(--wash); border-radius: 6px; padding: 1px 6px; font-family: inherit; font-size: 12px; box-shadow: 0 0 0 1px var(--line); }
+
+.pet-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 2px 14px 8px; animation: panelin 0.2s ease-out; }
+.pet-strip .pet-pick { min-height: 58px; }
+.pet-strip .pet-pick img { width: 34px; height: 34px; }
+.icon-btn.on { background: var(--wash); color: var(--accent); }
