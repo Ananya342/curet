@@ -37,7 +37,7 @@ export default function Chat({ petId }: { petId: PetId }) {
     if (!t) { field.current?.focus(); return; }
     setText("");
     setUndo(null);
-    const history = msgs.slice(-20);
+    const history = msgs.slice(-10);
     const next = [...msgs, { role: "user" as const, text: t }];
     setMsgs(next);
     setBusy(true);
@@ -106,7 +106,7 @@ export default function Chat({ petId }: { petId: PetId }) {
             <div>
               <div className="who" translate="no">{pet.name}</div>
               {draft
-                ? <p>{draft}</p>
+                ? <p className="typing">{draft}</p>
                 : <p className="status"><span className="paws" aria-hidden="true"><i /><i /><i /></span>{status || "Thinking…"}</p>}
             </div>
           </div>

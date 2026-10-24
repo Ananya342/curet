@@ -295,6 +295,9 @@ img { -webkit-user-drag: none; }
 .you { align-self: flex-end; max-width: 84%; background: var(--butter); color: var(--on-candy); border: 2px solid var(--edge); padding: 8px 13px; border-radius: 18px 18px 6px 18px; font-size: 14px; font-weight: 600; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; box-shadow: 0 2px 0 var(--pop); animation: pop-in 0.3s cubic-bezier(0.3, 1.5, 0.5, 1); }
 @keyframes pop-in { from { opacity: 0; transform: translateY(8px) scale(0.92); } }
 .status { color: var(--ink-soft); display: flex; align-items: center; gap: 9px; font-weight: 700; }
+.typing::after { content: "▍"; margin-left: 1px; color: var(--ink-soft); animation: caret 1s steps(2) infinite; }
+@keyframes caret { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .typing::after { animation: none; } }
 .paws { display: inline-flex; gap: 4px; }
 .paws i { width: 8px; height: 8px; border-radius: 50%; background: var(--pink); border: 1.5px solid var(--edge); animation: dots 0.9s ease-in-out infinite; }
 .paws i:nth-child(2) { background: var(--butter); animation-delay: 0.12s; }

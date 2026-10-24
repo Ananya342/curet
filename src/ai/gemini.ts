@@ -6,29 +6,25 @@ import { declarations, runTool } from "./tools";
 
 export interface Msg { role: "user" | "model"; text: string }
 // Default model. If Gemini rejects the name, chat falls back to FALLBACK_MODEL so it keeps working.
-export const DEFAULT_MODEL = "gemini-3.8-flash";
+export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 const FALLBACK_MODEL = "gemini-flash-latest";
 
 async function context(petId: PetId) {
   const now = new Date();
   const day = startOfDay(now);
-  const evs = await eventsRange(day, day + 3 * 86400);
+  const [evs, open, mem] = await Promise.all([eventsRange(day, day + 2 * 86400), tasks.list(), memories.list(null, 5)]);
   const line = (e: (typeof evs)[number]) =>
-    `- ${e.kind === "deadline" ? "[DEADLINE] " : ""}${e.title} — ${e.all_day ? fmtDay(e.start) + " (all day)" : `${fmtDay(e.start)} ${fmtTime(e.start)}–${fmtTime(e.end)}`}${e.link ? ` (${e.link})` : ""}`;
-  const open = await tasks.list();
-  const mem = await memories.list(null, 10);
+    `- ${e.kind === "deadline" ? "[DEADLINE] " : ""}${e.title} — ${e.all_day ? fmtDay(e.start) + " (all day)" : `${fmtDay(e.start)} ${fmtTime(e.start)}–${fmtTime(e.end)}`}`;
   const pet = PETS[petId];
-  return `You are ${pet.name}, ${pet.personality}. You live on the user's Mac desktop as their tiny life-assistant companion.
-Stay in character but be genuinely useful: short, warm, concrete replies (1–4 sentences unless asked for a plan). Use at most one emoji.
-The calendar below is complete for the next 3 days: answer questions about those days straight from it, without calling a tool. Only call get_events for dates further out. Use the other tools to find free time, manage tasks and remember things. Never invent events — if the calendar is empty or not connected, say so and mention Settings.
-Call add_calendar_event only when the user clearly asks to schedule something; afterwards say the exact title and time you added. Work out words like "tomorrow" or "Friday" from the current date and time below. When the user shares a lasting preference, goal or project, call remember. When they ask to be reminded or add something to do, call add_task.
-Now: ${now.toLocaleString([], { dateStyle: "full", timeStyle: "short" })} (${Intl.DateTimeFormat().resolvedOptions().timeZone}).
-Next 3 days:
-${evs.length ? evs.slice(0, 40).map(line).join("\n") : "(nothing on the calendar)"}
-Open tasks:
-${open.length ? open.map((t) => `- #${t.id} ${t.title}${t.due ? ` (due ${fmtDay(t.due)})` : ""}`).join("\n") : "(none)"}
-What you remember about the user:
-${mem.length ? mem.map((m) => `- ${m.fact}`).join("\n") : "(nothing yet)"}`;
+  return `You are ${pet.name}, ${pet.personality}, a tiny desktop companion. Reply warmly in 1–3 short sentences, at most one emoji.
+The calendar below covers today and tomorrow; use get_events only for other dates. Never invent events. Use tools to find free time, add tasks, add events (only when asked) and remember lasting preferences.
+Now: ${now.toLocaleString([], { dateStyle: "full", timeStyle: "short" })}.
+Calendar:
+${evs.length ? evs.slice(0, 15).map(line).join("\n") : "(empty or not connected)"}
+Tasks:
+${open.length ? open.slice(0, 10).map((t) => `- #${t.id} ${t.title}${t.due ? ` (due ${fmtDay(t.due)})` : ""}`).join("\n") : "(none)"}
+Remembered:
+${mem.length ? mem.map((m) => `- ${m.fact}`).join("\n") : "(nothing)"}`;
 }
 
 const STATUS: Record<string, string> = {
@@ -75,11 +71,13 @@ export async function ask(
 
   for (let round = 0; round < 6; round++) {
     const tryOpen = async (m: string) => {
-      const go = () => ai.models.generateContentStream({ model: m, contents, config: thinking ? { ...base, thinkingConfig: thinking as any } : base });
-      try { return await go(); }
-      catch (e) {
-        if (thinking && /thinking/i.test(String(e))) { thinking = null; return await go(); }
-        throw e;
+      for (;;) {
+        try { return await ai.models.generateContentStream({ model: m, contents, config: thinking ? { ...base, thinkingConfig: thinking as any } : base }); }
+        catch (e) {
+          if (!thinking || !/thinking/i.test(String(e))) throw e;
+          // Some models reject "minimal": step down to "low" rather than their slow default.
+          thinking = thinking.thinkingLevel === "minimal" ? { thinkingLevel: "low" } : null;
+        }
       }
     };
     // Overloaded (503) or flaky (500) responses are usually brief: retry quietly, then move to the next model.
