@@ -14,6 +14,6 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
 
 [[headers]]
-  for = "/icon.svg"
+  for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=604800"

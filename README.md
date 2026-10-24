@@ -1,4 +1,4 @@
-# LifePet 🐾
+# Curet 🐾
 
 A tiny AI companion that lives on your Mac desktop, knows your calendar and deadlines, and tucks itself into the menu bar when you need quiet.
 
@@ -14,16 +14,16 @@ Built with **Tauri 2** (Rust) + **React/TypeScript**. Ghost, cat, blob, dragon a
 ## Connect your calendars
 Open the panel → **Settings**.
 
-**Brightspace** — in Brightspace open *Calendar* → *Settings* (⚙) → tick **Enable Calendar Feeds** → *Subscribe* → choose **All Calendars and Tasks** → copy the link and paste it into LifePet. (The Subscribe button stays hidden until feeds are enabled.)
+**Brightspace** — in Brightspace open *Calendar* → *Settings* (⚙) → tick **Enable Calendar Feeds** → *Subscribe* → choose **All Calendars and Tasks** → copy the link and paste it into Curet. (The Subscribe button stays hidden until feeds are enabled.)
 
-**Google Calendar, easy way** — Google Calendar settings → your calendar → *Integrate calendar* → copy **Secret address in iCal format** → paste into LifePet.
+**Google Calendar, easy way** — Google Calendar settings → your calendar → *Integrate calendar* → copy **Secret address in iCal format** → paste into Curet.
 
-**Google Calendar** — press **Sign in with Google**. Your browser opens, you pick your own Google account, and LifePet can see your calendar and add events you create (from the Today tab, or by asking your pet). Sign out in Settings revokes the access.
+**Google Calendar** — press **Sign in with Google**. Your browser opens, you pick your own Google account, and Curet can see your calendar and add events you create (from the Today tab, or by asking your pet). Sign out in Settings revokes the access.
 
 **Gemini** — get a free key at <https://aistudio.google.com/apikey> and paste it in Settings → Brain. The default model is `gemini-flash-latest`; change it if you like.
 
 ## Maintainers: set up Google sign-in (once)
-LifePet ships one OAuth client; every user signs in with their own account.
+Curet ships one OAuth client; every user signs in with their own account.
 1. In [Google Cloud Console](https://console.cloud.google.com/) create a project and enable the **Google Calendar API**.
 2. Google Auth Platform → configure the consent screen (External), add scopes `calendar.events`, `calendar.calendarlist.readonly`, `openid`, `email`, and a privacy-policy URL.
 3. Clients → **Create client** → type **Desktop app**.
@@ -38,7 +38,7 @@ LifePet ships one OAuth client; every user signs in with their own account.
 ```bash
 npm install
 npm run tauri dev          # run
-npm run tauri build        # build LifePet.app (src-tauri/target/release/bundle/macos)
+npm run tauri build        # build Curet.app (src-tauri/target/release/bundle/macos)
 cd src-tauri && cargo test # ICS parser tests
 ```
 Preview the views in a normal browser with a mocked backend: `npm run dev`, then open `http://localhost:1420/?mock#/pet` (also `#/panel`).

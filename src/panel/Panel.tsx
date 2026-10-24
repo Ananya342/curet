@@ -18,7 +18,7 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 /**
- * LifePet's one pop-up. From the menu bar icon it opens as a compact glance (what's due, wake/tuck in, pets);
+ * Curet's one pop-up. From the menu bar icon it opens as a compact glance (what's due, wake/tuck in, pets);
  * choosing Chat or Settings grows the same window into the full tabbed view. The pet's menu opens it full.
  */
 export default function Panel() {
@@ -116,8 +116,8 @@ export default function Panel() {
     <div className="panel" data-pet={petId}>
       <header data-tauri-drag-region>
         <img src={PETS[petId].src} alt="" draggable={false} data-tauri-drag-region />
-        <h1 className="sr-only" translate="no">LifePet</h1>
-        <div className="tabs" role="tablist" aria-label="LifePet sections" onKeyDown={onTabKey}>
+        <h1 className="sr-only" translate="no">Curet</h1>
+        <div className="tabs" role="tablist" aria-label="Curet sections" onKeyDown={onTabKey}>
           {TABS.map((t) => (
             <button
               key={t.id}

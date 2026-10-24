@@ -134,7 +134,7 @@ export default function Settings({ petId }: { petId: PetId }) {
             </div>
             {!g.can_write && (
               <>
-                <p className="hint">LifePet can only read your calendar so far. Allow adding events so your pet can schedule things for you.</p>
+                <p className="hint">Curet can only read your calendar so far. Allow adding events so your pet can schedule things for you.</p>
                 <button className="btn" onClick={connectGoogle} aria-busy={busy === "google"}>Allow adding events{busy === "google" && <Spinner />}</button>
                 <Status where="google" />
               </>
@@ -150,8 +150,8 @@ export default function Settings({ petId }: { petId: PetId }) {
               {busy === "google"
                 ? "Finish signing in in your browser. This waits up to 4 minutes."
                 : g.configured
-                  ? "Opens your browser. LifePet asks to see your calendar and add events you create."
-                  : "Google sign-in isn’t set up in this build of LifePet."}
+                  ? "Opens your browser. Curet asks to see your calendar and add events you create."
+                  : "Google sign-in isn’t set up in this build of Curet."}
             </p>
             <Status where="google" />
             <details>
@@ -202,7 +202,7 @@ export default function Settings({ petId }: { petId: PetId }) {
 
       <footer>
         <p className="hint">Press <kbd>⌥&nbsp;⌘&nbsp;L</kbd> to tuck the pet into the menu bar and bring it back.</p>
-        <button className="btn quiet" onClick={() => invoke("quit")}>Quit LifePet</button>
+        <button className="btn quiet" onClick={() => invoke("quit")}>Quit Curet</button>
       </footer>
     </div>
   );

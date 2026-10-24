@@ -30,7 +30,7 @@ fn save_feeds(db: &Db, feeds: &[Feed]) {
 
 fn http() -> reqwest::Client {
     reqwest::Client::builder()
-        .user_agent("LifePet/0.1")
+        .user_agent("Curet/0.1")
         .timeout(std::time::Duration::from_secs(30))
         .build()
         .unwrap()
@@ -326,7 +326,7 @@ const GOOGLE_CLIENT_SECRET: Option<&str> = option_env!("LIFEPET_GOOGLE_CLIENT_SE
 fn google_client() -> Result<(String, String), String> {
     match (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET) {
         (Some(id), Some(secret)) if !id.is_empty() => Ok((id.to_string(), secret.to_string())),
-        _ => Err("Google sign-in isn't set up in this build of LifePet.".into()),
+        _ => Err("Google sign-in isn't set up in this build of Curet.".into()),
     }
 }
 
@@ -335,7 +335,7 @@ pub struct GoogleStatus {
     connected: bool,
     configured: bool,
     email: Option<String>,
-    /// False for people who signed in when LifePet could only read; they need to allow editing.
+    /// False for people who signed in when Curet could only read; they need to allow editing.
     can_write: bool,
 }
 
@@ -358,7 +358,7 @@ pub fn google_status(db: State<Db>) -> GoogleStatus {
 #[tauri::command]
 pub async fn google_disconnect(app: AppHandle) {
     let token = db::get(&app.state::<Db>(), "google_refresh");
-    // Revoke on Google's side too, so signing out really removes LifePet's access.
+    // Revoke on Google's side too, so signing out really removes Curet's access.
     if let Some(t) = token {
         let _ = http().post("https://oauth2.googleapis.com/revoke").form(&[("token", t.as_str())]).send().await;
     }
@@ -616,7 +616,7 @@ pub async fn google_add_event(app: AppHandle, event: NewEvent) -> Result<Event, 
             return Err("Google Calendar isn't connected. Sign in with Google in Settings first.".into());
         }
         if !can_write(&db) {
-            return Err("LifePet can only read your Google Calendar so far. Open Settings and choose Allow adding events.".into());
+            return Err("Curet can only read your Google Calendar so far. Open Settings and choose Allow adding events.".into());
         }
     }
     let title = event.title.trim();
@@ -657,7 +657,7 @@ pub async fn google_add_event(app: AppHandle, event: NewEvent) -> Result<Event, 
     if !status.is_success() {
         let msg = json["error"]["message"].as_str().unwrap_or("unknown error");
         return Err(if status.as_u16() == 403 {
-            "Google says LifePet isn't allowed to add events. Sign out and back in, and allow editing.".to_string()
+            "Google says Curet isn't allowed to add events. Sign out and back in, and allow editing.".to_string()
         } else {
             format!("Google couldn't add the event: {msg}")
         });

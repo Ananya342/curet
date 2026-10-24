@@ -1,6 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "LifePet",
+  "productName": "Curet",
+  "mainBinaryName": "Curet",
   "version": "0.1.0",
   "identifier": "com.sid.lifepet",
   "build": {
@@ -14,7 +15,7 @@
     "windows": [
       {
         "label": "pet",
-        "title": "LifePet",
+        "title": "Curet",
         "url": "index.html#/pet",
         "width": 340,
         "height": 400,
@@ -29,7 +30,7 @@
       },
       {
         "label": "panel",
-        "title": "LifePet Panel",
+        "title": "Curet Panel",
         "url": "index.html#/panel",
         "width": 400,
         "height": 580,

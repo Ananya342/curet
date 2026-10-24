@@ -118,7 +118,7 @@ export default function Today() {
         {!gs.connected ? (
           <p className="hint">Sign in with Google in Settings, and your pet can add events to your calendar.</p>
         ) : !gs.can_write ? (
-          <p className="hint">LifePet can only read your calendar so far. <button className="link" onClick={() => invoke("toggle_panel", { tab: "settings", forceOpen: true })}>Open Settings</button> and choose Allow adding events.</p>
+          <p className="hint">Curet can only read your calendar so far. <button className="link" onClick={() => invoke("toggle_panel", { tab: "settings", forceOpen: true })}>Open Settings</button> and choose Allow adding events.</p>
         ) : (
           <form className="stack" onSubmit={addEvent} noValidate>
             <input value={ev.title} onChange={(e) => setEv({ ...ev, title: e.target.value })} placeholder="Dentist appointment…" aria-label="Event title" autoComplete="off" />

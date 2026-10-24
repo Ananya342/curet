@@ -46,7 +46,7 @@ const STATUS: Record<string, string> = {
  * `onText` receives the reply so far, streamed as Gemini writes it.
  */
 
-/** Latency notes go to the app log (visible when LifePet is run from a terminal). */
+/** Latency notes go to the app log (visible when Curet is run from a terminal). */
 const timing = (msg: string) => { invoke("log", { msg: `gemini ${msg}` }).catch(() => {}); };
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));

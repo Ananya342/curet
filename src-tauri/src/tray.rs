@@ -93,7 +93,7 @@ fn menu(app: &AppHandle, events: &[Event], today: i64) -> tauri::Result<Menu<Wry
         &MenuItem::with_id(app, "today", "Today", true, None::<&str>)?,
         &MenuItem::with_id(app, "settings", "Settings…", true, None::<&str>)?,
         &PredefinedMenuItem::separator(app)?,
-        &MenuItem::with_id(app, "quit", "Quit LifePet", true, None::<&str>)?,
+        &MenuItem::with_id(app, "quit", "Quit Curet", true, None::<&str>)?,
     ])?;
     Ok(menu)
 }
@@ -101,7 +101,7 @@ fn menu(app: &AppHandle, events: &[Event], today: i64) -> tauri::Result<Menu<Wry
 pub fn build(app: &AppHandle) -> tauri::Result<()> {
     app.manage(TrayState::default());
     TrayIconBuilder::with_id(ID)
-        .tooltip("LifePet")
+        .tooltip("Curet")
         .show_menu_on_left_click(false)
         .on_menu_event(|app, ev| match ev.id.as_ref() {
             "toggle" => crate::toggle_hide(app),

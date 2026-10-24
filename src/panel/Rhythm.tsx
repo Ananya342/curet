@@ -18,7 +18,7 @@ export default function Rhythm() {
   const evening = useTimeSetting("briefing_evening", "20:00");
   const [brk, setBrk] = useState("50");
   useEffect(() => { kvGet("break_every").then((v) => v && setBrk(v)); }, []);
-  const preview = (type: "morning" | "evening" | "break") => emitTo("pet", "wellbeing-preview", { type });
+  const preview = (type: "morning" | "evening" | "week" | "break") => emitTo("pet", "wellbeing-preview", { type });
 
   return (
     <section aria-labelledby="h-rhythm">
@@ -40,9 +40,10 @@ export default function Rhythm() {
       <div className="row-btns">
         <button className="btn sm soft" onClick={() => preview("morning")}>Try morning</button>
         <button className="btn sm soft" onClick={() => preview("evening")}>Try evening</button>
+        <button className="btn sm soft" onClick={() => preview("week")}>Try week</button>
         <button className="btn sm soft" onClick={() => preview("break")}>Try break</button>
       </div>
-      <p className="hint">Briefings show up when your pet is awake and out. For quiet time, open your pet’s menu and choose Focus: it naps, holds your reminders, and tells you what it held when the timer ends.</p>
+      <p className="hint">Briefings show up when your pet is awake and out, and Sunday’s evening one previews the week: exams, deadlines and the heaviest day. For quiet time, open your pet’s menu and choose Focus: it naps, holds your reminders, and tells you what it held when the timer ends.</p>
     </section>
   );
 }

@@ -1,4 +1,4 @@
-# LifePet TODO
+# Curet TODO
 
 ## Test live (not yet seen in the real app)
 - [ ] Wake-up animation on launch
@@ -18,7 +18,7 @@
 - [ ] Pet-specific idle animations and expressions
 - [ ] Stream Gemini replies into the speech bubble
 - [ ] Launch at login
-- [ ] Custom app icon and menu-bar icon
+- [x] Custom app icon and menu-bar icon (Curet logo)
 
 ## From the original concept
 - [x] Morning briefing and evening summary

@@ -144,7 +144,7 @@ export function useWellbeing(c: WellbeingCtx) {
       listen<{ kind: BriefingKind }>("briefing", (e) => deliverBriefing(e.payload.kind)),
       listen<{ minutes: number }>("break-due", (e) => deliverBreak(e.payload.minutes)),
       // Settings → "Try it" buttons.
-      listen<{ type: "morning" | "evening" | "break" }>("wellbeing-preview", (e) =>
+      listen<{ type: BriefingKind | "break" }>("wellbeing-preview", (e) =>
         e.payload.type === "break" ? deliverBreak(50, true) : deliverBriefing(e.payload.type, true),
       ),
     ];

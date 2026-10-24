@@ -1,7 +1,7 @@
 import { eventsRange, fmtTime, nowSec, startOfDay, tasks, untilLabel } from "../api";
 import { runTool } from "../ai/tools";
 
-export type BriefingKind = "morning" | "evening";
+export type BriefingKind = "morning" | "evening" | "week";
 export interface Briefing { greeting: string; lines: string[] }
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
@@ -24,7 +24,29 @@ async function longestFree(day: Date): Promise<string | null> {
   return `${best.from}–${best.to}`;
 }
 
+const EXAM = /\b(exam|midterm|final|quiz|test)\b/i;
+const dayName = (ts: number) => new Date(ts * 1000).toLocaleDateString([], { weekday: "long" });
+
+/** The seven days starting tomorrow: how many exams and deadlines, which are the exams, and the heaviest day. */
+async function weekLines(): Promise<string[]> {
+  const t0 = startOfDay(new Date(Date.now() + 86400000));
+  const items = (await eventsRange(t0, t0 + 7 * 86400)).filter((e) => e.kind === "deadline" || EXAM.test(e.title));
+  if (!items.length) return ["Next week is clear: no exams or deadlines"];
+  const exams = items.filter((e) => EXAM.test(e.title));
+  const deadlines = items.filter((e) => !EXAM.test(e.title));
+  const counts = [exams.length ? plural(exams.length, "exam") : "", deadlines.length ? plural(deadlines.length, "deadline") : ""].filter(Boolean);
+  const lines = [`Next week: ${counts.join(", ")}`];
+  if (exams.length) lines.push(`Exams: ${exams.slice(0, 2).map((e) => `${short(e.title)} (${weekday(e.start)})`).join(", ")}${exams.length > 2 ? ` +${exams.length - 2} more` : ""}`);
+  const perDay = new Map<string, number>();
+  for (const e of items) perDay.set(dayName(e.start), (perDay.get(dayName(e.start)) ?? 0) + 1);
+  const [busiest, n] = [...perDay.entries()].sort((a, b) => b[1] - a[1])[0];
+  if (n >= 2) lines.push(`Heaviest day: ${busiest} (${n} things)`);
+  return lines;
+}
+
 export async function composeBriefing(kind: BriefingKind): Promise<Briefing> {
+  if (kind === "week") return { greeting: "The week ahead 🗓️", lines: await weekLines() };
+
   const now = nowSec();
   const open = await tasks.list();
 
@@ -62,6 +84,7 @@ export async function composeBriefing(kind: BriefingKind): Promise<Briefing> {
   }
   if (due.length) lines.push(dueLine(due, weekday));
   lines.push(open.length ? `Still open: ${plural(open.length, "task")}, first: “${clip(open[0].title, 24)}”` : "All tasks done. Nicely finished!");
+  if (new Date().getDay() === 0) return { greeting: "Sunday night 🌙", lines: [...(await weekLines()), ...lines.slice(0, 1), ...lines.slice(-1)] };
   return { greeting: "Winding down 🌙", lines };
 }
 
