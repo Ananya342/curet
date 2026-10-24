@@ -22,9 +22,10 @@ export default function Today() {
 
   const load = useCallback(async () => {
     const d = startOfDay();
-    const [t, up, ts] = await Promise.all([eventsRange(d, d + 86400), eventsRange(nowSec(), nowSec() + 7 * 86400), tasks.list(true)]);
+    // Deadlines from the last two days stay listed until ticked off, so a missed one can still be marked done.
+    const [t, up, ts, dn0] = await Promise.all([eventsRange(d, d + 86400), eventsRange(nowSec() - 2 * 86400, nowSec() + 7 * 86400), tasks.list(true), deadlinesDone()]);
     setToday(t.filter((e) => e.kind === "event" || e.start < d + 86400));
-    setDeadlines(up.filter((e) => e.kind === "deadline"));
+    setDeadlines(up.filter((e) => e.kind === "deadline" && (e.start > nowSec() || !dn0[deadlineKey(e)])));
     // Open tasks, then whatever was ticked off today (struck through).
     setTodo(ts.filter((x) => !x.done || (x.done_at ?? 0) >= d));
     const [dn, ps] = await Promise.all([deadlinesDone(), studyPlans()]);
@@ -116,15 +117,15 @@ export default function Today() {
               const plan = plans.find((p) => p.key === key && p.status !== "skipped" && p.end > now);
               return (
                 <li key={e.id + e.start} className={isDone ? "done" : ""}>
-                  <input type="checkbox" checked={isDone} onChange={() => setDeadlineDone(key, !isDone).then(load)} aria-label={`Mark “${e.title}” as done`} />
+                  <input type="checkbox" checked={isDone} onChange={() => setDeadlineDone(key, !isDone, e.start <= now ? e.start : undefined).then(load)} aria-label={`Mark “${e.title}” as done`} />
                   <div className="grow">
                     <div className="t">{e.title}</div>
                     <div className="s tnum">
-                      {fmtDay(e.start)}, {fmtTime(e.start)} · in {untilLabel(e.start, now)}
+                      {fmtDay(e.start)}, {fmtTime(e.start)} · {e.start <= now ? (isDone ? "done" : <b className="missed">missed</b>) : `in ${untilLabel(e.start, now)}`}
                       {plan && !isDone && <> · <b>study {fmtDay(plan.start)} {fmtTime(plan.start)}</b></>}
                     </div>
                   </div>
-                  {!isDone && !plan && <button className="btn sm" onClick={() => emitTo("pet", "plan-deadline", key)} title="Your pet finds a free stretch before it's due">Plan</button>}
+                  {!isDone && !plan && e.start > now && <button className="btn sm" onClick={() => emitTo("pet", "plan-deadline", key)} title="Your pet finds a free stretch before it's due">Plan</button>}
                   {e.link && <button className="btn sm soft" onClick={() => openUrl(e.link)}>Open</button>}
                 </li>
               );
