@@ -41,8 +41,10 @@ export default function Pet() {
   menuRef.current = menu;
   const [fx, setFx] = useState<Fx[]>([]);
   const [dir, setDir] = useState(1);
-  // Pets with a side profile turn to show it while they walk.
-  const view = (mode === "walking" && def.side) || def;
+  // Pets with a side profile turn to show it while they walk, except for the short hop in from a screen edge
+  // before the menu opens: that stays a front-facing hop, the same for every pet.
+  const [hoppingIn, setHoppingIn] = useState(false);
+  const view = (mode === "walking" && !hoppingIn && def.side) || def;
   const sw = def.w;
   const sh = def.w * view.ar;
   const [zzz, setZzz] = useState(true);
@@ -137,7 +139,10 @@ export default function Pet() {
     // At a screen edge part of the window hangs off it, so step in until all of it shows and the orbs have room.
     const w = screen.current;
     const inside = clamp(pos.current.x, w.x, w.x + w.w - WIN_W);
-    if (Math.abs(inside - pos.current.x) > 1) await walkTo(inside, 320);
+    if (Math.abs(inside - pos.current.x) > 1) {
+      setHoppingIn(true);
+      try { await walkTo(inside, 320); } finally { setHoppingIn(false); }
+    }
     setMenu(kind);
     menuTimer.current = window.setTimeout(() => setMenu(null), 9000);
   };
