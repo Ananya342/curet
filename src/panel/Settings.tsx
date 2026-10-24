@@ -6,6 +6,7 @@ import { PETS, PET_IDS, PetId } from "../pets";
 import { Feed, kvGet, kvSet, setPetId } from "../api";
 import { DEFAULT_MODEL } from "../ai/gemini";
 import Rhythm from "./Rhythm";
+import Wardrobe from "./Wardrobe";
 
 interface GStatus { connected: boolean; configured: boolean; email: string | null; can_write: boolean }
 type Note = { where: string; text: string; bad?: boolean };
@@ -99,6 +100,8 @@ export default function Settings({ petId }: { petId: PetId }) {
           ))}
         </div>
       </section>
+
+      <Wardrobe petId={petId} />
 
       <Rhythm />
 

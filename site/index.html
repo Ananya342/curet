@@ -3,15 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Curet: your deadlines find you</title>
+<title>Curet: a pet that nags kindly</title>
 <meta name="description" content="Curet is a small creature that lives on your Mac. It reads Brightspace and Google Calendar and tells you what is due before it is late.">
 <meta name="theme-color" content="#FFE6D2">
 <link rel="icon" type="image/png" href="assets/curet-icon.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preload" href="assets/fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="scenes/stage.css">
 <link rel="stylesheet" href="style.css">
 <meta property="og:title" content="Curet">
-<meta property="og:description" content="Your deadlines find you. A small creature for your Mac that reads Brightspace and Google Calendar.">
+<meta property="og:description" content="A pet that nags kindly. A small creature for your Mac that reads Brightspace and Google Calendar.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="assets/curet-logo.png">
 <script>document.documentElement.classList.add("js")</script>
@@ -32,7 +33,7 @@
   <div class="hero-disc" aria-hidden="true"></div>
 
   <div class="hero-copy">
-    <h1 class="reveal">Your deadlines<br>find you.</h1>
+    <h1 class="reveal">A pet that<br>nags kindly.</h1>
     <p class="reveal" style="--d:1">Curet is a small creature on your Mac. It reads Brightspace and Google Calendar and tells you what is due before it is late.</p>
     <p class="reveal" style="--d:2"><a class="button" href="https://github.com/Ananya342/curet/releases">Download for macOS</a></p>
     <p class="fine reveal" style="--d:3">Free and open source.</p>
@@ -45,66 +46,53 @@
   </div>
 </section>
 
-<!-- ============================================================ one Tuesday -->
-<section class="day" id="day" aria-labelledby="day-h">
+<!-- ============================================================ one Tuesday (scroll scene) -->
+<section class="scene day" id="day" data-scene="tuesday" data-options='{"hold":2.4}' aria-labelledby="day-h">
   <!-- The cat peeks over the top edge of this chapter, as it does over the u in the logo. -->
   <div class="peek peek-cat" style="--w:min(24vw,330px);--r:1.19;--x:84%">
     <div class="crop"><img src="assets/pets/cat.png" width="756" height="900" alt="Mochi, an orange cat, peeking over the edge" fetchpriority="high"></div>
     <i class="paw l"></i><i class="paw r"></i>
   </div>
 
-  <div class="field f-sky">
+  <div class="scene-stage">
     <h2 id="day-h" class="day-title">One Tuesday</h2>
-    <div class="bubble card" data-ui>
-      <p class="bubble-text">Good morning!<br>• 3 events today. Next: CS 241 at 11:00<br>• Due soon: Essay 2 (Fri)<br>• 2 open tasks</p>
-      <div class="bubble-actions"><span class="b go">Open Today</span><span class="b">Let’s go!</span></div>
-    </div>
-    <p class="clause">First it says what the day holds.</p>
-  </div>
+    <img class="walker" src="assets/pets/cat.png" width="756" height="900" alt="" aria-hidden="true">
 
-  <div class="field f-butter">
-    <div class="bubble card" data-ui>
-      <p class="bubble-text">Quiz 4 closes in 2 hours.<br>It is 11:59 pm tonight.</p>
-      <div class="bubble-actions"><span class="b go">Open</span><span class="b">Got it</span></div>
-    </div>
-    <p class="clause">Then it warns you before it is late.</p>
-  </div>
-
-  <div class="field f-pink">
-    <div class="bubble card" data-ui>
-      <p class="bubble-text">Focusing… 35 min left.</p>
-      <div class="bubble-actions"><span class="b go">End focus</span><span class="b">Keep going</span></div>
-    </div>
-    <p class="clause">Then it goes quiet while you work.</p>
-  </div>
-
-  <div class="field f-mint">
-    <div class="bubble card" data-ui>
-      <p class="bubble-text">Winding down<br>• Tomorrow: 2 events, first ENGL 210 at 2:00 pm<br>• Due soon: Lab report 3 (Mon)<br>• Still open: 1 task</p>
-      <div class="bubble-actions"><span class="b go">Open Today</span><span class="b">Thanks!</span></div>
-    </div>
-    <p class="clause">Then it tells you about tomorrow.</p>
-  </div>
-</section>
-
-<!-- ============================================================ five pets (the live thing) -->
-<section class="pets" id="pets" aria-labelledby="pets-h">
-  <div class="pets-grid">
-    <div class="pets-list" role="group" aria-label="Choose a pet">
-      <h2 id="pets-h">Five of them</h2>
-      <button type="button" data-pet="ghost" aria-pressed="true">Boo</button>
-      <button type="button" data-pet="cat" aria-pressed="false">Mochi</button>
-      <button type="button" data-pet="blob" aria-pressed="false">Jelly</button>
-      <button type="button" data-pet="dragon" aria-pressed="false">Ember</button>
-      <button type="button" data-pet="redpanda" aria-pressed="false">Maple</button>
+    <div class="field f-sky">
+      <p class="time"><span>8:40<small>am</small></span></p>
+      <div class="bubble card" data-ui>
+        <p class="bubble-text">Good morning!<br>• 3 events today. Next: CS 241 at 11:00<br>• Due soon: Essay 2 (Fri)<br>• 2 open tasks</p>
+        <div class="bubble-actions"><span class="b go">Open Today</span><span class="b">Let’s go!</span></div>
+      </div>
+      <p class="clause">First it says what the day holds.</p>
     </div>
 
-    <div class="stage">
-      <div class="disc" id="disc" aria-hidden="true"></div>
-      <img class="stage-pet" id="stage-pet" src="assets/pets/ghost.png" width="540" height="519" alt="Boo, a white ghost">
+    <div class="field f-butter">
+      <p class="time"><span>1:00<small>pm</small></span></p>
+      <div class="bubble card" data-ui>
+        <p class="bubble-text">Quiz 4 closes in 2 hours.<br>It is 11:59 pm tonight.</p>
+        <div class="bubble-actions"><span class="b go">Open</span><span class="b">Got it</span></div>
+      </div>
+      <p class="clause">Then it warns you before it is late.</p>
     </div>
 
-    <p class="fact" id="fact" aria-live="polite">A shy little ghost who giggles easily, and says boo when it is excited.</p>
+    <div class="field f-pink">
+      <p class="time"><span>2:45<small>pm</small></span></p>
+      <div class="bubble card" data-ui>
+        <p class="bubble-text">Focusing… 35 min left.</p>
+        <div class="bubble-actions"><span class="b go">End focus</span><span class="b">Keep going</span></div>
+      </div>
+      <p class="clause">Then it goes quiet while you work.</p>
+    </div>
+
+    <div class="field f-mint">
+      <p class="time"><span>4:20<small>pm</small></span></p>
+      <div class="bubble card" data-ui>
+        <p class="bubble-text">Winding down<br>• Tomorrow: 2 events, first ENGL 210 at 2:00 pm<br>• Due soon: Lab report 3 (Mon)<br>• Still open: 1 task</p>
+        <div class="bubble-actions"><span class="b go">Open Today</span><span class="b">Thanks!</span></div>
+      </div>
+      <p class="clause">Then it tells you about tomorrow.</p>
+    </div>
   </div>
 </section>
 
@@ -158,9 +146,32 @@
   </div>
 </section>
 
+<!-- ============================================================ five pets (the live thing) -->
+<section class="scene pets" id="pets" data-scene="pets" data-options='{"hold":3}' aria-labelledby="pets-h">
+  <div class="scene-stage">
+  <div class="pets-grid">
+    <div class="pets-list" role="group" aria-label="Choose a pet">
+      <h2 id="pets-h">Five of them</h2>
+      <button type="button" data-pet="ghost" aria-pressed="true">Boo</button>
+      <button type="button" data-pet="cat" aria-pressed="false">Mochi</button>
+      <button type="button" data-pet="blob" aria-pressed="false">Jelly</button>
+      <button type="button" data-pet="dragon" aria-pressed="false">Ember</button>
+      <button type="button" data-pet="redpanda" aria-pressed="false">Maple</button>
+    </div>
+
+    <div class="stage">
+      <div class="disc" id="disc" aria-hidden="true"></div>
+      <img class="stage-pet" id="stage-pet" src="assets/pets/ghost.png" width="540" height="519" alt="Boo, a white ghost">
+    </div>
+
+    <p class="fact" id="fact" aria-live="polite">A shy little ghost who giggles easily, and says boo when it is excited.</p>
+  </div>
+  </div>
+</section>
+
 <!-- ============================================================ setup -->
 <section class="setup" id="setup" aria-labelledby="setup-h">
-  <div class="peek" style="--w:min(24vw,320px);--r:0.96;--x:56%">
+  <div class="peek" style="--w:min(24vw,320px);--r:0.96;--x:44%">
     <div class="crop"><img src="assets/pets/ghost.png" width="540" height="519" alt="Boo, a ghost, peeking over the edge" loading="lazy"></div>
     <i class="paw l"></i><i class="paw r"></i>
   </div>
@@ -213,26 +224,11 @@
   </div>
 </section>
 
-<!-- ============================================================ footer -->
-<footer class="foot">
-  <div class="peek" style="--w:min(22vw,300px);--r:1.28;--x:74%">
-    <div class="crop"><img src="assets/pets/dragon.png" width="620" height="794" alt="Ember, a baby dragon, peeking over the edge" loading="lazy"></div>
-    <i class="paw l"></i><i class="paw r"></i>
-  </div>
-  <div class="foot-top">
-    <span class="wordmark small" translate="no">c<b>u</b>ret</span>
-    <p>A desktop companion for coursework.</p>
-    <p>Mac only, for now.</p>
-    <a class="textlink" href="#top">Back to top</a>
-  </div>
-  <p class="foot-line"><a href="https://github.com/Ananya342/curet">Ananya342/<wbr>curet</a></p>
-  <div class="foot-meta">
-    <span><a href="https://github.com/Ananya342/curet">Source</a> · <a href="https://github.com/Ananya342/curet/releases">Releases</a> · <a href="#setup">Setup</a></span>
-    <span>Made for students</span>
-    <span>2026</span>
-  </div>
-</footer>
-
+<script src="assets/vendor/gsap.min.js"></script>
+<script src="assets/vendor/ScrollTrigger.min.js"></script>
+<script src="assets/vendor/lenis.min.js"></script>
+<script src="scenes/stage.js"></script>
+<script src="scenes.js"></script>
 <script src="main.js" defer></script>
 </body>
 </html>

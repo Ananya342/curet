@@ -7,6 +7,8 @@ import { ChatIcon, HideIcon, PetsIcon, SettingsIcon, SleepIcon, TodayIcon, WakeI
 import { PETS, PET_IDS, PetId, pick } from "../pets";
 import { Area, Screen, fmtTime, getPetId, greeting, kvGet, kvSet, nowSec, setPetId } from "../api";
 import { startHitReporting } from "../hit";
+import { DEFAULT_OUTFIT, Outfit, getOutfit } from "../accessories";
+import Accessories from "./Accessories";
 import { FocusIcon } from "../wellbeing/FocusIcon";
 import { Laptop } from "../wellbeing/FocusGear";
 import { useWellbeing } from "../wellbeing/useWellbeing";
@@ -27,8 +29,7 @@ const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 export default function Pet() {
   const [petId, setPetIdState] = useState<PetId>("ghost");
   const def = PETS[petId];
-  const sw = def.w;
-  const sh = def.w * def.ar;
+  const [outfit, setOutfit] = useState<Outfit>(DEFAULT_OUTFIT);
 
   const [mode, _setMode] = useState<Mode>("sleeping");
   const modeRef = useRef<Mode>("sleeping");
@@ -40,6 +41,10 @@ export default function Pet() {
   menuRef.current = menu;
   const [fx, setFx] = useState<Fx[]>([]);
   const [dir, setDir] = useState(1);
+  // Pets with a side profile turn to show it while they walk.
+  const view = (mode === "walking" && def.side) || def;
+  const sw = def.w;
+  const sh = def.w * view.ar;
   const [zzz, setZzz] = useState(true);
   const [fading, setFading] = useState(false); // drops the drop-shadow while the pet fades out or back in
   const [poof, setPoof] = useState<null | { id: number; x: number; y: number; puffs: { x: number; y: number; s: number; d: number }[] }>(null);
@@ -616,6 +621,7 @@ export default function Pet() {
     (async () => {
       const id = await getPetId();
       setPetIdState(id);
+      setOutfit(await getOutfit());
       const s = await invoke<Screen | null>("screen_info");
       if (s) screen.current = s.work;
       const saved = Number(await kvGet("pet_x"));
@@ -629,6 +635,7 @@ export default function Pet() {
     })();
     const add = async <T,>(name: string, fn: (p: T) => void) => { unlisten.push(await listen<T>(name, (e) => fn(e.payload))) };
     add<string>("pet-changed", (p) => { setPetIdState(p as PetId); spawnFx("star", 6); jelly(1.2); });
+    add<Outfit>("outfit-changed", (o) => { setOutfit(o); spawnFx("star", 4); jelly(0.8); });
     add<null>("toggle-hide", () => toggleHide());
     add<null>("celebrate", () => celebrate());
     add<any>("reminder", (r) => onReminder(r));
@@ -646,16 +653,16 @@ export default function Pet() {
   // Eyelids should look like the skin around each eye, so sample the ring of pixels surrounding it.
   useEffect(() => {
     const img = new Image();
-    img.src = def.src;
+    img.src = view.src;
     img.onload = () => {
       const c = document.createElement("canvas");
       c.width = img.naturalWidth; c.height = img.naturalHeight;
       const g = c.getContext("2d", { willReadFrequently: true });
       if (!g) return;
       g.drawImage(img, 0, 0);
-      const fills = def.eyes.map((e) => {
+      const fills = view.eyes.map((e) => {
         const cx = e.x * c.width, cy = e.y * c.height;
-        const rx = def.eye.rx * c.width, ry = def.eye.ry * c.height;
+        const rx = view.eye.rx * c.width, ry = view.eye.ry * c.height;
         const top: number[][] = [], bot: number[][] = [];
         for (let k = 0; k < 28; k++) {
           const a = (k / 28) * Math.PI * 2;
@@ -673,7 +680,7 @@ export default function Pet() {
       });
       setLidFill(fills);
     };
-  }, [def]);
+  }, [def, view]);
 
   // Blink, wander, doze off.
   useEffect(() => {
@@ -883,14 +890,15 @@ export default function Pet() {
               <div className={breathClass}>
                 <motion.div className="squish" style={{ scaleX: sx, scaleY: sy, rotate: rot, y: ty }}>
                   <div className="sprite" data-hit ref={spriteRef} style={{ width: sw, height: sh }}>
-                    <img src={def.src} alt={def.name} draggable={false} />
-                    {def.eyes.map((e, i) => (
-                      <motion.div key={i} className="lid" style={{
-                        left: (e.x - def.eye.rx * 1.25) * sw, top: (e.y - def.eye.ry * 1.3) * sh,
-                        width: def.eye.rx * 2.5 * sw, height: def.eye.ry * 2.6 * sh,
+                    <img src={view.src} alt={def.name} draggable={false} />
+                    {view.eyes.map((e, i) => (
+                      <motion.div key={`${view.src}${i}`} className="lid" style={{
+                        left: (e.x - view.eye.rx * 1.25) * sw, top: (e.y - view.eye.ry * 1.3) * sh,
+                        width: view.eye.rx * 2.5 * sw, height: view.eye.ry * 2.6 * sh,
                         background: lidFill[i] ?? def.lid, scaleY: lid,
                       }}><i /></motion.div>
                     ))}
+                    <Accessories view={view} W={sw} H={sh} outfit={outfit} side={view !== def} />
                   </div>
                 </motion.div>
               </div>

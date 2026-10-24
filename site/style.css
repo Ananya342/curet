@@ -103,7 +103,7 @@ code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.86em
 .paw::after { content: ""; position: absolute; left: 50%; top: 52%; width: 34%; height: 30%; margin-left: -17%; border-radius: 50%; background: var(--pink); }
 .paw.l { left: 24%; } .paw.r { right: 24%; }
 
-section, footer { position: relative; }
+section { position: relative; }
 
 /* ---------------------------------------------------------- hero */
 .hero { min-height: 100svh; background: var(--peach); overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: 120px var(--margin) 160px; }
@@ -120,17 +120,34 @@ section, footer { position: relative; }
 .hero-bubble::after { left: 50%; }
 
 /* ---------------------------------------------------------- one Tuesday */
-.day { display: grid; grid-template-columns: repeat(4, 1fr); min-height: 84svh; z-index: 2; }
+/* The finished composition: four colour fields side by side. This is what a phone, reduced motion and a failed script show. */
+.day .scene-stage { display: grid; grid-template-columns: repeat(4, 1fr); min-height: 84svh; }
 .field { position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 calc(var(--margin) / 2) 32px var(--pad-l, calc(var(--margin) / 2)); min-height: 84svh; }
 .f-sky { background: var(--sky); } .f-butter { background: var(--butter); } .f-pink { background: var(--pink); } .f-mint { background: var(--mint); }
-.day-title { position: absolute; top: 40px; left: var(--margin); font-size: var(--t-head); }
+.day-title { position: absolute; z-index: 3; top: 40px; left: var(--margin); font-size: var(--t-head); }
 .f-sky { --pad-l: var(--margin); }
-.card { position: absolute; left: var(--pad-l, calc(var(--margin) / 2)); top: 38%; width: min(280px, calc(100% - var(--margin))); transition: transform 0.18s var(--ease); }
-.field:hover .card { transform: translateY(-6px); }
+.time { position: absolute; left: var(--pad-l, calc(var(--margin) / 2)); top: 25%; font-size: var(--t-head); font-weight: 900; letter-spacing: -0.03em; line-height: 1; }
+.time span { display: inline-block; }
+.time small { font-size: 0.34em; font-weight: 800; letter-spacing: 0; margin-left: 0.14em; }
+.card { position: absolute; left: var(--pad-l, calc(var(--margin) / 2)); top: 40%; width: min(280px, calc(100% - var(--margin))); }
 .clause { font-size: var(--t-clause); line-height: 1.12; font-weight: 800; max-width: 11em; text-wrap: balance; }
+.walker { display: none; }
+
+/* The live scene: the stage is held for a few screens, and scrolling plays the day. The fields stack and wipe in. */
+html.js .day.is-live .scene-stage { display: block; background: var(--sky); }
+.day.is-live .field { position: absolute; inset: 0; min-height: 0; padding: 0; isolation: isolate; }
+.day.is-live .time { font-size: clamp(100px, 17vw, 300px); left: var(--margin); top: 21%; line-height: 0.92; }
+.day.is-live .card { left: auto; right: var(--margin); top: 30%; width: min(400px, 34vw); }
+.day.is-live .card .bubble-text { font-size: 18px; }
+.day.is-live .clause { position: absolute; left: var(--margin); bottom: 72px; font-size: clamp(26px, 2.8vw, 44px); max-width: 11em; }
+.day.is-live .walker { display: block; position: absolute; z-index: 4; bottom: -4px; left: 0; width: clamp(110px, 11vw, 180px); height: auto; transform-origin: 50% 100%; }
+
 
 /* ---------------------------------------------------------- five pets */
-.pets { background: var(--ink); color: var(--paper); min-height: 100svh; padding: 140px var(--margin) 100px; z-index: 2; }
+.pets { background: var(--ink); color: var(--paper); }
+.pets .scene-stage { padding: 140px var(--margin) 100px; min-height: 100svh; }
+html.js .pets.is-live > .scene-stage { padding: 96px var(--margin) 56px; min-height: 0; display: flex; align-items: center; }
+html.js .pets.is-live .pets-grid { width: 100%; min-height: 0; }
 .pets-grid { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; align-items: end; min-height: calc(100svh - 240px); }
 .pets-list { grid-column: 1 / span 5; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; align-self: end; }
 .pets-list h2 { font-size: clamp(28px, 2.9vw, 44px); line-height: 1.15; color: var(--soft-dark); letter-spacing: -0.02em; margin-bottom: 4px; }
@@ -143,20 +160,20 @@ section, footer { position: relative; }
 .pets-list button[aria-pressed="true"] { color: var(--paper); }
 .pets-list button:focus-visible { outline-color: var(--paper); }
 .stage { --disc: min(64vh, 620px); grid-column: 6 / span 7; position: relative; height: calc(var(--disc) + 40px); align-self: center; }
-.disc { position: absolute; left: 50%; top: 50%; width: var(--disc); aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: #9ed7ff; transition: background-color 0.45s var(--ease); }
+.disc { position: absolute; left: calc(50% - var(--disc) / 2); top: calc(50% - var(--disc) / 2); width: var(--disc); aspect-ratio: 1; border-radius: 50%; background: #9ed7ff; transition: background-color 0.45s var(--ease); }
 /* the pet stands in front of the disc and breaks its outline at the top */
-.stage-pet { position: absolute; left: 0; right: 0; margin: 0 auto; top: calc(50% - var(--disc) * 0.54); height: calc(var(--disc) * 0.86); width: auto; max-width: none; transform-origin: 50% 100%; animation: peek-bob 6s ease-in-out infinite; transition: opacity 0.3s; }
+.stage-pet { position: absolute; left: 0; right: 0; margin: 0 auto; top: calc(50% - var(--disc) * 0.54); height: calc(var(--disc) * 0.86); width: auto; max-width: calc(var(--disc) * 0.96); object-fit: contain; transform-origin: 50% 100%; animation: peek-bob 6s ease-in-out infinite; transition: opacity 0.3s; }
 .stage-pet.swap { opacity: 0; }
 .fact { grid-column: 9 / span 4; align-self: end; font-size: var(--t-body); max-width: 20em; padding-bottom: 8px; }
 
 /* ---------------------------------------------------------- the board of close-ups */
-.board-wrap { background: var(--peach); padding: 150px var(--margin) 120px; z-index: 2; }
+.board-wrap { background: var(--peach); padding: 150px var(--margin) 120px; }
 .board { display: grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: 104px; gap: 8px; }
-.tile { position: relative; overflow: hidden; border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; justify-content: flex-end; transition: transform 0.2s var(--ease); }
-.tile:hover { transform: translateY(-4px) rotate(-0.4deg); }
+.tile { position: relative; top: 0; overflow: hidden; border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; justify-content: flex-end; transition: top 0.2s var(--ease); }
+.tile:hover { top: -4px; }
 .tile h2 { font-size: var(--t-head); }
 .t-head { grid-column: 1 / span 6; grid-row: 1 / span 2; background: transparent; padding: 0; justify-content: flex-start; }
-.t-head:hover { transform: none; }
+.t-head:hover { top: 0; }
 .t-join { grid-column: 7 / span 6; grid-row: 1 / span 4; }
 .t-keys { grid-column: 1 / span 3; grid-row: 3 / span 4; }
 .t-brief { grid-column: 4 / span 3; grid-row: 3 / span 2; }
@@ -191,16 +208,16 @@ section, footer { position: relative; }
 .z-week { --zs: 38px; left: 26px; top: 12px; white-space: normal; width: 80%; }
 
 /* ---------------------------------------------------------- setup */
-.setup { background: var(--sky); padding: 150px var(--margin) 120px; min-height: 90svh; z-index: 2; }
+.setup { background: var(--sky); padding: 150px var(--margin) 120px; min-height: 90svh; }
 .two { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; align-items: start; }
-.two > h2 { grid-column: 1 / span 5; font-size: var(--t-head); position: sticky; top: 96px; }
+.two > h2 { grid-column: 1 / span 5; font-size: var(--t-head); }
 .setup ol { grid-column: 6 / span 7; margin: 0; padding: 0 0 0 1.4em; display: grid; gap: 28px; font-size: var(--t-body); max-width: 40em; }
 .setup li { padding-left: 6px; }
 .setup li::marker { font-weight: 900; font-size: 1.2em; }
 .setup li b { font-weight: 900; font-size: var(--t-clause); letter-spacing: -0.02em; display: block; line-height: 1.1; margin-bottom: 6px; }
 
 /* ---------------------------------------------------------- questions */
-.faq { background: var(--pink); padding: 150px var(--margin) 120px; min-height: 90svh; z-index: 2; }
+.faq { background: var(--pink); padding: 150px var(--margin) 120px; min-height: 90svh; }
 .acc { grid-column: 6 / span 7; display: grid; gap: 8px; }
 .acc details { background: #f9bfd5; border-radius: var(--radius); transition: background-color 0.2s; }
 .acc summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 72px; padding: 16px 24px; font-size: var(--t-body); font-weight: 800; border-radius: var(--radius); }
@@ -214,7 +231,7 @@ section, footer { position: relative; }
 .acc details:not([open]):hover { background: #fbcade; }
 
 /* ---------------------------------------------------------- closing call */
-.cta { background: var(--tangerine); min-height: 90svh; z-index: 2; padding: 120px var(--margin) 56px; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; align-items: end; }
+.cta { background: var(--tangerine); min-height: 90svh; padding: 120px var(--margin) 56px; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; align-items: end; }
 .cta-line { grid-column: 1 / span 6; align-self: end; }
 .cta-line h2 { font-size: clamp(56px, 7vw, 112px); line-height: 0.92; }
 .cta-line p { margin-top: 24px; max-width: 24em; }
@@ -223,40 +240,33 @@ section, footer { position: relative; }
 .dialog-sub { margin: 10px 0 26px; font-size: var(--t-body); }
 .dialog p + p { margin-top: 18px; }
 
-/* ---------------------------------------------------------- footer */
-.foot { background: var(--mint); min-height: 90svh; z-index: 2; padding: 56px var(--margin) 40px; display: flex; flex-direction: column; }
-.foot-top { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; align-items: baseline; font-size: var(--t-small); }
-.foot-top .wordmark { grid-column: 1 / span 2; }
-.foot-top p { grid-column: span 3; }
-.foot-top .textlink { grid-column: 11 / span 2; justify-self: end; }
-.foot-line { margin-top: auto; font-size: clamp(40px, 10.6vw, 200px); font-weight: 900; letter-spacing: -0.04em; line-height: 0.95; }
-.foot-line a { text-decoration: none; display: inline-block; transition: transform 0.25s var(--ease); }
-.foot-line a:hover { transform: translateX(10px); }
-.foot-meta { margin-top: 40px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; font-size: 14px; font-weight: 700; }
-.foot-meta a { text-underline-offset: 3px; }
-
 /* ---------------------------------------------------------- phones */
 @media (max-width: 860px) {
   .nav nav a:nth-child(n+3) { display: none; }
   .hero { padding: 110px var(--margin) 0; justify-content: flex-start; min-height: 100svh; }
   .hero-copy h1 { font-size: 11.5vw; }
   .hero-disc { width: 130vw; height: 130vw; left: -15vw; top: 58svh; }
-  .hero-bubble { right: auto; left: var(--margin); top: calc(100svh - 440px); width: min(300px, calc(100% - 2 * var(--margin))); }
-  .hero-bubble::after { left: 76%; }
+  .hero-bubble { position: relative; right: auto; left: auto; top: auto; width: min(300px, 100%); margin-top: 28px; }
+  .hero-bubble::after { left: 24%; }
 
-  .pets, .setup, .faq, .cta, .foot { min-height: 0; }
-  .day { grid-template-columns: repeat(2, 1fr); min-height: 0; }
-  .field { min-height: 0; padding: 48px var(--margin) 44px; justify-content: flex-start; gap: 20px; }
-  .card { position: relative; left: auto; top: auto; width: min(300px, 100%); order: 2; }
-  .day-title { position: static; font-size: 9vw; margin-bottom: 4px; }
-  .clause { font-size: var(--t-clause); order: 1; }
+  .pets, .setup, .faq, .cta { min-height: 0; }
+  .day:not(.is-live) .scene-stage { grid-template-columns: repeat(2, 1fr); min-height: 0; }
+  .day:not(.is-live) .field { min-height: 0; padding: 48px var(--margin) 44px; justify-content: flex-start; gap: 20px; }
+  .day:not(.is-live) .time { position: static; order: 0; }
+  .day:not(.is-live) .card { position: relative; left: auto; top: auto; width: min(300px, 100%); order: 2; }
+  .day:not(.is-live) .day-title { position: static; grid-column: 1 / -1; font-size: 9vw; padding: 48px var(--margin) 0; }
+  .day:not(.is-live) .clause { font-size: var(--t-clause); order: 1; }
+  /* the live scene on a tablet: a smaller clock beside a narrower bubble */
+  .day.is-live .time { font-size: 13.5vw; }
+  .day.is-live .card { width: min(400px, 31vw); }
+  .day.is-live .clause { font-size: clamp(24px, 3.4vw, 40px); }
 
-  .pets { padding: 110px var(--margin) 60px; }
+  .pets .scene-stage { padding: 110px var(--margin) 60px; }
   .pets-grid { grid-template-columns: 1fr; min-height: 0; row-gap: 22px; }
   .stage { --disc: 80vw; grid-column: 1; grid-row: 1; }
-  .pets-list { grid-column: 1; grid-row: 2; flex-direction: row; flex-wrap: nowrap; align-items: baseline; gap: 22px; overflow-x: auto; padding-bottom: 8px; width: 100%; }
+  .pets-list { grid-column: 1; grid-row: 2; flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 4px 22px; width: 100%; }
   .pets-list h2 { display: none; }
-  .pets-list button { font-size: 26px; white-space: nowrap; }
+  .pets-list button { font-size: 28px; white-space: nowrap; }
   .fact { grid-column: 1; grid-row: 3; font-size: 16px; }
 
   .board-wrap { padding: 110px var(--margin) 80px; }
@@ -287,18 +297,22 @@ section, footer { position: relative; }
   .dialog { max-width: none; justify-self: stretch; padding: 24px; }
   .dialog .button { display: block; text-align: center; padding: 18px; }
 
-  .foot { padding: 40px var(--margin) 32px; }
-  .foot-top { grid-template-columns: 1fr; row-gap: 8px; }
-  .foot-top .wordmark, .foot-top p, .foot-top .textlink { grid-column: 1; justify-self: start; }
-  .foot-line { font-size: 15vw; margin-top: 56px; }
-  .foot-meta { flex-direction: column; font-size: 13px; }
 }
 
 @media (max-width: 560px) {
-  .day { grid-template-columns: 1fr; }
+  .day:not(.is-live) .scene-stage { grid-template-columns: 1fr; }
   .field { padding: 40px var(--margin); }
-  .day-title { font-size: 12vw; }
+  .day:not(.is-live) .day-title { font-size: 12vw; padding-top: 40px; }
 }
+
+/* the Three.js layer: one fixed canvas that lets every click through */
+#gl { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 60; pointer-events: none; }
+.scene > .scene-stage { z-index: 70; }
+.gl .stage-pet, .gl .disc { opacity: 0; animation: none; }
+:is(h1, h2, h3, p, li, summary, label, a, button, kbd) { position: relative; z-index: 70; }
+.nav, .hero-copy, .hero-bubble, .card, .zoom, .cap, .bubble, .dialog, .day-title, .stage-pet, .tile, .acc details { z-index: 70; }
+.acc details { position: relative; }
+.dialog { position: relative; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

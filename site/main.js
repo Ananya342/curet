@@ -14,7 +14,7 @@ if (reduce || !("IntersectionObserver" in window)) {
 }
 
 // Reveal the parts of the later chapters too, without having to tag each in the markup.
-const later = document.querySelectorAll(".card, .clause, .tile, .setup li, .acc details, .cta-line > *, .dialog");
+const later = document.querySelectorAll(".tile, .setup li, .acc details, .cta-line > *, .dialog");
 later.forEach((el, i) => { el.classList.add("reveal"); el.style.setProperty("--d", String(i % 4)); });
 if (!reduce && "IntersectionObserver" in window) {
   const io2 = new IntersectionObserver(
@@ -39,8 +39,10 @@ const stage = document.getElementById("stage-pet");
 const fact = document.getElementById("fact");
 const buttons = [...document.querySelectorAll(".pets-list button")];
 
-function choose(id) {
+function choose(id, fromUser = false) {
   const p = PETS[id];
+  current = id;
+  if (fromUser) dispatchEvent(new CustomEvent("curet:pet", { detail: { id, color: p.color } }));
   buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.pet === id)));
   disc.style.backgroundColor = p.color;
   fact.textContent = p.fact;
@@ -51,5 +53,31 @@ function choose(id) {
     stage.classList.remove("swap");
   }, reduce ? 0 : 220);
 }
-buttons.forEach((b) => b.addEventListener("click", () => choose(b.dataset.pet)));
+const petsScene = document.querySelector('.scene[data-scene="pets"]');
+const ORDER = buttons.map((b) => b.dataset.pet);
+let current = "ghost";
+buttons.forEach((b, i) => b.addEventListener("click", () => {
+  if (petsScene && petsScene.classList.contains("is-live")) {
+    // in the held scene, the scrollbar is the control: go to the middle of that pet's beat
+    const hold = parseFloat(petsScene.style.getPropertyValue("--hold")) || 3;
+    const y = petsScene.getBoundingClientRect().top + scrollY + ((i + 0.5) / ORDER.length) * hold * innerHeight;
+    if (window.Stage && Stage.lenis) Stage.lenis.scrollTo(y); else scrollTo({ top: y, behavior: "smooth" });
+  } else {
+    choose(b.dataset.pet, true);
+  }
+}));
+// scrolling through the held scene steps through the pets, one beat each
+if (petsScene) {
+  (function watch() {
+    if (petsScene.classList.contains("is-live")) {
+      const beat = Number(petsScene.dataset.beat);
+      if (Number.isFinite(beat) && ORDER[beat] && ORDER[beat] !== current) choose(ORDER[beat], true);
+    }
+    requestAnimationFrame(watch);
+  })();
+}
 choose("ghost");
+
+// ---- the live Three.js layer: bouncing pets, sparkle trail, a spinning showcase pet.
+// It loads only when motion is welcome, and the page is complete without it.
+if (!reduce) import("./three-scene.js").catch(() => {});
