@@ -119,32 +119,6 @@ img { -webkit-user-drag: none; }
   100% { opacity: 0; transform: translate(calc(var(--x) * 1.3), calc(var(--y) * 1.3 - 18px)) scale(0.35); }
 }
 
-/* ---------------------------------------------------------------- popover */
-.pop {
-  margin: 10px; height: calc(100% - 20px); display: flex; flex-direction: column; padding: 14px 18px;
-  background: #000; color: #fff; border-radius: 22px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-  animation: popdown 0.24s cubic-bezier(0.2, 1.2, 0.4, 1);
-}
-@keyframes popdown { from { opacity: 0; transform: translateY(-8px) scale(0.97); } to { opacity: 1; transform: none; } }
-.pop .muted { color: #8a849c; }
-.pop .small { font-size: 12px; }
-.pop-list { flex: 1; display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
-.pop-row { display: flex; align-items: center; gap: 8px; font-size: 13px; }
-.pop-row .t { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pop-row .w { color: #a9a3bd; font-variant-numeric: tabular-nums; font-size: 12px; }
-.pop-pets { flex: 1; display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
-.pop-pets button { flex: 1; height: 100%; max-height: 48px; border: 0; border-radius: 12px; background: #1d1b26; cursor: pointer; padding: 4px; }
-.pop-pets button.on { background: var(--violet); }
-.pop-pets img { width: 100%; height: 100%; object-fit: contain; }
-.pop .row { display: flex; gap: 8px; }
-.pop .pill { border: 0; border-radius: 999px; padding: 7px 14px; font-size: 12.5px; font-weight: 600; background: #26232f; color: #fff; cursor: pointer; font-family: inherit; }
-.pop .pill:hover { background: #3a3647; }
-.pop .pill.go { background: var(--violet); }
-.pop .pill.go:hover { background: #8f73ff; }
-.pop-reminder { flex: 1; padding-top: 2px; }
-.pop-reminder .r-title { font-size: 15px; font-weight: 700; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pop-reminder .r-sub { color: #b7b1cc; font-size: 12.5px; margin-bottom: 14px; }
-
 /* Honour the OS "reduce motion" setting everywhere (JS animations are handled by MotionConfig). */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
@@ -205,6 +179,23 @@ img { -webkit-user-drag: none; }
 .icon-btn.sm { width: 28px; height: 28px; }
 .icon-btn.on { background: var(--pink); border-color: var(--edge); color: var(--on-candy); box-shadow: 0 2px 0 var(--pop); }
 .panel main { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+
+/* the compact glance that drops from the menu bar icon */
+.panel.compact { animation: drop-in 0.3s cubic-bezier(0.3, 1.4, 0.5, 1); }
+@keyframes drop-in { from { opacity: 0; transform: translateY(-10px) scale(0.96); } to { opacity: 1; transform: none; } }
+.panel.compact header { cursor: default; padding-bottom: 4px; }
+.panel.compact header > img { width: 34px; height: 34px; }
+.panel.compact h1 { font-size: 16px; font-weight: 900; }
+.glance { padding: 4px 14px 14px; gap: 12px; }
+.glance > .items, .glance > .pets, .glance-empty { flex: 1; }
+.glance .items li { padding: 7px 10px; }
+.glance .items .s { flex: none; }
+.glance-empty { display: grid; place-items: center; }
+.glance .pet-pick { min-height: 0; }
+.glance .pet-pick img { width: 34px; height: 34px; }
+.glance-actions { display: flex; gap: 8px; }
+.glance-actions .btn { flex: 1; }
+.glance-actions .btn.on { background: var(--pink); color: var(--on-candy); }
 
 /* buttons: chunky stickers that press down */
 .btn {

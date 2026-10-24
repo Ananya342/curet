@@ -326,7 +326,7 @@ export default function Pet() {
     setPoof(null); setFading(false);
     sx.set(1); sy.set(1); ty.set(0); rot.set(0); fly.set(1); op.set(1);
     setMode("hidden");
-    await emitTo("popover", "pet-hidden", petRef.current.id);
+    await emitTo("panel", "pet-hidden", petRef.current.id);
   }, [fly, lid, op, rot, sx, sy, ty]);
   const hidePetRef = useRef(hidePet);
   hidePetRef.current = hidePet;
@@ -340,7 +340,7 @@ export default function Pet() {
     setFading(true);
     fly.set(0.6); op.set(0); rot.set(0); ty.set(0); sx.set(1.06); sy.set(0.92); // the sleepy squash wakeUp starts from
     await invoke("set_pet_visible", { visible: true });
-    await emitTo("popover", "pet-shown", petRef.current.id);
+    await emitTo("panel", "pet-shown", petRef.current.id);
     await Promise.all([
       animate(fly, 1, { type: "spring", stiffness: 380, damping: 18 }),
       animate(op, 1, { duration: 0.18 }),

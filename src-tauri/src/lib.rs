@@ -11,7 +11,7 @@ use std::{
     sync::Mutex,
     time::{Duration, Instant},
 };
-use tauri::{ActivationPolicy, AppHandle, Emitter, Listener, LogicalPosition, Manager, WebviewWindow};
+use tauri::{ActivationPolicy, AppHandle, Emitter, Listener, LogicalPosition, LogicalSize, Manager, WebviewWindow};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
 #[derive(Serialize)]
@@ -55,6 +55,23 @@ fn screen_of(app: &AppHandle) -> Option<Screen> {
     Some(Screen { work, tray: Point { x, y } })
 }
 
+/// The panel is one window in two sizes: the compact glance that drops from the menu bar icon, and the full
+/// Chat / Today / Settings view it grows into. Sizes include the 10px margin around the card for its shadow.
+const GLANCE: (f64, f64) = (400.0, 262.0);
+const FULL: (f64, f64) = (400.0, 580.0);
+
+#[derive(Clone, Serialize)]
+struct PanelMode {
+    mode: &'static str,
+    tab: Option<String>,
+}
+
+fn set_mode(app: &AppHandle, panel: &WebviewWindow, size: (f64, f64), mode: &'static str, tab: Option<String>) -> Result<(), String> {
+    panel.set_size(LogicalSize::new(size.0, size.1)).map_err(|e| e.to_string())?;
+    let _ = app.emit_to("panel", "panel-mode", PanelMode { mode, tab });
+    Ok(())
+}
+
 #[tauri::command]
 fn screen_info(app: AppHandle) -> Option<Screen> {
     screen_of(&app)
@@ -88,9 +105,8 @@ fn toggle_panel(app: AppHandle, tab: Option<String>, force_open: Option<bool>) -
         return panel.hide().map_err(|e| e.to_string());
     }
     // Dock the panel beside the pet, or under the menu bar icon while the pet is hidden.
-    let scale = panel.scale_factor().map_err(|e| e.to_string())?;
-    let psz = panel.outer_size().map_err(|e| e.to_string())?;
-    let (pw, ph) = (psz.width as f64 / scale, psz.height as f64 / scale);
+    set_mode(&app, &panel, FULL, "full", tab)?;
+    let (pw, ph) = FULL;
     let screen = screen_of(&app);
     let (mut x, mut y);
     let pet = win(&app, "pet")?;
@@ -110,55 +126,51 @@ fn toggle_panel(app: AppHandle, tab: Option<String>, force_open: Option<bool>) -
     }
     panel.set_position(LogicalPosition::new(x, y)).map_err(|e| e.to_string())?;
     panel.show().map_err(|e| e.to_string())?;
-    panel.set_focus().map_err(|e| e.to_string())?;
-    if let Some(t) = tab {
-        let _ = app.emit_to("panel", "panel-tab", t);
-    }
-    Ok(())
+    panel.set_focus().map_err(|e| e.to_string())
 }
+
+/// Grow the glance into the full panel where it stands, under the menu bar icon.
+#[tauri::command]
+fn expand_panel(app: AppHandle, tab: String) -> Result<(), String> {
+    let panel = win(&app, "panel")?;
+    set_mode(&app, &panel, FULL, "full", Some(tab))?;
+    panel.set_focus().map_err(|e| e.to_string())
+}
+
+static PANEL_HIDDEN_AT: Mutex<Option<Instant>> = Mutex::new(None);
 
 #[tauri::command]
 fn hide_panel(app: AppHandle) {
     if let Some(p) = app.get_webview_window("panel") {
         let _ = p.hide();
+        *PANEL_HIDDEN_AT.lock().unwrap() = Some(Instant::now());
     }
 }
 
-static POPOVER_HIDDEN_AT: Mutex<Option<Instant>> = Mutex::new(None);
-
+/// Drop the glance down from the menu bar icon. Reminders show it without taking focus.
 #[tauri::command]
-fn show_popover(app: AppHandle, focus: bool) -> Result<(), String> {
-    let popover = win(&app, "popover")?;
+fn show_glance(app: AppHandle, focus: bool) -> Result<(), String> {
+    let panel = win(&app, "panel")?;
+    set_mode(&app, &panel, GLANCE, "compact", None)?;
     if let Some(s) = screen_of(&app) {
-        let scale = popover.scale_factor().map_err(|e| e.to_string())?;
-        let w = popover.outer_size().map_err(|e| e.to_string())?.width as f64 / scale;
-        let x = (s.tray.x - w / 2.0).clamp(s.work.x, s.work.x + s.work.w - w);
-        popover.set_position(LogicalPosition::new(x, s.work.y - 4.0)).map_err(|e| e.to_string())?;
+        let x = (s.tray.x - GLANCE.0 / 2.0).clamp(s.work.x, s.work.x + s.work.w - GLANCE.0);
+        panel.set_position(LogicalPosition::new(x, s.work.y - 4.0)).map_err(|e| e.to_string())?;
     }
-    popover.show().map_err(|e| e.to_string())?;
+    panel.show().map_err(|e| e.to_string())?;
     if focus {
-        popover.set_focus().map_err(|e| e.to_string())?;
+        panel.set_focus().map_err(|e| e.to_string())?;
     }
-    let _ = app.emit_to("popover", "popover-shown", ());
     Ok(())
 }
 
-#[tauri::command]
-fn hide_popover(app: AppHandle) {
-    if let Some(p) = app.get_webview_window("popover") {
-        let _ = p.hide();
-        *POPOVER_HIDDEN_AT.lock().unwrap() = Some(Instant::now());
-    }
-}
-
-fn toggle_popover(app: &AppHandle) {
-    let Ok(popover) = win(app, "popover") else { return };
-    // Clicking the icon can blur an open popover, which hides it just before the click arrives here.
-    let just_hidden = POPOVER_HIDDEN_AT.lock().unwrap().is_some_and(|t| t.elapsed() < Duration::from_millis(300));
-    if popover.is_visible().unwrap_or(false) {
-        hide_popover(app.clone());
+fn toggle_glance(app: &AppHandle) {
+    let Ok(panel) = win(app, "panel") else { return };
+    // Clicking the icon can blur an open glance, which hides it just before the click arrives here.
+    let just_hidden = PANEL_HIDDEN_AT.lock().unwrap().is_some_and(|t| t.elapsed() < Duration::from_millis(300));
+    if panel.is_visible().unwrap_or(false) {
+        hide_panel(app.clone());
     } else if !just_hidden {
-        let _ = show_popover(app.clone(), true);
+        let _ = show_glance(app.clone(), true);
     }
 }
 
@@ -237,8 +249,8 @@ pub fn run() {
             set_pet_visible,
             toggle_panel,
             hide_panel,
-            show_popover,
-            hide_popover,
+            show_glance,
+            expand_panel,
             quit,
             log,
             db::kv_get,
@@ -276,10 +288,8 @@ pub fn run() {
 
             let pet = win(&handle, "pet")?;
             let panel = win(&handle, "panel")?;
-            let popover = win(&handle, "popover")?;
             mac::float(&pet, 20);
             mac::float(&panel, 21);
-            mac::float(&popover, 22);
 
             if let Some(s) = &screen {
                 let ps = pet.outer_size()?;
