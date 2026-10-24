@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { PETS, PetId } from "../pets";
-import { getPetId } from "../api";
+import { PETS, PET_IDS, PetId } from "../pets";
+import { getPetId, setPetId as choosePet } from "../api";
 import Chat from "./Chat";
 import Today from "./Today";
 import Settings from "./Settings";
@@ -17,6 +17,7 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
 export default function Panel() {
   const [tab, setTab] = useState<Tab>("chat");
   const [petId, setPetId] = useState<PetId>("ghost");
+  const [picking, setPicking] = useState(false);
 
   useEffect(() => {
     getPetId().then(setPetId);
@@ -39,9 +40,22 @@ export default function Panel() {
               <span>{t.icon}</span> {t.label}
             </button>
           ))}
+          <button className={picking ? "on" : ""} onClick={() => setPicking((v) => !v)} title="Change pet">
+            <span>🐾</span> Pets
+          </button>
         </nav>
         <button className="x" onClick={() => invoke("hide_panel")} title="Close (esc)">✕</button>
       </header>
+      {picking && (
+        <div className="pet-strip">
+          {PET_IDS.map((id) => (
+            <button key={id} className={id === petId ? "on" : ""} onClick={() => { choosePet(id); setPicking(false); }} title={PETS[id].name}>
+              <img src={PETS[id].src} alt={PETS[id].name} draggable={false} />
+              <span>{PETS[id].name}</span>
+            </button>
+          ))}
+        </div>
+      )}
       <main>
         {tab === "chat" && <Chat petId={petId} />}
         {tab === "today" && <Today />}
