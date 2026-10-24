@@ -130,11 +130,11 @@ export function useWellbeing(c: WellbeingCtx) {
     if (!preview && (unavailable() || focusActive())) return;
     const { say, hush, wakeUp, modeRef } = ctx.current;
     if (modeRef.current === "sleeping") await wakeUp({ text: "", sleepy: true });
-    say(`You’ve been at it for ${minutes} min. Stand up, stretch, sip some water 💧`, {
+    say(`You’ve been at it for ${minutes} min. Stand up, stretch, sip some water.`, {
       ms: 30000,
       speak: true,
       actions: [
-        { label: "On it", run: () => { hush(); say("Back in a few! 🌿", { ms: 2500 }); } },
+        { label: "On it", run: () => { hush(); say("Back in a few!", { ms: 2500 }); } },
         { label: "Later", run: hush },
       ],
     });

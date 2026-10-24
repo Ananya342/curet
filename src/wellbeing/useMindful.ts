@@ -41,10 +41,10 @@ export function useMindful(c: MindfulCtx) {
       if (away()) return;
       await rouse();
       const { say, hush, fallAsleep } = ctx.current;
-      say("It's getting late 🌙 Your brain does its best filing while you sleep. Wind down soon?", {
+      say("It's getting late. Your brain does its best filing while you sleep. Wind down soon?", {
         ms: 20000,
         actions: [
-          { label: "Good night", run: () => { hush(); say("Sleep well 💤", { ms: 1800 }); window.setTimeout(() => fallAsleep(), 1900); } },
+          { label: "Good night", run: () => { hush(); say("Sleep well.", { ms: 1800 }); window.setTimeout(() => fallAsleep(), 1900); } },
           { label: "10 more min", run: hush },
         ],
       });
@@ -55,7 +55,7 @@ export function useMindful(c: MindfulCtx) {
       if (!preview) await kvSet("last_recap", week);
       await rouse();
       const { say, hush, openPanel } = ctx.current;
-      say("Your week in review is ready 📊\nAnd one small question to reflect on.", {
+      say("Your week in review is ready.\nAnd one small question to reflect on.", {
         ms: 30000,
         actions: [
           { label: "See my week", run: () => { hush(); openPanel("week"); } },
@@ -78,7 +78,7 @@ export function useMindful(c: MindfulCtx) {
       let text = "";
       if (n >= 3) text = `${plural(n, "thing")} due ${busiest}. Want to start one today?`;
       else if (due.length >= 5) text = `${plural(due.length, "deadline")} this week. Want to start one today?`;
-      else if (preview) text = due.length ? `A lighter week: ${plural(due.length, "deadline")} coming up. Nice pacing!` : "Nothing due this week. Enjoy the breathing room 🌿";
+      else if (preview) text = due.length ? `A lighter week: ${plural(due.length, "deadline")} coming up. Nice pacing!` : "Nothing due this week. Enjoy the breathing room.";
       if (!text) return;
       await rouse();
       const { say, hush, openPanel, openFocusMenu } = ctx.current;

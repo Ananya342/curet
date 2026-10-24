@@ -75,7 +75,7 @@ export default function Glance({ petId, hidden, reminder, opened, onExpand, onCl
           <Wardrobe petId={petId} />
         </div>
       ) : events.length === 0 ? (
-        <p className="hint glance-empty">Nothing coming up 🌿</p>
+        <p className="hint glance-empty">Nothing coming up</p>
       ) : (
         <ul className="items">
           {events.slice(0, 2).map((e) => (
@@ -88,7 +88,7 @@ export default function Glance({ petId, hidden, reminder, opened, onExpand, onCl
         </ul>
       )}
       <div className="glance-actions">
-        <button className="btn sm" onClick={toggle}>{hidden ? "Wake pet 🐾" : "Tuck in 🏝️"}</button>
+        <button className="btn sm" onClick={toggle}>{hidden ? "Wake pet" : "Tuck in"}</button>
         <button className="btn sm soft" onClick={() => onExpand("chat")}>Chat</button>
         <button className={`btn sm soft${picking ? " on" : ""}`} aria-expanded={picking} onClick={() => setPicking(!picking)}>{picking ? "Done" : "Pets"}</button>
       </div>

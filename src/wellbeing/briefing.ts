@@ -45,7 +45,7 @@ async function weekLines(): Promise<string[]> {
 }
 
 export async function composeBriefing(kind: BriefingKind): Promise<Briefing> {
-  if (kind === "week") return { greeting: "The week ahead 🗓️", lines: await weekLines() };
+  if (kind === "week") return { greeting: "The week ahead", lines: await weekLines() };
 
   const now = nowSec();
   const open = await tasks.list();
@@ -66,7 +66,7 @@ export async function composeBriefing(kind: BriefingKind): Promise<Briefing> {
     const free = await longestFree(new Date());
     if (free) lines.push(`Best free stretch: ${free}`);
     const hour = new Date().getHours();
-    return { greeting: hour < 12 ? "Good morning! ☀️" : "Hello! ☀️", lines };
+    return { greeting: hour < 12 ? "Good morning!" : "Hello!", lines };
   }
 
   // evening: look ahead to tomorrow
@@ -84,8 +84,8 @@ export async function composeBriefing(kind: BriefingKind): Promise<Briefing> {
   }
   if (due.length) lines.push(dueLine(due, weekday));
   lines.push(open.length ? `Still open: ${plural(open.length, "task")}, first: “${clip(open[0].title, 24)}”` : "All tasks done. Nicely finished!");
-  if (new Date().getDay() === 0) return { greeting: "Sunday night 🌙", lines: [...(await weekLines()), ...lines.slice(0, 1), ...lines.slice(-1)] };
-  return { greeting: "Winding down 🌙", lines };
+  if (new Date().getDay() === 0) return { greeting: "Sunday night", lines: [...(await weekLines()), ...lines.slice(0, 1), ...lines.slice(-1)] };
+  return { greeting: "Winding down", lines };
 }
 
 export const briefingText = (b: Briefing) => `${b.greeting}\n${b.lines.map((l) => `• ${l}`).join("\n")}`;

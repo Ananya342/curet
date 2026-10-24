@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
 import { animate, motion, useMotionValue } from "motion/react";
 import { invoke } from "@tauri-apps/api/core";
 import { emitTo, listen } from "@tauri-apps/api/event";
@@ -26,6 +26,17 @@ interface Fx { id: number; kind: "heart" | "star" | "boop" | "confetti"; x: numb
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
+
+// Little drawings for the pet's effects and focus thoughts, in the same cocoa ink as the stickers.
+const INK = "#3a2a2a";
+const HEART = <svg viewBox="0 0 24 22" width="18" height="17"><path d="M12 20.5S2 14.4 2 7.6A5.1 5.1 0 0 1 12 5.4a5.1 5.1 0 0 1 10 2.2c0 6.8-10 12.9-10 12.9z" fill="#ff8fb8" stroke={INK} strokeWidth="2" strokeLinejoin="round" /></svg>;
+const SPARKLE = <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 1.5c.9 5.6 2.9 7.6 8.5 8.5-5.6.9-7.6 2.9-8.5 8.5-.9-5.6-2.9-7.6-8.5-8.5 5.6-.9 7.6-2.9 8.5-8.5z" transform="translate(0 2)" fill="#ffd95a" stroke={INK} strokeWidth="1.8" strokeLinejoin="round" /></svg>;
+const CONFETTI = ["#ffd95a", "#6fdcb2", "#ff8fb8", "#8fd3ff", "#ff9248"];
+const THOUGHTS: Record<string, ReactElement> = {
+  idea: <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke={INK} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z" fill="#ffd95a" /></svg>,
+  pencil: <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke={INK} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 20l1-4.5L16 4.5a2.1 2.1 0 0 1 3 3L8 18.5z" fill="#ff9248" /><path d="M14 7l3 3" /></svg>,
+  dots: <svg viewBox="0 0 24 24" width="16" height="16" fill={INK}><circle cx="5" cy="12" r="2.2" /><circle cx="12" cy="12" r="2.2" /><circle cx="19" cy="12" r="2.2" /></svg>,
+};
 
 export default function Pet() {
   const [petId, setPetIdState] = useState<PetId>("ghost");
@@ -191,7 +202,7 @@ export default function Pet() {
   const celebrate = useCallback(async () => {
     spawnFx("confetti", 14);
     spawnFx("star", 4);
-    say(pick(["yay! one down! 🎉", "you did it!!", "woohoo, nice work!"]), { ms: 3000 });
+    say(pick(["yay! one down!", "you did it!!", "woohoo, nice work!"]), { ms: 3000 });
     for (let i = 0; i < 3; i++) await hop(40);
     animate(rot, [0, -10, 10, -6, 0], { duration: 0.6 });
   }, [hop, rot, say, spawnFx]);
@@ -435,7 +446,7 @@ export default function Pet() {
     eyesResting.current = false;
     setEyeRest(null);
     if (modeRef.current !== "sleeping") animate(lid, 0, { duration: 0.3, ease: "easeOut" });
-    if (finished) { spawnFx("star", 4); say(pick(["Ahh, fresh eyes ✨", "Much better! 👀", "Eyes rested. Back to it!"]), { ms: 2400 }); }
+    if (finished) { spawnFx("star", 4); say(pick(["Ahh, fresh eyes.", "Much better!", "Eyes rested. Back to it!"]), { ms: 2400 }); }
   }, [lid, say, spawnFx]);
   const restEyes = useCallback((seconds: number) => {
     window.clearInterval(eyeTimer.current);
@@ -525,7 +536,7 @@ export default function Pet() {
         if (r.flips.length >= 5) {
           r.flips = [];
           touch();
-          happy(pick(["mmm, that's nice 💕", "hehe don't stop!", "I love pats!"]));
+          happy(pick(["mmm, that's nice", "hehe don't stop!", "I love pats!"]));
         }
       }
       r.dir = d2;
@@ -585,7 +596,7 @@ export default function Pet() {
     if (pokes.current.length >= 6) {
       pokes.current = [];
       animate(rot, [0, -8, 8, -8, 8, 0], { duration: 0.5 });
-      say("okay okay okay!! 😤", { ms: 2000 });
+      say("okay okay okay!!", { ms: 2000 });
     }
   };
 
@@ -608,7 +619,9 @@ export default function Pet() {
     setBadge(true);
     const mins = Math.round((r.start - nowSec()) / 60);
     const when = mins <= 1 ? "starting now" : mins < 90 ? `in ${mins} min` : mins < 36 * 60 ? `in ${Math.round(mins / 60)}h` : `on ${fmtTime(r.start)}`;
-    const text = r.kind === "deadline" ? `📚 ${r.title} is due ${when}!` : `📅 ${r.title} ${when} (${fmtTime(r.start)})`;
+    // Brightspace titles end in " - Due" or " - Availability Ends"; the line already says it's due
+    const title = r.kind === "deadline" ? r.title.replace(/\s*[-–]\s*(due|closes?|availability ends)\s*$/i, "") : r.title;
+    const text = r.kind === "deadline" ? `${title} is due ${when}!` : `${title} ${when} (${fmtTime(r.start)})`;
     const b = bounds();
     await walkTo((screen.current.x + screen.current.w / 2) - WIN_W / 2, 230);
     setMode("alert");
@@ -745,7 +758,7 @@ export default function Pet() {
     let alive = true;
     const think = window.setInterval(() => {
       const id = Date.now();
-      setThought({ id, e: pick(["💻", "✏️", "💡", "🧠", "📝"]) });
+      setThought({ id, e: pick(["idea", "pencil", "dots"]) });
       window.setTimeout(() => setThought((t) => (t?.id === id ? null : t)), 2600);
     }, 70000);
     (async () => {
@@ -776,7 +789,7 @@ export default function Pet() {
     const next = streakRef.current + 1;
     setStreak(next);
     kvSet("focus_streak", JSON.stringify({ day: new Date().toDateString(), n: next }));
-    window.setTimeout(() => spawnFx("boop", 1, undefined, `🔥 ${next} today`), 1600);
+    window.setTimeout(() => spawnFx("boop", 1, undefined, next === 1 ? "1 session today" : `${next} sessions today`), 1600);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wb.focusing]);
 
@@ -886,19 +899,19 @@ export default function Pet() {
         <div className="eye-rest" data-hit role="timer" aria-live="polite" style={{ bottom: FLOOR_PAD + sh + 10, left: WIN_W / 2, ["--p" as string]: 1 - eyeRest.left / eyeRest.total }}>
           <svg viewBox="0 0 36 36" aria-hidden="true"><circle className="track" cx="18" cy="18" r="15" /><circle className="done" cx="18" cy="18" r="15" /></svg>
           <b>{eyeRest.left}</b>
-          <span>Look at something far away 👀</span>
+          <span>Look at something far away</span>
           <button onClick={() => endEyeRest(false)}>Skip</button>
         </div>
       )}
       {thought && mode === "focusing" && !bubble && !menu && (
         <div key={thought.id} className="think" style={{ left: WIN_W / 2 + sw * 0.32, bottom: FLOOR_PAD + sh - 4 }} aria-hidden="true">
-          <span>{thought.e}</span>
+          {THOUGHTS[thought.e]}
         </div>
       )}
 
       {fx.map((f) => (
         <span key={f.id} className={`fx ${f.kind}`} style={{ left: f.x, top: f.y, ["--dx" as string]: `${f.dx}px` }}>
-          {f.kind === "heart" ? "💕" : f.kind === "star" ? "✨" : f.kind === "confetti" ? pick(["🎉", "✨", "🎊", "⭐", "💜"]) : f.text}
+          {f.kind === "heart" ? HEART : f.kind === "star" ? SPARKLE : f.kind === "confetti" ? <i style={{ background: pick(CONFETTI) }} /> : f.text}
         </span>
       ))}
 

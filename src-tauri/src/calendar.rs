@@ -413,8 +413,8 @@ pub async fn google_connect(app: AppHandle) -> Result<(), String> {
             let page = |msg: &str| {
                 format!(
                     "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n\
-                     <html><body style='font-family:-apple-system,sans-serif;text-align:center;padding-top:20vh;\
-                     background:#f7f3ff;color:#463a66'><h1 style='font-size:48px;margin:0'>🐾</h1><h2>{msg}</h2></body></html>"
+                     <html><body style='font-family:ui-rounded,sans-serif;text-align:center;padding-top:20vh;\
+                     background:#fff7e8;color:#3a2a2a'><h2>{msg}</h2></body></html>"
                 )
             };
             if let Some(err) = q.get("error") {

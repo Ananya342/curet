@@ -74,11 +74,10 @@ fn short(s: &str, n: usize) -> String {
 fn menu(app: &AppHandle, events: &[Event], today: i64) -> tauri::Result<Menu<Wry>> {
     let menu = Menu::new(app)?;
     if events.is_empty() {
-        menu.append(&MenuItem::new(app, "Nothing coming up 🌿", false, None::<&str>)?)?;
+        menu.append(&MenuItem::new(app, "Nothing coming up", false, None::<&str>)?)?;
     }
     for e in events {
-        let icon = if e.kind == "deadline" { "📚" } else { "📅" };
-        let text = format!("{icon} {}  ·  {}", short(&e.title, 40), when(e, today));
+        let text = format!("{}  ·  {}", short(&e.title, 40), when(e, today));
         let item = if e.link.is_empty() {
             MenuItem::new(app, text, false, None::<&str>)?
         } else {

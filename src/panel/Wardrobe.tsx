@@ -61,11 +61,11 @@ export default function Wardrobe({ petId, onOutfit }: { petId: PetId; onOutfit?:
     });
   };
 
-  const Row = ({ k, label, icon, children }: { k: keyof Outfit; label: string; icon: string; children: React.ReactNode }) => (
+  const Row = ({ k, label, children }: { k: keyof Outfit; label: string; children: React.ReactNode }) => (
     <div className="acc-row">
       <label>
         <input type="checkbox" checked={outfit[k].on} onChange={(e) => change(k, { on: e.target.checked })} />
-        {label}<em aria-hidden="true">{icon}</em>
+        {label}
       </label>
       {outfit[k].on && <div className="acc-opts">{children}</div>}
     </div>
@@ -78,21 +78,21 @@ export default function Wardrobe({ petId, onOutfit }: { petId: PetId; onOutfit?:
         <Dressed view={def} w={def.side ? 92 : 110} outfit={outfit} />
         {def.side && <Dressed view={def.side} w={104} outfit={outfit} side />}
       </div>
-      {Row({ k: "hat", label: "Hat", icon: "🎩", children: <>
+      {Row({ k: "hat", label: "Hat", children: <>
         <Seg label="Hat style" value={outfit.hat.style} options={HATS} onPick={(style) => change("hat", { style })} />
         <Colors label="Hat colour" value={outfit.hat.color} onPick={(color) => change("hat", { color })} />
       </> })}
-      {Row({ k: "cap", label: "Cap", icon: "🧢", children:
+      {Row({ k: "cap", label: "Cap", children:
         <Colors label="Cap colour" value={outfit.cap.color} onPick={(color) => change("cap", { color })} /> })}
-      {Row({ k: "glasses", label: "Sunglasses", icon: "🕶️", children: <>
+      {Row({ k: "glasses", label: "Sunglasses", children: <>
         <Seg label="Glasses style" value={outfit.glasses.style} options={GLASSES} onPick={(style) => change("glasses", { style })} />
         <Colors label="Frame colour" value={outfit.glasses.color} onPick={(color) => change("glasses", { color })} />
       </> })}
-      {Row({ k: "collar", label: "Collar", icon: "📿", children: <>
+      {Row({ k: "collar", label: "Collar", children: <>
         <Seg label="Collar tag" value={outfit.collar.tag} options={TAGS} onPick={(tag) => change("collar", { tag })} />
         <Colors label="Collar colour" value={outfit.collar.color} onPick={(color) => change("collar", { color })} />
       </> })}
-      {Row({ k: "shine", label: "Shininess", icon: "✨", children: <>
+      {Row({ k: "shine", label: "Shininess", children: <>
         <input type="range" min={5} max={100} value={outfit.shine.amount} aria-label="How shiny"
           onChange={(e) => change("shine", { amount: Number(e.target.value) })} />
         <label className="small">

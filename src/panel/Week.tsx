@@ -65,7 +65,7 @@ export default function Week() {
         <textarea id="journal-text" rows={4} value={text} onChange={(e) => setText(e.target.value)} placeholder="Write as much or as little as you like…" />
         <div className="head">
           <span className="hint">Stays on this Mac. Nothing is sent anywhere.</span>
-          <button className="btn sm" onClick={save} disabled={!text.trim()}>{saved ? "Saved ✓" : "Save"}</button>
+          <button className="btn sm" onClick={save} disabled={!text.trim()}>{saved ? "Saved" : "Save"}</button>
         </div>
         {kept.length > 0 && (
           <details>
