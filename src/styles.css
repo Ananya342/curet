@@ -377,3 +377,9 @@ kbd { background: var(--raised); border: 2px solid var(--edge); border-radius: 7
 .rrow input[type="time"] { width: 124px; }
 .rrow select { width: 156px; }
 .row-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* A bubble can never outgrow the pet window: the text scrolls and the buttons stay visible. */
+.bubble { display: flex; flex-direction: column; }
+.bubble .bubble-text { overflow-y: auto; min-height: 0; overscroll-behavior: contain; }
+.bubble .bubble-actions { flex: none; }
+.bubble.rich { font-size: 13px; }

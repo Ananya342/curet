@@ -1,4 +1,4 @@
-import { eventsRange, fmtDay, fmtTime, nowSec, startOfDay, tasks, untilLabel } from "../api";
+import { eventsRange, fmtTime, nowSec, startOfDay, tasks, untilLabel } from "../api";
 import { runTool } from "../ai/tools";
 
 export type BriefingKind = "morning" | "evening";
@@ -6,6 +6,11 @@ export interface Briefing { greeting: string; lines: string[] }
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 const clip = (s: string, n = 34) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
+/** Drop Brightspace's " - Due" suffix: the line already says it's due. */
+const short = (s: string, n = 22) => clip(s.replace(/\s*[-–]\s*(due|closes?|availability ends)\s*$/i, ""), n);
+const weekday = (ts: number) => new Date(ts * 1000).toLocaleDateString([], { weekday: "short" });
+const dueLine = (due: { title: string; start: number }[], label: (ts: number) => string) =>
+  `Due soon: ${due.slice(0, 2).map((d) => `${short(d.title)} (${label(d.start)})`).join(", ")}${due.length > 2 ? ` +${due.length - 2} more` : ""}`;
 
 /** Local YYYY-MM-DD, used to remember which day a briefing was already given. */
 export const todayKey = () => new Date().toLocaleDateString("en-CA");
@@ -30,12 +35,12 @@ export async function composeBriefing(kind: BriefingKind): Promise<Briefing> {
     const lines: string[] = [];
     if (evs.length) {
       const next = evs.find((e) => !e.all_day) ?? evs[0];
-      lines.push(`${plural(evs.length, "event")} today. Next: ${clip(next.title)}${next.all_day ? "" : ` at ${fmtTime(next.start)}`}`);
+      lines.push(`${plural(evs.length, "event")} today. Next: ${clip(next.title, 24)}${next.all_day ? "" : ` at ${fmtTime(next.start)}`}`);
     } else {
       lines.push("Nothing on the calendar today");
     }
-    for (const d of due.slice(0, 2)) lines.push(`Due ${untilLabel(d.start, now) === "now" ? "now" : `in ${untilLabel(d.start, now)}`}: ${clip(d.title)}`);
-    if (open.length) lines.push(`${plural(open.length, "open task")}${open[0] ? `, starting with “${clip(open[0].title, 28)}”` : ""}`);
+    if (due.length) lines.push(dueLine(due, (t) => (untilLabel(t, now) === "now" ? "now" : `in ${untilLabel(t, now)}`)));
+    if (open.length) lines.push(`${plural(open.length, "open task")}, first: “${clip(open[0].title, 24)}”`);
     const free = await longestFree(new Date());
     if (free) lines.push(`Best free stretch: ${free}`);
     const hour = new Date().getHours();
@@ -51,12 +56,12 @@ export async function composeBriefing(kind: BriefingKind): Promise<Briefing> {
   const lines: string[] = [];
   if (evs.length) {
     const first = evs.find((e) => !e.all_day) ?? evs[0];
-    lines.push(`Tomorrow: ${plural(evs.length, "event")}, starting with ${clip(first.title)}${first.all_day ? "" : ` at ${fmtTime(first.start)}`}`);
+    lines.push(`Tomorrow: ${plural(evs.length, "event")}, first ${clip(first.title, 24)}${first.all_day ? "" : ` at ${fmtTime(first.start)}`}`);
   } else {
-    lines.push(`Tomorrow (${fmtDay(t0)}) is clear`);
+    lines.push("Tomorrow is clear");
   }
-  for (const d of due.slice(0, 2)) lines.push(`Coming up: ${clip(d.title)}, ${fmtDay(d.start)}`);
-  lines.push(open.length ? `Still open: ${plural(open.length, "task")} — maybe “${clip(open[0].title, 28)}” first tomorrow` : "All tasks done. Nicely finished!");
+  if (due.length) lines.push(dueLine(due, weekday));
+  lines.push(open.length ? `Still open: ${plural(open.length, "task")}, first: “${clip(open[0].title, 24)}”` : "All tasks done. Nicely finished!");
   return { greeting: "Winding down 🌙", lines };
 }
 
