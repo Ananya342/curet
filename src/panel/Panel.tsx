@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { PETS, PET_IDS, PetId } from "../pets";
-import { getPetId, setPetId as choosePet } from "../api";
+import { PETS, PetId } from "../pets";
+import { getPetId } from "../api";
 import Chat from "./Chat";
 import Today from "./Today";
 import Settings from "./Settings";
@@ -17,7 +17,6 @@ const TABS: { id: Tab; label: string }[] = [
 export default function Panel() {
   const [tab, setTab] = useState<Tab>("chat");
   const [petId, setPetId] = useState<PetId>("ghost");
-  const [picking, setPicking] = useState(false);
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   useEffect(() => {
@@ -65,23 +64,10 @@ export default function Panel() {
             </button>
           ))}
         </div>
-        <button className={`icon-btn${picking ? " on" : ""}`} onClick={() => setPicking((v) => !v)} aria-label="Change pet" aria-expanded={picking} aria-controls="pet-strip" title="Change pet">
-          <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><g fill="currentColor"><ellipse cx="8" cy="10.6" rx="3.2" ry="2.6" /><circle cx="3.4" cy="7.2" r="1.35" /><circle cx="6.2" cy="4.2" r="1.35" /><circle cx="9.8" cy="4.2" r="1.35" /><circle cx="12.6" cy="7.2" r="1.35" /></g></svg>
-        </button>
         <button className="icon-btn" onClick={() => invoke("hide_panel")} aria-label="Close panel" title="Close (Esc)">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 3.5l9 9m0-9l-9 9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none" /></svg>
         </button>
       </header>
-      {picking && (
-        <div id="pet-strip" className="pet-strip" role="radiogroup" aria-label="Choose your pet">
-          {PET_IDS.map((id) => (
-            <button key={id} role="radio" aria-checked={id === petId} className="pet-pick" onClick={() => { choosePet(id); setPicking(false); }}>
-              <img src={PETS[id].src} alt="" draggable={false} />
-              <span translate="no">{PETS[id].name}</span>
-            </button>
-          ))}
-        </div>
-      )}
       <main id="panel-body" role="tabpanel" aria-labelledby={`tab-${tab}`}>
         {tab === "chat" && <Chat petId={petId} />}
         {tab === "today" && <Today />}
