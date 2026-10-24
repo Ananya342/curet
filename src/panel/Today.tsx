@@ -7,7 +7,7 @@ import { CalEvent, Task, addCalendarEvent, eventsRange, fmtDay, fmtTime, nowSec,
 export default function Today() {
   const [today, setToday] = useState<CalEvent[]>([]);
   const [deadlines, setDeadlines] = useState<CalEvent[]>([]);
-  const [open, setOpen] = useState<Task[]>([]);
+  const [todo, setTodo] = useState<Task[]>([]);
   const [title, setTitle] = useState("");
   const [hint, setHint] = useState("");
   const [syncing, setSyncing] = useState(false);
@@ -18,10 +18,11 @@ export default function Today() {
 
   const load = useCallback(async () => {
     const d = startOfDay();
-    const [t, up, ts] = await Promise.all([eventsRange(d, d + 86400), eventsRange(nowSec(), nowSec() + 21 * 86400), tasks.list()]);
+    const [t, up, ts] = await Promise.all([eventsRange(d, d + 86400), eventsRange(nowSec(), nowSec() + 7 * 86400), tasks.list(true)]);
     setToday(t.filter((e) => e.kind === "event" || e.start < d + 86400));
-    setDeadlines(up.filter((e) => e.kind === "deadline").slice(0, 12));
-    setOpen(ts);
+    setDeadlines(up.filter((e) => e.kind === "deadline"));
+    // Open tasks, then whatever was ticked off today (struck through).
+    setTodo(ts.filter((x) => !x.done || (x.done_at ?? 0) >= d));
   }, []);
 
   useEffect(() => {
@@ -44,9 +45,9 @@ export default function Today() {
     setTitle("");
     load();
   };
-  const complete = async (t: Task) => {
-    await tasks.done(t.id, true);
-    emitTo("pet", "celebrate", null);
+  const toggle = async (t: Task) => {
+    await tasks.done(t.id, !t.done);
+    if (!t.done) emitTo("pet", "celebrate", null);
     load();
   };
   const sync = async () => { setSyncing(true); await refreshEvents(); await load(); setSyncing(false); };
@@ -139,15 +140,17 @@ export default function Today() {
       </section>
 
       <section aria-labelledby="h-tasks">
-        <h2 id="h-tasks">Tasks</h2>
-        {open.length === 0 && <p className="hint">No open tasks. Add one below, or ask your pet to.</p>}
+        <h2 id="h-tasks">To-do</h2>
+        {todo.length === 0 && <p className="hint">No open tasks. Add one below, or ask your pet to.</p>}
         <ul className="tasks">
-          {open.map((t) => (
-            <li key={t.id}>
+          {todo.map((t) => (
+            <li key={t.id} className={`${t.done ? "done" : ""}${!t.done && t.due && t.due < now ? " overdue" : ""}`}>
               <label>
-                <input type="checkbox" onChange={() => complete(t)} />
-                <span className="grow">{t.title}</span>
-                {t.due && <em className="tnum">{fmtDay(t.due)}</em>}
+                <input type="checkbox" checked={t.done} onChange={() => toggle(t)} />
+                <span className="grow">
+                  <span className="tt">{t.title}</span>
+                  {t.due && <em className="tnum">{!t.done && t.due < now ? "Overdue" : fmtDay(t.due)}</em>}
+                </span>
               </label>
               <button className="icon-btn sm" onClick={() => tasks.remove(t.id).then(load)} aria-label={`Delete task: ${t.title}`}>
                 <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M3.5 3.5l9 9m0-9l-9 9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none" /></svg>
