@@ -182,6 +182,11 @@ export function useWellbeing(c: WellbeingCtx) {
     const un = [
       listen<{ kind: BriefingKind }>("briefing", (e) => deliverBriefing(e.payload.kind)),
       listen<{ minutes: number }>("break-due", (e) => deliverBreak(e.payload.minutes)),
+      // Chat's start_focus / end_focus tools: minutes > 0 starts a block, 0 ends the current one.
+      listen<{ minutes: number }>("focus-request", (e) => {
+        if (e.payload.minutes > 0 && !focusActive()) beginFocus(e.payload.minutes);
+        else if (e.payload.minutes === 0 && focusActive()) endFocus(false);
+      }),
       // Settings → "Try it" buttons.
       listen<{ type: BriefingKind | "break" | "nudge" }>("wellbeing-preview", (e) =>
         e.payload.type === "break" ? deliverBreak(50, true)
