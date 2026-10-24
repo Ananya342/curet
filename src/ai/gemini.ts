@@ -5,8 +5,8 @@ import { PETS, PetId } from "../pets";
 import { declarations, runTool } from "./tools";
 
 export interface Msg { role: "user" | "model"; text: string }
-// Lite is much quicker to the first word; the fallback keeps chat working if that alias ever goes away.
-export const DEFAULT_MODEL = "gemini-flash-lite-latest";
+// Default model. If Gemini rejects the name, chat falls back to FALLBACK_MODEL so it keeps working.
+export const DEFAULT_MODEL = "gemini-3.8-flash";
 const FALLBACK_MODEL = "gemini-flash-latest";
 
 async function context(petId: PetId) {
