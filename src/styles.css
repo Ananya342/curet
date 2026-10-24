@@ -407,6 +407,9 @@ svg.spinning { animation: spin 0.8s linear infinite; }
 .syllabus .tasks li.off .tt { color: var(--ink-soft); }
 .row-actions { display: flex; gap: 8px; }
 .settings h3.sub { margin: 10px 0 0; font-size: 13.5px; font-weight: 900; }
+.settings .seen { margin: 0; padding: 7px 11px; border-radius: 12px; background: var(--wash); font-size: 12.5px; font-weight: 600; color: var(--ink-soft); }
+.settings .seen b { color: var(--ink); }
+.settings .seen .bad { color: #d9485f; font-weight: 800; }
 .row-actions .btn:first-child { flex: 1; }
 .tasks li.overdue em { color: #c2304c; font-weight: 800; }
 @media (prefers-color-scheme: dark) { .panel .tasks li.overdue em { color: #ff9db1; } }

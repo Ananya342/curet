@@ -204,6 +204,20 @@ fn frontmost_app() -> Option<String> {
     mac::frontmost_app()
 }
 
+/// The website of the browser tab in front (domain only), if a known browser is in front and the user has
+/// allowed it. Runs off the main thread: the first call waits on macOS's permission prompt.
+#[tauri::command]
+async fn active_site() -> Option<(String, String)> {
+    tauri::async_runtime::spawn_blocking(|| {
+        let app = mac::frontmost_app()?;
+        let site = mac::active_tab_domain(&app)?;
+        Some((app, site))
+    })
+    .await
+    .ok()
+    .flatten()
+}
+
 #[tauri::command]
 fn log(msg: String) {
     eprintln!("[js] {msg}");
@@ -282,6 +296,7 @@ pub fn run() {
             show_glance,
             resize_glance,
             frontmost_app,
+            active_site,
             expand_panel,
             quit,
             log,

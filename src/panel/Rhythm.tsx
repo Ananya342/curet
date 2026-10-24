@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { emitTo } from "@tauri-apps/api/event";
+import { emitTo, listen } from "@tauri-apps/api/event";
+import type { InFront } from "../study/procrastination";
 import { kvGet, kvSet } from "../api";
 
 const EYES = [["0", "Off"], ["20", "Every 20 min"], ["30", "Every 30 min"], ["45", "Every 45 min"]];
@@ -42,6 +43,12 @@ export default function Rhythm() {
   const plans = useToggle("plans_on");
   const procrastination = useToggle("procrastination_on");
   const study = (type: "propose" | "block" | "submit" | "procrastinate") => emitTo("pet", "study-preview", { type });
+  const sites = useToggle("browser_sites_on");
+  const [seen, setSeen] = useState<(InFront & { at: number }) | null>(null);
+  useEffect(() => {
+    const un = listen<(InFront & { at: number }) | null>("in-front", (e) => e.payload && setSeen(e.payload));
+    return () => { un.then((f) => f()); };
+  }, []);
 
   return (
     <section aria-labelledby="h-rhythm">
@@ -101,13 +108,23 @@ export default function Rhythm() {
       <div className="rrow">
         <label className="check"><input type="checkbox" checked={procrastination.on} onChange={(e) => procrastination.set(e.target.checked)} /><span>Notice distracting apps when something's due</span></label>
       </div>
+      <div className="rrow">
+        <label className="check"><input type="checkbox" checked={sites.on} disabled={!procrastination.on} onChange={(e) => sites.set(e.target.checked)} /><span>Include websites in Safari, Chrome, Arc and Brave</span></label>
+      </div>
+      {procrastination.on && (
+        <p className="seen" role="status">
+          {seen
+            ? <>Last check: <b>{seen.app}</b>{seen.site && <> · <b>{seen.site}</b></>} · {seen.kind ? <span className="bad">distracting</span> : "fine"}</>
+            : "Last check: nothing yet. Your pet looks every 20 seconds while it's out."}
+        </p>
+      )}
       <div className="row-btns">
         <button className="btn sm soft" onClick={() => study("propose")}>Try study plan</button>
         <button className="btn sm soft" onClick={() => study("block")}>Try study time</button>
         <button className="btn sm soft" onClick={() => study("submit")}>Try “submitted?”</button>
         <button className="btn sm soft" onClick={() => study("procrastinate")}>Try distraction</button>
       </div>
-      <p className="hint">Only the name of the app in front is checked (like “Discord” or a YouTube web app), on this Mac, and it’s never saved. Sites in a browser tab aren’t seen.</p>
+      <p className="hint">Your pet checks only the app in front and, for a browser, the website of the tab in front (just the site, like youtube.com). It happens on this Mac and nothing is saved. macOS asks once before it can read a browser’s tab.</p>
       <p className="hint">Briefings show up when your pet is awake and out, and Sunday’s evening one previews the week: exams, deadlines and the heaviest day. For quiet time, open your pet’s menu and choose Focus: it locks in, holds your reminders, and tells you what it held when the timer ends.</p>
     </section>
   );

@@ -1,9 +1,9 @@
 import { MutableRefObject, useCallback, useEffect, useRef } from "react";
-import { listen } from "@tauri-apps/api/event";
+import { emitTo, listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { CalEvent, eventsRange, kvGet, kvSet, nowSec } from "../api";
 import { markSubmitAsked, unaskedPastDeadline } from "./mood";
-import { distraction, frontmostApp, inWords, nextUnfinished } from "./procrastination";
+import { inFront, inWords, nextUnfinished } from "./procrastination";
 import { FOCUS_CHOICES } from "../wellbeing/focus";
 import {
   Proposal, StudyPlan, acceptProposal, blockStartingNow, dayWord, deadlineKey, markAsked, nextProposal, setDeadlineDone, slotFor,
@@ -129,10 +129,12 @@ export function useStudy(c: StudyCtx) {
 
   const watchApp = useCallback(async () => {
     if ((await kvGet("procrastination_on")) === "off") return;
-    const app = await frontmostApp();
-    const kind = distraction(app);
+    const front = await inFront();
+    // Settings shows what was last checked, so it's never a mystery what the pet looks at. Sent, not saved.
+    emitTo("panel", "in-front", front ? { ...front, at: nowSec() } : null).catch(() => {});
     const now = nowSec();
-    if (!app || !kind) { distracted.current = null; return; }
+    if (!front?.kind) { distracted.current = null; return; }
+    const { label: app, kind } = front;
     if (distracted.current?.app !== app) distracted.current = { app, since: now };
     const long = now - distracted.current.since >= (ctx.current.focusActive() ? DISTRACTED_FOR_FOCUS : DISTRACTED_FOR);
     if (!long || now < quietUntil.current) return;
@@ -220,9 +222,8 @@ export function useStudy(c: StudyCtx) {
       // Settings → demo buttons, so the whole loop can be shown without waiting for real time.
       listen<{ type: "propose" | "block" | "submit" | "procrastinate" }>("study-preview", async (e) => {
         if (e.payload.type === "procrastinate") {
-          const app = await frontmostApp();
-          const kind = distraction(app);
-          callOut(kind && app ? app : "YouTube", kind ?? "watching", true);
+          const front = await inFront();
+          callOut(front?.kind ? front.label : "YouTube", front?.kind ?? "watching", true);
           return;
         }
         if (e.payload.type === "submit") {

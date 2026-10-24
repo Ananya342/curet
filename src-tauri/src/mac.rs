@@ -76,6 +76,35 @@ pub fn frontmost_app() -> Option<String> {
     app.localizedName().map(|n| n.to_string())
 }
 
+/// The website (domain only, like "youtube.com") of the tab in front, when `app` is a browser Curet knows.
+/// Asks the browser over Apple Events, so the first call shows macOS's "Curet wants to control …" prompt.
+/// The full address never leaves this function.
+pub fn active_tab_domain(app: &str) -> Option<String> {
+    let script = match app {
+        "Safari" | "Safari Technology Preview" => format!("tell application \"{app}\" to get URL of current tab of front window"),
+        "Google Chrome" | "Arc" | "Brave Browser" | "Microsoft Edge" | "Chromium" | "Vivaldi" | "Opera" => {
+            format!("tell application \"{app}\" to get URL of active tab of front window")
+        }
+        _ => return None,
+    };
+    let out = std::process::Command::new("osascript").args(["-e", &script]).output().ok()?;
+    if !out.status.success() {
+        return None; // permission refused, no window, or a blank tab
+    }
+    domain_of(String::from_utf8_lossy(&out.stdout).trim())
+}
+
+/// "https://www.youtube.com/watch?v=…" → "youtube.com". Anything without a host (blank tabs, files) → None.
+fn domain_of(url: &str) -> Option<String> {
+    let (scheme, rest) = url.split_once("://")?;
+    if scheme != "http" && scheme != "https" {
+        return None;
+    }
+    let host = rest.split(['/', '?', '#']).next()?.rsplit('@').next()?.split(':').next()?.to_lowercase();
+    let host = host.strip_prefix("www.").unwrap_or(&host).to_string();
+    (!host.is_empty() && host.contains('.')).then_some(host)
+}
+
 /// Whether another app is full screen on the display at this rect (logical, top-left origin): its normal
 /// window then exactly covers the display, menu bar strip included, which an ordinary window never does.
 pub fn fullscreen_app_on(x: f64, y: f64, w: f64, h: f64) -> bool {
@@ -154,5 +183,20 @@ mod cg {
         pub fn CFDictionaryGetValue(dict: CFTypeRef, key: CFTypeRef) -> CFTypeRef;
         pub fn CFNumberGetValue(number: CFTypeRef, kind: isize, out: *mut c_void) -> bool;
         pub fn CFRelease(cf: CFTypeRef);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::domain_of;
+
+    #[test]
+    fn keeps_only_the_site() {
+        assert_eq!(domain_of("https://www.youtube.com/watch?v=abc&t=10").as_deref(), Some("youtube.com"));
+        assert_eq!(domain_of("https://m.youtube.com/").as_deref(), Some("m.youtube.com"));
+        assert_eq!(domain_of("http://user@localhost.test:8080/x").as_deref(), Some("localhost.test"));
+        assert_eq!(domain_of("about:blank"), None);
+        assert_eq!(domain_of("file:///Users/me/notes.pdf"), None);
+        assert_eq!(domain_of("chrome://newtab/"), None);
     }
 }

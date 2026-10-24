@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- Shown in macOS's "Curet wants to control Safari/Chrome" prompt. Curet only reads the website of the tab in front. -->
+  <key>NSAppleEventsUsageDescription</key>
+  <string>Curet checks which website is open in the tab in front (just the site, like youtube.com) so your pet can notice distractions when something is due. It stays on this Mac and is never saved.</string>
+</dict>
+</plist>
