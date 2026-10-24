@@ -102,6 +102,21 @@ img { -webkit-user-drag: none; }
 @keyframes fxboop { 0% { opacity: 0; transform: translate(-50%, 6px) scale(0.5); } 25% { opacity: 1; transform: translate(-50%, -8px) scale(1.25); } 100% { opacity: 0; transform: translate(-50%, -32px) scale(1); } }
 @keyframes fxconfetti { 0% { opacity: 0; transform: translate(0, 0) scale(0.5); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), 70px) rotate(300deg) scale(1); } }
 
+/* Cloud puffs that burst out when the pet poofs away or back. Each puff gets its offset, size and delay from Pet. */
+.poof { position: absolute; width: 0; height: 0; pointer-events: none; z-index: 4; }
+.poof i {
+  position: absolute; left: calc(var(--s) / -2); top: calc(var(--s) / -2); width: var(--s); height: var(--s); border-radius: 50%;
+  background: #fffdf7; box-shadow: inset -4px -5px 0 rgba(58, 42, 42, 0.1), 0 3px 8px rgba(60, 40, 110, 0.14);
+  animation: puff 0.78s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+.poof.in i { animation-duration: 0.6s; }
+@keyframes puff {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.2); }
+  12% { opacity: 1; }
+  45% { opacity: 1; transform: translate(var(--x), var(--y)) scale(1); }
+  100% { opacity: 0; transform: translate(calc(var(--x) * 1.3), calc(var(--y) * 1.3 - 18px)) scale(0.35); }
+}
+
 /* ---------------------------------------------------------------- popover */
 .pop {
   margin: 10px; height: calc(100% - 20px); display: flex; flex-direction: column; padding: 14px 18px;

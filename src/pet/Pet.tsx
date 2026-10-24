@@ -19,8 +19,6 @@ interface Fx { id: number; kind: "heart" | "star" | "boop" | "confetti"; x: numb
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
-const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
-const easeIn = (t: number) => t * t * t;
 
 export default function Pet() {
   const [petId, setPetIdState] = useState<PetId>("ghost");
@@ -39,6 +37,7 @@ export default function Pet() {
   const [fx, setFx] = useState<Fx[]>([]);
   const [dir, setDir] = useState(1);
   const [zzz, setZzz] = useState(true);
+  const [poof, setPoof] = useState<null | { id: number; dir: "out" | "in"; x: number; y: number; puffs: { x: number; y: number; s: number; d: number }[] }>(null);
   const [badge, setBadge] = useState(false);
   const [lidFill, setLidFill] = useState<string[]>([]);
 
@@ -50,7 +49,6 @@ export default function Pet() {
 
   const pos = useRef({ x: 0, y: 0 });
   const screen = useRef<Area>({ x: 0, y: 0, w: 1440, h: 900 });
-  const trayAt = useRef({ x: 1280, y: 12 });
   const spriteRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const lastInteract = useRef(Date.now());
@@ -287,25 +285,21 @@ export default function Pet() {
     requestAnimationFrame(step);
   }), [bounds, moveTo, rot, sx, sy]);
 
-  // ---- hide into / emerge from the menu bar icon ----------------------------------------------
-  const trayTarget = async () => {
-    // Other menu bar items can shift the icon, so look it up each time.
-    const s = await invoke<Screen | null>("screen_info").catch(() => null);
-    if (s) trayAt.current = s.tray;
+  // ---- poof away / poof back, right where the pet stands ------------------------------------------
+  const cloud = (dir: "out" | "in") => {
     const d = petRef.current;
-    const spriteCentre = WIN_H - FLOOR_PAD - (d.w * d.ar) / 2;
-    return { x: trayAt.current.x - WIN_W / 2, y: trayAt.current.y - spriteCentre };
+    const w = d.w, h = d.w * d.ar;
+    const puffs = Array.from({ length: 13 }, (_, i) => {
+      const core = i < 4; // a few big ones in the middle hide the moment the pet vanishes
+      const a = (i / 13) * Math.PI * 2 + Math.random() * 0.5;
+      const dist = core ? 8 + Math.random() * 14 : w * (0.32 + Math.random() * 0.2);
+      return {
+        x: Math.cos(a) * dist, y: Math.sin(a) * dist * 0.75 - (core ? 6 : 0),
+        s: core ? 54 + Math.random() * 16 : 26 + Math.random() * 22, d: Math.random() * 90,
+      };
+    });
+    setPoof({ id: Date.now(), dir, x: WIN_W / 2, y: WIN_H - FLOOR_PAD - h / 2, puffs });
   };
-
-  const tween = (ms: number, f: (t: number) => void) => new Promise<void>((resolve) => {
-    const t0 = performance.now();
-    const step = (now: number) => {
-      const t = clamp((now - t0) / ms, 0, 1);
-      f(t);
-      t < 1 ? requestAnimationFrame(step) : resolve();
-    };
-    requestAnimationFrame(step);
-  });
 
   const hidePet = useCallback(async () => {
     if (["hiding", "hidden", "waking"].includes(modeRef.current)) return;
@@ -314,20 +308,23 @@ export default function Pet() {
     setMode("hiding");
     await invoke("hide_panel").catch(() => {});
     animate(lid, 0, { duration: 0.1 });
-    const from = { ...pos.current };
-    const to = await trayTarget();
-    await tween(650, (t) => {
-      const e = easeIn(t);
-      moveTo(from.x + (to.x - from.x) * e, from.y + (to.y - from.y) * e);
-      fly.set(1 - 0.88 * e);
-      rot.set(e * 540);
-      op.set(1 - clamp((t - 0.7) / 0.3, 0, 1));
-    });
+    // Crouch, then spring up and shrink into the cloud.
+    await Promise.all([animate(sy, 0.8, { duration: 0.14 }), animate(sx, 1.15, { duration: 0.14 })]);
+    cloud("out");
+    await Promise.all([
+      animate(sy, 1.3, { duration: 0.22, ease: "easeOut" }),
+      animate(sx, 0.75, { duration: 0.22, ease: "easeOut" }),
+      animate(ty, -26, { duration: 0.22, ease: "easeOut" }),
+      animate(fly, 0.15, { duration: 0.24, ease: "easeIn" }),
+      animate(op, 0, { duration: 0.2, delay: 0.04 }),
+    ]);
+    await sleep(520); // let the cloud drift apart
     await invoke("set_pet_visible", { visible: false });
-    rot.set(0); op.set(1);
+    setPoof(null);
+    sx.set(1); sy.set(1); ty.set(0); rot.set(0); fly.set(1); op.set(1);
     setMode("hidden");
     await emitTo("popover", "pet-hidden", petRef.current.id);
-  }, [fly, lid, moveTo, op, rot]);
+  }, [fly, lid, op, rot, sx, sy, ty]);
   const hidePetRef = useRef(hidePet);
   hidePetRef.current = hidePet;
 
@@ -335,26 +332,22 @@ export default function Pet() {
     if (modeRef.current !== "hidden") return;
     setMode("waking");
     const b = bounds();
-    const to = { x: clamp(homeX.current ?? b.maxX - 30, b.minX, b.maxX), y: b.floorY };
-    const from = await trayTarget();
-    lid.set(1); sx.set(1.06); sy.set(0.92); setZzz(false);
-    fly.set(0.12); op.set(0); rot.set(540);
-    moveTo(from.x, from.y);
+    moveTo(clamp(pos.current.x, b.minX, b.maxX), b.floorY);
+    lid.set(1); setZzz(false);
+    fly.set(0.2); op.set(0); rot.set(0); ty.set(0); sx.set(1); sy.set(1);
     await invoke("set_pet_visible", { visible: true });
     await emitTo("popover", "pet-shown", petRef.current.id);
-    await tween(750, (t) => {
-      const e = easeOut(t);
-      // Fall with a little bounce at the end.
-      const drop = t < 0.8 ? easeOut(t / 0.8) : 1 - Math.sin((t - 0.8) / 0.2 * Math.PI) * 0.03;
-      moveTo(from.x + (to.x - from.x) * e, from.y + (to.y - from.y) * drop);
-      fly.set(0.12 + 0.88 * e);
-      rot.set(540 * (1 - e));
-      op.set(clamp(t / 0.25, 0, 1));
-    });
-    rot.set(0); fly.set(1); op.set(1);
-    await Promise.all([animate(sy, [0.92, 0.78, 0.92], { duration: 0.25 }), animate(sx, [1.06, 1.2, 1.06], { duration: 0.25 })]);
+    cloud("in");
+    await sleep(160);
+    await Promise.all([
+      animate(fly, 1, { type: "spring", stiffness: 420, damping: 14 }),
+      animate(op, 1, { duration: 0.12 }),
+      animate(sy, [1.25, 0.85, 1], { duration: 0.45 }),
+      animate(sx, [0.8, 1.12, 1], { duration: 0.45 }),
+    ]);
+    window.setTimeout(() => setPoof(null), 600);
     await wakeUp();
-  }, [bounds, fly, lid, moveTo, op, rot, sx, sy, wakeUp]);
+  }, [bounds, fly, lid, moveTo, op, rot, sx, sy, ty, wakeUp]);
 
   const toggleHide = useCallback(() => {
     const m = modeRef.current;
@@ -537,7 +530,7 @@ export default function Pet() {
       const id = await getPetId();
       setPetIdState(id);
       const s = await invoke<Screen | null>("screen_info");
-      if (s) { screen.current = s.work; trayAt.current = s.tray; }
+      if (s) screen.current = s.work;
       const saved = Number(await kvGet("pet_x"));
       const b = bounds();
       const x = clamp(Number.isFinite(saved) && saved !== 0 ? saved : b.maxX - 30, b.minX, b.maxX);
@@ -699,6 +692,13 @@ export default function Pet() {
         );
       })}
 
+      {poof && (
+        <div key={poof.id} className={`poof ${poof.dir}`} style={{ left: poof.x, top: poof.y }}>
+          {poof.puffs.map((p, i) => (
+            <i key={i} style={{ ["--x" as string]: `${p.x}px`, ["--y" as string]: `${p.y}px`, ["--s" as string]: `${p.s}px`, animationDelay: `${p.d}ms` }} />
+          ))}
+        </div>
+      )}
       {fx.map((f) => (
         <span key={f.id} className={`fx ${f.kind}`} style={{ left: f.x, top: f.y, ["--dx" as string]: `${f.dx}px` }}>
           {f.kind === "heart" ? "💕" : f.kind === "star" ? "✨" : f.kind === "confetti" ? pick(["🎉", "✨", "🎊", "⭐", "💜"]) : f.text}
