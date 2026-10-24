@@ -18,9 +18,21 @@ Open the panel → **Settings**.
 
 **Google Calendar, easy way** — Google Calendar settings → your calendar → *Integrate calendar* → copy **Secret address in iCal format** → paste into LifePet.
 
-**Google Calendar, sign‑in** — create a Google Cloud project, enable the *Google Calendar API*, set up the consent screen (External, add yourself as a test user), create an OAuth client of type **Desktop app**, and paste the client ID/secret into LifePet.
+**Google Calendar** — press **Sign in with Google**. Your browser opens, you pick your own Google account, and LifePet gets read-only access to your calendar. Sign out in Settings revokes the access.
 
 **Gemini** — get a free key at <https://aistudio.google.com/apikey> and paste it in Settings → Brain. The default model is `gemini-flash-latest`; change it if you like.
+
+## Maintainers: set up Google sign-in (once)
+LifePet ships one OAuth client; every user signs in with their own account.
+1. In [Google Cloud Console](https://console.cloud.google.com/) create a project and enable the **Google Calendar API**.
+2. Google Auth Platform → configure the consent screen (External), add scopes `calendar.readonly`, `openid`, `email`, and a privacy-policy URL.
+3. Clients → **Create client** → type **Desktop app**.
+4. Build with the client baked in:
+   ```bash
+   LIFEPET_GOOGLE_CLIENT_ID=xxx.apps.googleusercontent.com LIFEPET_GOOGLE_CLIENT_SECRET=xxx npm run tauri build
+   ```
+   (Google doesn't treat a desktop app's client secret as confidential.) Without these the button is disabled.
+5. While the consent screen is in *Testing*, only listed test users can sign in and tokens expire after 7 days. Publish it, and complete Google's verification (free; calendar access is a sensitive scope), to open sign-in to everyone.
 
 ## Develop
 ```bash

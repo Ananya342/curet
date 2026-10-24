@@ -43,7 +43,7 @@ const emit = (event: string, payload: unknown) =>
       case "events_range": return events.filter((e) => e.end >= args.from && e.start <= args.to);
       case "task_list": return tasks;
       case "memory_list": case "feeds_list": return [];
-      case "google_status": return { connected: false, has_client: false };
+      case "google_status": return { connected: false, configured: true, email: null };
       case "window_rect": return { x: 0, y: 0, w: 440, h: 180 };
       default: return null;
     }

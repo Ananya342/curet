@@ -315,23 +315,44 @@ pub fn feed_remove(app: AppHandle, db: State<Db>, id: String) {
 // Google Calendar (OAuth desktop flow with PKCE over a loopback redirect)
 // ---------------------------------------------------------------------------------------------
 
+/// One OAuth "Desktop app" client ships inside the app; every user signs in with their own Google
+/// account. Set both at build time: LIFEPET_GOOGLE_CLIENT_ID / LIFEPET_GOOGLE_CLIENT_SECRET.
+/// (Google doesn't treat an installed app's client secret as confidential.)
+const GOOGLE_CLIENT_ID: Option<&str> = option_env!("LIFEPET_GOOGLE_CLIENT_ID");
+const GOOGLE_CLIENT_SECRET: Option<&str> = option_env!("LIFEPET_GOOGLE_CLIENT_SECRET");
+
+fn google_client() -> Result<(String, String), String> {
+    match (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET) {
+        (Some(id), Some(secret)) if !id.is_empty() => Ok((id.to_string(), secret.to_string())),
+        _ => Err("Google sign-in isn't set up in this build of LifePet.".into()),
+    }
+}
+
 #[derive(Serialize)]
 pub struct GoogleStatus {
     connected: bool,
-    has_client: bool,
+    configured: bool,
+    email: Option<String>,
 }
 
 #[tauri::command]
 pub fn google_status(db: State<Db>) -> GoogleStatus {
     GoogleStatus {
         connected: db::get(&db, "google_refresh").is_some(),
-        has_client: db::get(&db, "google_client_id").is_some() && db::get(&db, "google_client_secret").is_some(),
+        configured: google_client().is_ok(),
+        email: db::get(&db, "google_email"),
     }
 }
 
 #[tauri::command]
-pub fn google_disconnect(app: AppHandle, db: State<Db>) {
-    for k in ["google_refresh", "google_access", "google_expiry"] {
+pub async fn google_disconnect(app: AppHandle) {
+    let token = db::get(&app.state::<Db>(), "google_refresh");
+    // Revoke on Google's side too, so signing out really removes LifePet's access.
+    if let Some(t) = token {
+        let _ = http().post("https://oauth2.googleapis.com/revoke").form(&[("token", t.as_str())]).send().await;
+    }
+    let db = app.state::<Db>();
+    for k in ["google_refresh", "google_access", "google_expiry", "google_email", "err:google"] {
         db::set(&db, k, None);
     }
     db::replace_source(&db, "google", &[]);
@@ -347,13 +368,7 @@ fn random_token() -> String {
 
 #[tauri::command]
 pub async fn google_connect(app: AppHandle) -> Result<(), String> {
-    let (client_id, client_secret) = {
-        let db = app.state::<Db>();
-        (
-            db::get(&db, "google_client_id").ok_or("Add your Google client ID first")?,
-            db::get(&db, "google_client_secret").ok_or("Add your Google client secret first")?,
-        )
-    };
+    let (client_id, client_secret) = google_client()?;
     let verifier = random_token();
     let challenge = URL_SAFE_NO_PAD.encode(Sha256::digest(verifier.as_bytes()));
     let state = random_token();
@@ -366,7 +381,7 @@ pub async fn google_connect(app: AppHandle) -> Result<(), String> {
         .append_pair("client_id", &client_id)
         .append_pair("redirect_uri", &redirect)
         .append_pair("response_type", "code")
-        .append_pair("scope", "https://www.googleapis.com/auth/calendar.readonly")
+        .append_pair("scope", "https://www.googleapis.com/auth/calendar.readonly openid email")
         .append_pair("code_challenge", &challenge)
         .append_pair("code_challenge_method", "S256")
         .append_pair("access_type", "offline")
@@ -431,6 +446,16 @@ pub async fn google_connect(app: AppHandle) -> Result<(), String> {
         db::set(&db, "google_refresh", Some(refresh_token));
         store_access(&db, &res);
     }
+    // Show which account is connected (best effort).
+    if let Some(access) = res["access_token"].as_str() {
+        if let Ok(r) = http().get("https://openid.connect.googleapis.com/v1/userinfo").bearer_auth(access).send().await {
+            if let Ok(info) = r.json::<Value>().await {
+                if let Some(email) = info["email"].as_str() {
+                    db::set(&app.state::<Db>(), "google_email", Some(email));
+                }
+            }
+        }
+    }
     refresh(&app).await;
     Ok(())
 }
@@ -444,7 +469,8 @@ fn store_access(db: &Db, res: &Value) {
 }
 
 async fn google_access_token(app: &AppHandle) -> Result<String, String> {
-    let (refresh, id, secret) = {
+    let (id, secret) = google_client()?;
+    let refresh = {
         let db = app.state::<Db>();
         let valid = db::get(&db, "google_expiry").and_then(|s| s.parse::<i64>().ok()).unwrap_or(0) > Utc::now().timestamp();
         if valid {
@@ -452,11 +478,7 @@ async fn google_access_token(app: &AppHandle) -> Result<String, String> {
                 return Ok(t);
             }
         }
-        (
-            db::get(&db, "google_refresh").ok_or("not connected")?,
-            db::get(&db, "google_client_id").unwrap_or_default(),
-            db::get(&db, "google_client_secret").unwrap_or_default(),
-        )
+        db::get(&db, "google_refresh").ok_or("not connected")?
     };
     let res: Value = http()
         .post("https://oauth2.googleapis.com/token")

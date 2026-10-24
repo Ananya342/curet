@@ -6,7 +6,7 @@ import { PETS, PET_IDS, PetId } from "../pets";
 import { Feed, kvGet, kvSet, setPetId } from "../api";
 import { DEFAULT_MODEL } from "../ai/gemini";
 
-interface GStatus { connected: boolean; has_client: boolean }
+interface GStatus { connected: boolean; configured: boolean; email: string | null }
 const link = (url: string, text: string) => <a href="#" onClick={(e) => { e.preventDefault(); openUrl(url); }}>{text}</a>;
 
 export default function Settings({ petId }: { petId: PetId }) {
@@ -14,9 +14,8 @@ export default function Settings({ petId }: { petId: PetId }) {
   const [model, setModel] = useState("");
   const [saved, setSaved] = useState("");
   const [feeds, setFeeds] = useState<(Feed & { err?: string })[]>([]);
-  const [g, setG] = useState<GStatus>({ connected: false, has_client: false });
-  const [gid, setGid] = useState("");
-  const [gsec, setGsec] = useState("");
+  const [g, setG] = useState<GStatus>({ connected: false, configured: true, email: null });
+  const [gerr, setGerr] = useState("");
   const [bsUrl, setBsUrl] = useState("");
   const [icalUrl, setIcalUrl] = useState("");
   const [busy, setBusy] = useState("");
@@ -26,14 +25,13 @@ export default function Settings({ petId }: { petId: PetId }) {
     const list = await invoke<Feed[]>("feeds_list");
     setFeeds(await Promise.all(list.map(async (f) => ({ ...f, err: (await kvGet(`err:${f.id}`)) ?? undefined }))));
     setG(await invoke<GStatus>("google_status"));
+    setGerr((await kvGet("err:google")) ?? "");
   }, []);
 
   useEffect(() => {
     load();
     kvGet("gemini_key").then((v) => setKey(v ?? ""));
     kvGet("gemini_model").then((v) => setModel(v ?? ""));
-    kvGet("google_client_id").then((v) => setGid(v ?? ""));
-    kvGet("google_client_secret").then((v) => setGsec(v ?? ""));
     const un = listen("events-updated", load);
     return () => { un.then((f) => f()); };
   }, [load]);
@@ -61,8 +59,6 @@ export default function Settings({ petId }: { petId: PetId }) {
   const connectGoogle = async () => {
     setBusy("google"); setMsg(null);
     try {
-      await kvSet("google_client_id", gid.trim());
-      await kvSet("google_client_secret", gsec.trim());
       await invoke("google_connect");
       setMsg({ where: "google", text: "Google Calendar connected 🎉" });
     } catch (e) {
@@ -113,42 +109,38 @@ export default function Settings({ petId }: { petId: PetId }) {
       <section>
         <h3>Google Calendar</h3>
         {g.connected ? (
-          <div className="row between">
-            <span className="ok">✓ Connected</span>
-            <button className="ghost" onClick={() => invoke("google_disconnect").then(load)}>Disconnect</button>
-          </div>
+          <>
+            <div className="row between">
+              <span className="ok">✓ {g.email ?? "Connected"}</span>
+              <button className="ghost" onClick={() => invoke("google_disconnect").then(load)}>Sign out</button>
+            </div>
+            {gerr && <p className="err">{gerr}</p>}
+          </>
         ) : (
           <>
+            <button className="google" disabled={!g.configured || busy === "google"} onClick={connectGoogle}>
+              {busy === "google" ? "Waiting for Google…" : "Sign in with Google"}
+            </button>
+            <Msg where="google" />
+            <p className="muted small">
+              {g.configured
+                ? "Opens your browser to sign in. LifePet only asks to read your calendar."
+                : "Google sign-in isn't set up in this build of LifePet."}
+            </p>
             <details>
-              <summary>Easiest: use your secret iCal address</summary>
+              <summary>Prefer not to sign in? Use your secret iCal address</summary>
               <ol className="guide">
                 <li>Open {link("https://calendar.google.com/calendar/r/settings", "Google Calendar settings")}.</li>
                 <li>Under <b>Settings for my calendars</b>, pick your calendar → <b>Integrate calendar</b>.</li>
                 <li>Copy <b>Secret address in iCal format</b> and paste it below. Keep it private — anyone with it can see your events.</li>
               </ol>
-            </details>
-            <div className="row">
-              <input value={icalUrl} onChange={(e) => setIcalUrl(e.target.value)} placeholder="Paste secret iCal address" />
-              <button disabled={!icalUrl.trim() || busy === "ical"} onClick={() => addFeed("ical", "Google", icalUrl, "events", () => setIcalUrl(""))}>
-                {busy === "ical" ? "…" : "Add"}
-              </button>
-            </div>
-            <Msg where="ical" />
-            <details>
-              <summary>Or sign in with Google (all calendars)</summary>
-              <ol className="guide">
-                <li>Go to {link("https://console.cloud.google.com/projectcreate", "Google Cloud Console")} and create a project (any name).</li>
-                <li>Open {link("https://console.cloud.google.com/apis/library/calendar-json.googleapis.com", "Google Calendar API")} and click <b>Enable</b>.</li>
-                <li>Open {link("https://console.cloud.google.com/auth/overview", "Google Auth Platform")}, set it up as <b>External</b>, and under <b>Audience</b> add your own Gmail as a <b>Test user</b>.</li>
-                <li>Open {link("https://console.cloud.google.com/auth/clients", "Clients")} → <b>Create client</b> → type <b>Desktop app</b>.</li>
-                <li>Paste the <b>Client ID</b> and <b>Client secret</b> below, then press Connect.</li>
-              </ol>
-              <input value={gid} onChange={(e) => setGid(e.target.value)} placeholder="Client ID" />
-              <input value={gsec} type="password" onChange={(e) => setGsec(e.target.value)} placeholder="Client secret" />
-              <button disabled={!gid.trim() || !gsec.trim() || busy === "google"} onClick={connectGoogle}>
-                {busy === "google" ? "Waiting for Google…" : "Connect Google Calendar"}
-              </button>
-              <Msg where="google" />
+              <div className="row">
+                <input value={icalUrl} onChange={(e) => setIcalUrl(e.target.value)} placeholder="Paste secret iCal address" />
+                <button disabled={!icalUrl.trim() || busy === "ical"} onClick={() => addFeed("ical", "Google", icalUrl, "events", () => setIcalUrl(""))}>
+                  {busy === "ical" ? "…" : "Add"}
+                </button>
+              </div>
+              <Msg where="ical" />
             </details>
           </>
         )}
