@@ -228,6 +228,7 @@ img { -webkit-user-drag: none; }
 .tab[data-tab="chat"][aria-selected="true"] { background: var(--butter); }
 .tab[data-tab="today"][aria-selected="true"] { background: var(--mint); }
 .tab[data-tab="week"][aria-selected="true"] { background: var(--pink); }
+.tab[data-tab="pets"][aria-selected="true"] { background: var(--tangerine); }
 .tab[data-tab="settings"][aria-selected="true"] { background: var(--sky); }
 .icon-btn { border: 2px solid transparent; background: transparent; color: var(--ink); width: 34px; height: 34px; border-radius: 12px; display: grid; place-items: center; cursor: pointer; flex: none; transition: transform 0.15s cubic-bezier(0.3, 1.6, 0.5, 1), background-color 0.15s; }
 .icon-btn:hover { background: var(--wash); transform: rotate(8deg) scale(1.06); }
@@ -490,3 +491,6 @@ kbd { background: var(--raised); border: 2px solid var(--edge); border-radius: 7
 .bubble .bubble-text { overflow-y: auto; min-height: 0; overscroll-behavior: contain; }
 .bubble .bubble-actions { flex: none; }
 .bubble.rich { font-size: 13px; }
+
+.pick-sprite { height: 44px; display: flex; align-items: flex-end; justify-content: center; }
+.pick-sprite .sprite img { filter: none; }

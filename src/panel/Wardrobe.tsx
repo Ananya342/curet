@@ -13,7 +13,7 @@ const TAGS: { id: TagStyle; label: string }[] = [
   { id: "heart", label: "Heart" }, { id: "bell", label: "Bell" }, { id: "star", label: "Star" }, { id: "none", label: "No tag" },
 ];
 
-function Dressed({ view, w, outfit, side }: { view: PetView; w: number; outfit: Outfit; side?: boolean }) {
+export function Dressed({ view, w, outfit, side }: { view: PetView; w: number; outfit: Outfit; side?: boolean }) {
   const h = w * view.ar;
   return (
     <div className="sprite" style={{ width: w, height: h }}>
@@ -41,12 +41,13 @@ function Colors({ label, value, onPick }: { label: string; value: string; onPick
 }
 
 /** Dress the pet up: each accessory toggles on and opens its own options. Saved as you go. */
-export default function Wardrobe({ petId }: { petId: PetId }) {
+export default function Wardrobe({ petId, onOutfit }: { petId: PetId; onOutfit?: (o: Outfit) => void }) {
   const [outfit, setLocal] = useState<Outfit>(DEFAULT_OUTFIT);
   const saveTimer = useRef<number>(0);
   const def = PETS[petId];
 
   useEffect(() => { getOutfit().then(setLocal); }, []);
+  useEffect(() => { onOutfit?.(outfit); }, [outfit, onOutfit]);
 
   const change = <K extends keyof Outfit>(k: K, patch: Partial<Outfit[K]>) => {
     setLocal((cur) => {
