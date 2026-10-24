@@ -176,7 +176,7 @@ export default function Settings({ petId }: { petId: PetId }) {
       </section>
 
       <section className="foot">
-        <p className="muted small">Shortcut <kbd>⌥⌘L</kbd> tucks the pet into the island and brings it back.</p>
+        <p className="muted small">Shortcut <kbd>⌥⌘L</kbd> tucks the pet into the menu bar and brings it back.</p>
         <button className="ghost" onClick={() => invoke("quit")}>Quit LifePet</button>
       </section>
     </div>

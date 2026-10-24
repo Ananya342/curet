@@ -39,7 +39,7 @@ const emit = (event: string, payload: unknown) =>
       case "plugin:event|emit": case "plugin:event|emit_to": emit(args.event, args.payload); return;
       case "kv_get": return kv.get(args.key) ?? null;
       case "kv_set": args.value == null ? kv.delete(args.key) : kv.set(args.key, args.value); return;
-      case "screen_info": return { work: { x: 0, y: 0, w: window.innerWidth, h: window.innerHeight }, island_x: window.innerWidth / 2 };
+      case "screen_info": return { work: { x: 0, y: 0, w: window.innerWidth, h: window.innerHeight }, tray: { x: window.innerWidth - 160, y: 12 } };
       case "events_range": return events.filter((e) => e.end >= args.from && e.start <= args.to);
       case "task_list": return tasks;
       case "memory_list": case "feeds_list": return [];

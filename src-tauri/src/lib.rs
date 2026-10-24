@@ -3,13 +3,14 @@ mod db;
 mod hit;
 mod mac;
 mod scheduler;
+mod tray;
 
 use serde::Serialize;
-use tauri::{
-    menu::{Menu, MenuItem},
-    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    ActivationPolicy, AppHandle, Emitter, LogicalPosition, Manager, WebviewWindow,
+use std::{
+    sync::Mutex,
+    time::{Duration, Instant},
 };
+use tauri::{ActivationPolicy, AppHandle, Emitter, Listener, LogicalPosition, Manager, WebviewWindow};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
 #[derive(Serialize)]
@@ -21,10 +22,16 @@ struct Area {
 }
 
 #[derive(Serialize)]
+struct Point {
+    x: f64,
+    y: f64,
+}
+
+#[derive(Serialize)]
 struct Screen {
     work: Area,
-    /// Centre of the notch/top edge, where the island sits.
-    island_x: f64,
+    /// Centre of the pet's menu bar icon, where it hides.
+    tray: Point,
 }
 
 fn win(app: &AppHandle, label: &str) -> Result<WebviewWindow, String> {
@@ -35,17 +42,16 @@ fn screen_of(app: &AppHandle) -> Option<Screen> {
     let m = app.primary_monitor().ok()??;
     let s = m.scale_factor();
     let wa = m.work_area();
-    let size = m.size();
-    let pos = m.position();
-    Some(Screen {
-        work: Area {
-            x: wa.position.x as f64 / s,
-            y: wa.position.y as f64 / s,
-            w: wa.size.width as f64 / s,
-            h: wa.size.height as f64 / s,
-        },
-        island_x: pos.x as f64 / s + size.width as f64 / s / 2.0,
-    })
+    let work = Area {
+        x: wa.position.x as f64 / s,
+        y: wa.position.y as f64 / s,
+        w: wa.size.width as f64 / s,
+        h: wa.size.height as f64 / s,
+    };
+    // Until the menu bar item has been laid out, aim at the right end of the menu bar.
+    let menu_bar_mid = (m.position().y as f64 / s + work.y) / 2.0;
+    let (x, y) = tray::icon_centre(app).unwrap_or((work.x + work.w - 160.0, menu_bar_mid));
+    Some(Screen { work, tray: Point { x, y } })
 }
 
 #[tauri::command]
@@ -80,11 +86,11 @@ fn toggle_panel(app: AppHandle, tab: Option<String>, force_open: Option<bool>) -
     if open && !force_open.unwrap_or(false) && tab.is_none() {
         return panel.hide().map_err(|e| e.to_string());
     }
-    // Dock the panel beside whichever of the pet / island is currently on screen.
+    // Dock the panel beside the pet, or under the menu bar icon while the pet is hidden.
     let scale = panel.scale_factor().map_err(|e| e.to_string())?;
     let psz = panel.outer_size().map_err(|e| e.to_string())?;
     let (pw, ph) = (psz.width as f64 / scale, psz.height as f64 / scale);
-    let area = screen_of(&app).map(|s| s.work);
+    let screen = screen_of(&app);
     let (mut x, mut y);
     let pet = win(&app, "pet")?;
     if pet.is_visible().unwrap_or(false) {
@@ -93,11 +99,11 @@ fn toggle_panel(app: AppHandle, tab: Option<String>, force_open: Option<bool>) -
         x = if left_room >= pw { r.x - pw + 24.0 } else { r.x + r.w - 24.0 };
         y = r.y + r.h - ph;
     } else {
-        let isl = window_rect(app.clone(), "island".into())?;
-        x = isl.x + isl.w / 2.0 - pw / 2.0;
-        y = isl.y + 44.0;
+        let (tray_x, top) = screen.as_ref().map_or((0.0, 0.0), |s| (s.tray.x, s.work.y));
+        x = tray_x - pw / 2.0;
+        y = top;
     }
-    if let Some(a) = area {
+    if let Some(a) = screen.map(|s| s.work) {
         x = x.clamp(a.x + 8.0, a.x + a.w - pw - 8.0);
         y = y.clamp(a.y + 8.0, a.y + a.h - ph - 8.0);
     }
@@ -114,6 +120,44 @@ fn toggle_panel(app: AppHandle, tab: Option<String>, force_open: Option<bool>) -
 fn hide_panel(app: AppHandle) {
     if let Some(p) = app.get_webview_window("panel") {
         let _ = p.hide();
+    }
+}
+
+static POPOVER_HIDDEN_AT: Mutex<Option<Instant>> = Mutex::new(None);
+
+#[tauri::command]
+fn show_popover(app: AppHandle, focus: bool) -> Result<(), String> {
+    let popover = win(&app, "popover")?;
+    if let Some(s) = screen_of(&app) {
+        let scale = popover.scale_factor().map_err(|e| e.to_string())?;
+        let w = popover.outer_size().map_err(|e| e.to_string())?.width as f64 / scale;
+        let x = (s.tray.x - w / 2.0).clamp(s.work.x, s.work.x + s.work.w - w);
+        popover.set_position(LogicalPosition::new(x, s.work.y - 4.0)).map_err(|e| e.to_string())?;
+    }
+    popover.show().map_err(|e| e.to_string())?;
+    if focus {
+        popover.set_focus().map_err(|e| e.to_string())?;
+    }
+    let _ = app.emit_to("popover", "popover-shown", ());
+    Ok(())
+}
+
+#[tauri::command]
+fn hide_popover(app: AppHandle) {
+    if let Some(p) = app.get_webview_window("popover") {
+        let _ = p.hide();
+        *POPOVER_HIDDEN_AT.lock().unwrap() = Some(Instant::now());
+    }
+}
+
+fn toggle_popover(app: &AppHandle) {
+    let Ok(popover) = win(app, "popover") else { return };
+    // Clicking the icon can blur an open popover, which hides it just before the click arrives here.
+    let just_hidden = POPOVER_HIDDEN_AT.lock().unwrap().is_some_and(|t| t.elapsed() < Duration::from_millis(300));
+    if popover.is_visible().unwrap_or(false) {
+        hide_popover(app.clone());
+    } else if !just_hidden {
+        let _ = show_popover(app.clone(), true);
     }
 }
 
@@ -150,7 +194,7 @@ fn debug_commands(app: AppHandle, path: std::path::PathBuf) {
                     let a = app.clone();
                     let _ = app.run_on_main_thread(move || {
                         let hs = a.state::<hit::HitState>();
-                        for l in ["pet", "island", "panel"] {
+                        for l in ["pet", "panel"] {
                             if let Ok(w) = win(&a, l) {
                                 let rects = hs.0.lock().unwrap().get(l).map(|r| r.len()).unwrap_or(0);
                                 let ign = hs.1.lock().unwrap().get(l).copied();
@@ -192,6 +236,8 @@ pub fn run() {
             set_pet_visible,
             toggle_panel,
             hide_panel,
+            show_popover,
+            hide_popover,
             quit,
             log,
             db::kv_get,
@@ -227,23 +273,21 @@ pub fn run() {
             let screen = screen_of(&handle);
 
             let pet = win(&handle, "pet")?;
-            let island = win(&handle, "island")?;
             let panel = win(&handle, "panel")?;
+            let popover = win(&handle, "popover")?;
             mac::float(&pet, 20);
             mac::float(&panel, 21);
-            mac::float(&island, 26);
+            mac::float(&popover, 22);
 
             if let Some(s) = &screen {
                 let ps = pet.outer_size()?;
                 let sc = pet.scale_factor()?;
                 let (pw, ph) = (ps.width as f64 / sc, ps.height as f64 / sc);
                 pet.set_position(LogicalPosition::new(s.work.x + s.work.w - pw - 40.0, s.work.y + s.work.h - ph))?;
-                let isz = island.outer_size()?;
-                island.set_position(LogicalPosition::new(s.island_x - isz.width as f64 / sc / 2.0, 0.0))?;
             }
 
             if std::env::var_os("LIFEPET_DEBUG").is_some() {
-                for l in ["pet", "island", "panel"] {
+                for l in ["pet", "panel"] {
                     if let Ok(w) = win(&handle, l) {
                         eprintln!("[{l}] pos={:?} size={:?} scale={:?}", w.outer_position(), w.outer_size(), w.scale_factor());
                     }
@@ -254,7 +298,7 @@ pub fn run() {
                         std::thread::sleep(std::time::Duration::from_secs(3));
                         let h3 = h2.clone();
                         let _ = h2.run_on_main_thread(move || {
-                            for l in ["pet", "island", "panel"] {
+                            for l in ["pet", "panel"] {
                                 if let Ok(w) = win(&h3, l) {
                                     eprintln!("[native t{round} {l}] {}", mac::describe(&w));
                                 }
@@ -270,35 +314,11 @@ pub fn run() {
                 }
             }
 
-            let menu = Menu::with_items(
-                app,
-                &[
-                    &MenuItem::with_id(app, "toggle", "Hide / wake pet  (⌥⌘L)", true, None::<&str>)?,
-                    &MenuItem::with_id(app, "chat", "Chat…", true, None::<&str>)?,
-                    &MenuItem::with_id(app, "today", "Today", true, None::<&str>)?,
-                    &MenuItem::with_id(app, "settings", "Settings…", true, None::<&str>)?,
-                    &MenuItem::with_id(app, "quit", "Quit LifePet", true, None::<&str>)?,
-                ],
-            )?;
-            TrayIconBuilder::new()
-                .icon(app.default_window_icon().unwrap().clone())
-                .icon_as_template(false)
-                .menu(&menu)
-                .show_menu_on_left_click(false)
-                .on_menu_event(|app, ev| match ev.id.as_ref() {
-                    "toggle" => toggle_hide(app),
-                    "chat" => { let _ = toggle_panel(app.clone(), Some("chat".into()), Some(true)); }
-                    "today" => { let _ = toggle_panel(app.clone(), Some("today".into()), Some(true)); }
-                    "settings" => { let _ = toggle_panel(app.clone(), Some("settings".into()), Some(true)); }
-                    "quit" => app.exit(0),
-                    _ => {}
-                })
-                .on_tray_icon_event(|tray, ev| {
-                    if let TrayIconEvent::Click { button: MouseButton::Left, button_state: MouseButtonState::Up, .. } = ev {
-                        toggle_hide(tray.app_handle());
-                    }
-                })
-                .build(app)?;
+            tray::build(&handle)?;
+            for event in ["events-updated", "pet-changed"] {
+                let h = handle.clone();
+                app.listen_any(event, move |_| tray::update(&h));
+            }
 
             let _ = app.global_shortcut().register(toggle);
             hit::spawn(handle.clone());

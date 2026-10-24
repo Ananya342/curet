@@ -47,7 +47,7 @@ export default function Pet() {
 
   const pos = useRef({ x: 0, y: 0 });
   const screen = useRef<Area>({ x: 0, y: 0, w: 1440, h: 900 });
-  const islandX = useRef(720);
+  const trayAt = useRef({ x: 1280, y: 12 });
   const spriteRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const lastInteract = useRef(Date.now());
@@ -55,6 +55,7 @@ export default function Pet() {
   const physTok = useRef(0);
   const bubbleTimer = useRef<number>(0);
   const menuTimer = useRef<number>(0);
+  const lastClick = useRef(0);
   const fxId = useRef(1);
   const pokes = useRef<number[]>([]);
   const lastBoop = useRef(0);
@@ -280,11 +281,14 @@ export default function Pet() {
     requestAnimationFrame(step);
   }), [bounds, moveTo, rot, sx, sy]);
 
-  // ---- hide into / emerge from the island -----------------------------------------------------
-  const islandTarget = () => {
+  // ---- hide into / emerge from the menu bar icon ----------------------------------------------
+  const trayTarget = async () => {
+    // Other menu bar items can shift the icon, so look it up each time.
+    const s = await invoke<Screen | null>("screen_info").catch(() => null);
+    if (s) trayAt.current = s.tray;
     const d = petRef.current;
     const spriteCentre = WIN_H - FLOOR_PAD - (d.w * d.ar) / 2;
-    return { x: islandX.current - WIN_W / 2, y: 18 - spriteCentre };
+    return { x: trayAt.current.x - WIN_W / 2, y: trayAt.current.y - spriteCentre };
   };
 
   const tween = (ms: number, f: (t: number) => void) => new Promise<void>((resolve) => {
@@ -305,7 +309,7 @@ export default function Pet() {
     await invoke("hide_panel").catch(() => {});
     animate(lid, 0, { duration: 0.1 });
     const from = { ...pos.current };
-    const to = islandTarget();
+    const to = await trayTarget();
     await tween(650, (t) => {
       const e = easeIn(t);
       moveTo(from.x + (to.x - from.x) * e, from.y + (to.y - from.y) * e);
@@ -316,7 +320,7 @@ export default function Pet() {
     await invoke("set_pet_visible", { visible: false });
     rot.set(0); op.set(1);
     setMode("hidden");
-    await emitTo("island", "pet-hidden", petRef.current.id);
+    await emitTo("popover", "pet-hidden", petRef.current.id);
   }, [fly, lid, moveTo, op, rot]);
   const hidePetRef = useRef(hidePet);
   hidePetRef.current = hidePet;
@@ -326,12 +330,12 @@ export default function Pet() {
     setMode("waking");
     const b = bounds();
     const to = { x: clamp(homeX.current ?? b.maxX - 30, b.minX, b.maxX), y: b.floorY };
-    const from = islandTarget();
+    const from = await trayTarget();
     lid.set(1); sx.set(1.06); sy.set(0.92); setZzz(false);
     fly.set(0.12); op.set(0); rot.set(540);
     moveTo(from.x, from.y);
     await invoke("set_pet_visible", { visible: true });
-    await emitTo("island", "pet-shown", petRef.current.id);
+    await emitTo("popover", "pet-shown", petRef.current.id);
     await tween(750, (t) => {
       const e = easeOut(t);
       // Fall with a little bounce at the end.
@@ -452,6 +456,13 @@ export default function Pet() {
     // A click.
     touch();
     if (modeRef.current === "sleeping") { wakeUp({ sleepy: true, text: pick(["mmf… I'm up!", "five more minutes…", "huh? oh, hi!"]) }); return; }
+    const clickNow = performance.now();
+    const isDouble = clickNow - lastClick.current < 350;
+    lastClick.current = isDouble ? 0 : clickNow;
+    if (isDouble) {
+      if (menu) closeMenu(); else openMenu("main");
+      return;
+    }
     const onNose = noseHit(e.clientX, e.clientY);
     if (onNose) {
       const d2 = petRef.current;
@@ -467,7 +478,6 @@ export default function Pet() {
       if (quick) return;
       if (menu) { closeMenu(); return; }
       say(pick(d2.boops), { ms: 1500 });
-      window.setTimeout(() => openMenu("main"), 380);
       return;
     }
     // Poke the body.
@@ -525,7 +535,7 @@ export default function Pet() {
       const id = await getPetId();
       setPetIdState(id);
       const s = await invoke<Screen | null>("screen_info");
-      if (s) { screen.current = s.work; islandX.current = s.island_x; }
+      if (s) { screen.current = s.work; trayAt.current = s.tray; }
       const saved = Number(await kvGet("pet_x"));
       const b = bounds();
       const x = clamp(Number.isFinite(saved) && saved !== 0 ? saved : b.maxX - 30, b.minX, b.maxX);
