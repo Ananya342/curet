@@ -160,8 +160,22 @@ pub fn task_list(db: State<Db>, include_done: bool) -> Vec<Task> {
 
 #[tauri::command]
 pub fn task_done(db: State<Db>, id: i64, done: bool) {
-    let c = db.0.lock().unwrap();
-    let _ = c.execute("UPDATE tasks SET done=?2 WHERE id=?1", params![id, done]);
+    {
+        let c = db.0.lock().unwrap();
+        let _ = c.execute("UPDATE tasks SET done=?2 WHERE id=?1", params![id, done]);
+    }
+    if done {
+        log_time(&db, "tasks_done_log", chrono::Utc::now().timestamp());
+    }
+}
+
+/// Append a timestamp to a JSON list kept in `kv`, dropping entries older than about two months.
+/// The weekly recap reads these (finished tasks, late nights).
+pub fn log_time(db: &Db, key: &str, t: i64) {
+    let mut v: Vec<i64> = get(db, key).and_then(|s| serde_json::from_str(&s).ok()).unwrap_or_default();
+    v.retain(|x| t - x < 60 * 86400);
+    v.push(t);
+    set(db, key, Some(&serde_json::to_string(&v).unwrap()));
 }
 
 #[tauri::command]

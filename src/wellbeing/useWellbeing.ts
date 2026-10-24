@@ -1,15 +1,17 @@
 import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
-import { fmtTime, kvSet, nowSec } from "../api";
+import { fmtTime, kvGet, kvSet, nowSec } from "../api";
 import { BriefingKind, briefingText, composeBriefing, todayKey } from "./briefing";
 import { FOCUS_CHOICES, getFocusUntil, minutesLeft, setFocusUntil } from "./focus";
+import { logFocus } from "./log";
 
 type Action = { label: string; run: () => void };
 export interface WellbeingCtx {
   modeRef: MutableRefObject<string>;
   say: (text: string, opts?: { ms?: number; actions?: Action[]; rich?: boolean }) => void;
   hush: () => void;
-  fallAsleep: () => Promise<void>;
+  lockIn: () => Promise<void>;
+  unlock: () => Promise<void>;
   wakeUp: (o?: { text?: string; sleepy?: boolean }) => Promise<void>;
   celebrate: () => Promise<void>;
   openPanel: (tab: string) => void;
@@ -36,16 +38,19 @@ export function useWellbeing(c: WellbeingCtx) {
   // ---- focus ------------------------------------------------------------------------------------
   const endFocus = useCallback(async (completed: boolean) => {
     window.clearTimeout(endTimer.current);
+    const from = Number(await kvGet("focus_from")) || 0;
+    if (from) logFocus({ from, to: completed ? focusUntil.current : nowSec(), done: completed });
     focusUntil.current = 0;
     setFocusing(false);
     await setFocusUntil(0);
-    const { say, wakeUp, celebrate, openPanel, hush } = ctx.current;
+    const { say, wakeUp, unlock, celebrate, openPanel, hush } = ctx.current;
     const queued = held.current;
     held.current = [];
     if (ctx.current.modeRef.current === "sleeping") await wakeUp({ text: "", sleepy: true });
+    else if (ctx.current.modeRef.current === "focusing") await unlock();
     if (completed) celebrate();
     const lines = queued.slice(0, 3).map((h) => `• ${h.title}${h.kind === "deadline" ? " (due soon)" : ` at ${fmtTime(h.start)}`}`);
-    const base = completed ? "Focus session done! 🎉 Stretch and sip some water." : "Welcome back!";
+    const base = completed ? "Focus session done. Stretch and sip some water." : "Welcome back!";
     say(queued.length ? `${base}\nWhile you focused:\n${lines.join("\n")}` : base, {
       ms: queued.length ? 20000 : 6000,
       rich: queued.length > 0,
@@ -64,14 +69,15 @@ export function useWellbeing(c: WellbeingCtx) {
     held.current = [];
     setFocusing(true);
     await setFocusUntil(until);
+    await kvSet("focus_from", String(nowSec()));
     armTimer(until);
-    ctx.current.say(`Focus time 🎯 I’ll keep quiet for ${minutes} min.`, { ms: 2600 });
-    window.setTimeout(() => { if (focusActive()) ctx.current.fallAsleep(); }, 2800);
+    ctx.current.say(`Let's lock in. I'll stay quiet for ${minutes} min.`, { ms: 2600 });
+    window.setTimeout(() => { if (focusActive()) ctx.current.lockIn(); }, 2800);
   }, [armTimer]);
 
   const showFocusStatus = useCallback(() => {
     const { say, hush } = ctx.current;
-    say(`Focusing… ${minutesLeft(focusUntil.current)} min left. 🎯`, {
+    say(`Still locked in. ${minutesLeft(focusUntil.current)} min left.`, {
       ms: 8000,
       actions: [{ label: "End focus", run: () => { hush(); endFocus(false); } }, { label: "Keep going", run: hush }],
     });
@@ -138,7 +144,7 @@ export function useWellbeing(c: WellbeingCtx) {
       focusUntil.current = until;
       setFocusing(true);
       armTimer(until);
-      window.setTimeout(() => { if (focusActive()) ctx.current.fallAsleep(); }, 3500);
+      window.setTimeout(() => { if (focusActive()) ctx.current.lockIn(); }, 3500);
     });
     const un = [
       listen<{ kind: BriefingKind }>("briefing", (e) => deliverBriefing(e.payload.kind)),
@@ -152,5 +158,5 @@ export function useWellbeing(c: WellbeingCtx) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { focusing, focusActive, openFocusMenu, showFocusStatus, holdReminder };
+  return { focusing, focusEnds: focusUntil.current, focusActive, openFocusMenu, showFocusStatus, holdReminder };
 }

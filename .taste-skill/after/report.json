@@ -1,27 +1,25 @@
 {
  "url": "site/index.html",
- "at": "2026-10-24T07:04:05.809Z",
+ "at": "2026-10-24T17:37:16.826Z",
  "allow": [],
  "viewports": [
   {
    "width": 1440,
    "height": 900,
    "load": "load",
-   "screens": 9,
+   "screens": 7,
    "filled": [
-    0.59,
-    0.65,
-    0.61,
-    0.76,
-    0.71,
+    0.56,
+    0.62,
+    0.56,
     0.74,
-    1,
-    0.99,
-    0.77
+    0.69,
+    0.85,
+    0.75
    ],
    "motion": {
-    "elements": 31,
-    "css": 31,
+    "elements": 27,
+    "css": 27,
     "transitions": 0,
     "scripted": 0,
     "videos": 0,
@@ -33,19 +31,19 @@
      "h": 900
     },
     "page": {
-     "height": 7629,
-     "screens": 8.5,
-     "words": 570,
-     "img": 12,
+     "height": 5865,
+     "screens": 6.5,
+     "words": 376,
+     "img": 10,
      "video": 0,
      "canvas": 0,
      "svg": 0,
-     "sections": 6,
+     "sections": 5,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 5,
      "uiAbuse": false,
-     "realPictures": 7,
+     "realPictures": 5,
      "videoCount": 0,
      "uiPictures": 5,
      "pictureSamples": [
@@ -53,9 +51,7 @@
       "cat.png",
       "blob.png",
       "dragon.png",
-      "redpanda.png",
-      "astrology-almanac-utrecht-1655-letterpress.webp",
-      "almanac-scroll.jpg"
+      "redpanda.png"
      ],
      "blendText": 0,
      "sideScrollers": 0,
@@ -64,14 +60,14 @@
      "videosNoPoster": 0
     },
     "hero": {
-     "text": "Your deadlines find you.",
-     "words": 4,
-     "chars": 24,
+     "text": "No more guessing",
+     "words": 3,
+     "chars": 16,
      "lines": 2,
      "size": 87.8,
      "vw": 6.1,
-     "font": "Bodoni Moda",
-     "weight": 500,
+     "font": "Playfair Display",
+     "weight": 600,
      "tracking": -0.02,
      "leading": 0.9,
      "upper": false,
@@ -85,22 +81,22 @@
      "kind": "heading"
     },
     "h1": {
-     "text": "Your deadlines find you.",
-     "words": 4,
+     "text": "No more guessing",
+     "words": 3,
      "lines": 2,
      "size": 87.8,
-     "font": "Bodoni Moda"
+     "font": "Playfair Display"
     },
     "headings": [
      {
-      "text": "Your deadlines find you.",
-      "words": 4,
-      "chars": 24,
+      "text": "No more guessing",
+      "words": 3,
+      "chars": 16,
       "lines": 2,
       "size": 87.8,
       "vw": 6.1,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.9,
       "upper": false,
@@ -120,8 +116,8 @@
       "lines": 1,
       "size": 64,
       "vw": 4.4,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.95,
       "upper": false,
@@ -141,8 +137,8 @@
       "lines": 1,
       "size": 64,
       "vw": 4.4,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.95,
       "upper": false,
@@ -162,7 +158,7 @@
       "lines": 1,
       "size": 64,
       "vw": 4.4,
-      "font": "Bodoni Moda",
+      "font": "Playfair Display",
       "weight": 400,
       "tracking": 0.003,
       "leading": 1,
@@ -172,7 +168,7 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.44,
-      "top": 1489,
+      "top": 1429,
       "tag": "label",
       "kind": "statement"
      },
@@ -183,7 +179,7 @@
       "lines": 1,
       "size": 64,
       "vw": 4.4,
-      "font": "Bodoni Moda",
+      "font": "Playfair Display",
       "weight": 400,
       "tracking": 0.003,
       "leading": 1,
@@ -193,7 +189,7 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.44,
-      "top": 1729,
+      "top": 1644,
       "tag": "label",
       "kind": "statement"
      },
@@ -204,7 +200,7 @@
       "lines": 1,
       "size": 64,
       "vw": 4.4,
-      "font": "Bodoni Moda",
+      "font": "Playfair Display",
       "weight": 400,
       "tracking": 0.003,
       "leading": 1,
@@ -214,7 +210,7 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.44,
-      "top": 1968,
+      "top": 1859,
       "tag": "label",
       "kind": "statement"
      },
@@ -225,7 +221,7 @@
       "lines": 1,
       "size": 64,
       "vw": 4.4,
-      "font": "Bodoni Moda",
+      "font": "Playfair Display",
       "weight": 400,
       "tracking": 0.003,
       "leading": 1,
@@ -235,7 +231,7 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.44,
-      "top": 2208,
+      "top": 2074,
       "tag": "label",
       "kind": "statement"
      },
@@ -246,7 +242,7 @@
       "lines": 1,
       "size": 64,
       "vw": 4.4,
-      "font": "Bodoni Moda",
+      "font": "Playfair Display",
       "weight": 400,
       "tracking": 0.003,
       "leading": 1,
@@ -256,7 +252,7 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.44,
-      "top": 2447,
+      "top": 2289,
       "tag": "label",
       "kind": "statement"
      },
@@ -267,8 +263,8 @@
       "lines": 1,
       "size": 64,
       "vw": 4.4,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.95,
       "upper": false,
@@ -277,7 +273,7 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.46,
-      "top": 2799,
+      "top": 2617,
       "tag": "h2",
       "kind": "heading"
      },
@@ -288,8 +284,8 @@
       "lines": 1,
       "size": 87.8,
       "vw": 6.1,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.8,
       "upper": false,
@@ -298,55 +294,34 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.46,
-      "top": 4649,
+      "top": 4436,
       "tag": "h2",
       "kind": "heading"
      },
      {
-      "text": "Printed deadlines, since 1655",
-      "words": 4,
-      "chars": 29,
-      "lines": 2,
-      "size": 64,
-      "vw": 4.4,
-      "font": "Bodoni Moda",
-      "weight": 500,
-      "tracking": -0.02,
-      "leading": 0.95,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "right",
-      "widthRatio": 0.4,
-      "top": 5788,
-      "tag": "h2",
-      "kind": "heading"
-     },
-     {
-      "text": "It is waiting.",
-      "words": 3,
-      "chars": 14,
+      "text": "Put it on your desktop.",
+      "words": 5,
+      "chars": 23,
       "lines": 1,
       "size": 87.8,
       "vw": 6.1,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.9,
       "upper": false,
       "italic": false,
       "mono": false,
       "align": "left",
-      "position": "left",
-      "widthRatio": 0.49,
-      "top": 6979,
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 5312,
       "tag": "h2",
       "kind": "heading"
      }
     ],
     "headingSummary": {
-     "count": 12,
+     "count": 11,
      "maxLines": 2,
      "over2Lines": 0,
      "statements": 5,
@@ -357,13 +332,13 @@
     "type": {
      "families": [
       {
-       "family": "Jost",
-       "share": 0.89,
+       "family": "-apple-system",
+       "share": 0.88,
        "mono": false
       },
       {
-       "family": "Bodoni Moda",
-       "share": 0.11,
+       "family": "Playfair Display",
+       "share": 0.12,
        "mono": false
       }
      ],
@@ -378,19 +353,19 @@
      "sizeCount": 5,
      "notLoaded": [],
      "body": {
-      "font": "Jost",
+      "font": "-apple-system",
       "size": 19,
       "leading": 1.6,
       "weight": 400,
       "tracking": 0.01,
       "contrast": 11.4
      },
-     "measureChars": 50,
+     "measureChars": 51,
      "max": {
       "size": 87.8,
       "vw": 6.1,
-      "font": "Bodoni Moda",
-      "text": "Your deadlines find you."
+      "font": "Playfair Display",
+      "text": "No more guessing"
      },
      "monoShare": 0,
      "monoProseShare": 0,
@@ -399,7 +374,7 @@
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0,
+     "upperShare": 0.01,
      "centerShare": 0,
      "smallText": 0
     },
@@ -425,7 +400,7 @@
       },
       {
        "color": "#2456d6",
-       "top": 6448,
+       "top": 5142,
        "hsl": {
         "h": 223,
         "s": 0.71,
@@ -436,23 +411,23 @@
      "textColors": [
       {
        "color": "#26251e",
-       "share": 0.64
+       "share": 0.77
       },
       {
        "color": "#46443d",
-       "share": 0.21
-      },
-      {
-       "color": "#a8a79f",
-       "share": 0.06
+       "share": 0.16
       },
       {
        "color": "#ffffff",
        "share": 0.04
       },
       {
+       "color": "#cfcec8",
+       "share": 0.01
+      },
+      {
        "color": "#1b43ad",
-       "share": 0.03
+       "share": 0.01
       }
      ],
      "button": {
@@ -494,7 +469,7 @@
      "blurred": 0,
      "roundedBoxes": 0,
      "boxRadius": 0,
-     "squareMedia": 4,
+     "squareMedia": 2,
      "roundedMedia": 0,
      "mediaRadius": 0,
      "textShadow": 0,
@@ -509,8 +484,7 @@
      "blur": false
     },
     "fontsLoaded": [
-     "bodoni moda",
-     "jost"
+     "playfair display"
     ]
    },
    "layout": {
@@ -518,28 +492,28 @@
      "w": 1440,
      "h": 900
     },
-    "pageH": 7629,
+    "pageH": 5865,
     "margins": {
      "left": 63,
-     "right": 83
+     "right": 85
     },
     "sections": [
      {
       "sel": "div.split",
       "tag": "div",
       "top": 0,
-      "height": 5355,
-      "words": 531,
+      "height": 5142,
+      "words": 420,
       "media": 6,
       "middle": 284,
       "heading": {
-       "text": "Your deadlines find you.",
+       "text": "No more guessing",
        "size": 88,
        "tag": "h1"
       },
-      "left": 184,
+      "left": 183,
       "right": 63,
-      "textLeft": 184,
+      "textLeft": 183,
       "textRight": 63,
       "fullBleed": false,
       "footer": false,
@@ -548,45 +522,22 @@
       "pinned": true
      },
      {
-      "sel": "section.band",
-      "tag": "section",
-      "top": 5355,
-      "height": 1093,
-      "words": 43,
-      "media": 1,
-      "middle": 63,
-      "heading": {
-       "text": "Printed deadlines, since 1655",
-       "size": 64,
-       "tag": "h2"
-      },
-      "left": 63,
-      "right": 131,
-      "textLeft": 795,
-      "textRight": 131,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": false,
-      "pinned": false
-     },
-     {
       "sel": "section.closer",
       "tag": "section",
-      "top": 6448,
-      "height": 925,
-      "words": 21,
-      "media": 1,
-      "middle": 575,
+      "top": 5142,
+      "height": 565,
+      "words": 18,
+      "media": 0,
+      "middle": 0,
       "heading": {
-       "text": "It is waiting.",
+       "text": "Put it on your desktop.",
        "size": 88,
        "tag": "h2"
       },
       "left": 63,
-      "right": 63,
+      "right": 513,
       "textLeft": 63,
-      "textRight": 909,
+      "textRight": 513,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -596,16 +547,16 @@
      {
       "sel": "footer",
       "tag": "footer",
-      "top": 7373,
+      "top": 5707,
       "height": 158,
-      "words": 10,
+      "words": 12,
       "media": 0,
-      "middle": 293,
+      "middle": 239,
       "heading": null,
       "left": 63,
-      "right": 578,
+      "right": 573,
       "textLeft": 63,
-      "textRight": 578,
+      "textRight": 573,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -615,13 +566,13 @@
     ],
     "gaps": [
      {
-      "top": 6320,
-      "height": 296
+      "top": 5556,
+      "height": 276
      }
     ],
     "h1s": [
      {
-      "text": "Your deadlines find you.",
+      "text": "No more guessing",
       "size": 88,
       "top": 202,
       "firstScreen": true
@@ -631,31 +582,27 @@
     "edges": [
      {
       "x": 711,
-      "n": 16
+      "n": 15
      },
      {
       "x": 731,
-      "n": 4
+      "n": 3
      },
      {
       "x": 63,
-      "n": 2
-     },
-     {
-      "x": 795,
-      "n": 2
+      "n": 1
      }
     ],
-    "leftBlocks": 24,
+    "leftBlocks": 19,
     "bodySize": 19,
     "stage": false,
     "explains": true,
     "slivers": [],
-    "voidShare": 0.11,
+    "voidShare": 0.18,
     "voidBox": {
-     "x": 0,
+     "x": 1140,
      "y": 120,
-     "w": 180,
+     "w": 300,
      "h": 780
     }
    },
@@ -666,20 +613,18 @@
    "width": 768,
    "height": 1024,
    "load": "load",
-   "screens": 8,
+   "screens": 6,
    "filled": [
-    0.55,
-    0.28,
-    0.38,
-    0.64,
-    0.7,
-    1,
-    1,
+    0.54,
+    0.3,
+    0.5,
+    0.48,
+    0.72,
     0.69
    ],
    "motion": {
-    "elements": 31,
-    "css": 31,
+    "elements": 27,
+    "css": 27,
     "transitions": 0,
     "scripted": 0,
     "videos": 0,
@@ -691,25 +636,23 @@
      "h": 1024
     },
     "page": {
-     "height": 7522,
-     "screens": 7.3,
-     "words": 570,
-     "img": 12,
+     "height": 5167,
+     "screens": 5,
+     "words": 376,
+     "img": 10,
      "video": 0,
      "canvas": 0,
      "svg": 0,
-     "sections": 6,
+     "sections": 5,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 5,
      "uiAbuse": false,
-     "realPictures": 3,
+     "realPictures": 1,
      "videoCount": 0,
      "uiPictures": 5,
      "pictureSamples": [
-      "ghost.png",
-      "astrology-almanac-utrecht-1655-letterpress.webp",
-      "almanac-scroll.jpg"
+      "ghost.png"
      ],
      "blendText": 0,
      "sideScrollers": 0,
@@ -718,14 +661,14 @@
      "videosNoPoster": 0
     },
     "hero": {
-     "text": "Your deadlines find you.",
-     "words": 4,
-     "chars": 24,
+     "text": "No more guessing",
+     "words": 3,
+     "chars": 16,
      "lines": 1,
      "size": 46.8,
      "vw": 6.1,
-     "font": "Bodoni Moda",
-     "weight": 500,
+     "font": "Playfair Display",
+     "weight": 600,
      "tracking": -0.02,
      "leading": 0.9,
      "upper": false,
@@ -739,22 +682,22 @@
      "kind": "heading"
     },
     "h1": {
-     "text": "Your deadlines find you.",
-     "words": 4,
+     "text": "No more guessing",
+     "words": 3,
      "lines": 1,
      "size": 46.8,
-     "font": "Bodoni Moda"
+     "font": "Playfair Display"
     },
     "headings": [
      {
-      "text": "Your deadlines find you.",
-      "words": 4,
-      "chars": 24,
+      "text": "No more guessing",
+      "words": 3,
+      "chars": 16,
       "lines": 1,
       "size": 46.8,
       "vw": 6.1,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.9,
       "upper": false,
@@ -774,8 +717,8 @@
       "lines": 1,
       "size": 45.4,
       "vw": 5.9,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.95,
       "upper": false,
@@ -784,7 +727,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.91,
-      "top": 1079,
+      "top": 975,
       "tag": "h2",
       "kind": "heading"
      },
@@ -795,8 +738,8 @@
       "lines": 1,
       "size": 45.4,
       "vw": 5.9,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.95,
       "upper": false,
@@ -805,7 +748,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.91,
-      "top": 1402,
+      "top": 1319,
       "tag": "h2",
       "kind": "heading"
      },
@@ -816,7 +759,7 @@
       "lines": 1,
       "size": 45.4,
       "vw": 5.9,
-      "font": "Bodoni Moda",
+      "font": "Playfair Display",
       "weight": 400,
       "tracking": 0.004,
       "leading": 1,
@@ -826,7 +769,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.88,
-      "top": 1605,
+      "top": 1464,
       "tag": "label",
       "kind": "statement"
      },
@@ -837,7 +780,7 @@
       "lines": 1,
       "size": 45.4,
       "vw": 5.9,
-      "font": "Bodoni Moda",
+      "font": "Playfair Display",
       "weight": 400,
       "tracking": 0.004,
       "leading": 1,
@@ -847,7 +790,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.88,
-      "top": 1802,
+      "top": 1638,
       "tag": "label",
       "kind": "statement"
      },
@@ -858,7 +801,7 @@
       "lines": 1,
       "size": 45.4,
       "vw": 5.9,
-      "font": "Bodoni Moda",
+      "font": "Playfair Display",
       "weight": 400,
       "tracking": 0.004,
       "leading": 1,
@@ -868,7 +811,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.88,
-      "top": 2000,
+      "top": 1812,
       "tag": "label",
       "kind": "statement"
      },
@@ -879,7 +822,7 @@
       "lines": 1,
       "size": 45.4,
       "vw": 5.9,
-      "font": "Bodoni Moda",
+      "font": "Playfair Display",
       "weight": 400,
       "tracking": 0.004,
       "leading": 1,
@@ -889,7 +832,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.88,
-      "top": 2197,
+      "top": 1986,
       "tag": "label",
       "kind": "statement"
      },
@@ -900,7 +843,7 @@
       "lines": 1,
       "size": 45.4,
       "vw": 5.9,
-      "font": "Bodoni Moda",
+      "font": "Playfair Display",
       "weight": 400,
       "tracking": 0.004,
       "leading": 1,
@@ -910,7 +853,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.88,
-      "top": 2395,
+      "top": 2160,
       "tag": "label",
       "kind": "statement"
      },
@@ -921,8 +864,8 @@
       "lines": 1,
       "size": 45.4,
       "vw": 5.9,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.95,
       "upper": false,
@@ -931,7 +874,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.91,
-      "top": 2637,
+      "top": 2379,
       "tag": "h2",
       "kind": "heading"
      },
@@ -942,8 +885,8 @@
       "lines": 1,
       "size": 46.8,
       "vw": 6.1,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.8,
       "upper": false,
@@ -952,40 +895,19 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.91,
-      "top": 4399,
+      "top": 4026,
       "tag": "h2",
       "kind": "heading"
      },
      {
-      "text": "Printed deadlines, since 1655",
-      "words": 4,
-      "chars": 29,
-      "lines": 1,
-      "size": 45.4,
-      "vw": 5.9,
-      "font": "Bodoni Moda",
-      "weight": 500,
-      "tracking": -0.02,
-      "leading": 0.95,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "center",
-      "widthRatio": 0.91,
-      "top": 5084,
-      "tag": "h2",
-      "kind": "heading"
-     },
-     {
-      "text": "It is waiting.",
-      "words": 3,
-      "chars": 14,
+      "text": "Put it on your desktop.",
+      "words": 5,
+      "chars": 23,
       "lines": 1,
       "size": 46.8,
       "vw": 6.1,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.9,
       "upper": false,
@@ -994,13 +916,13 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.91,
-      "top": 6255,
+      "top": 4654,
       "tag": "h2",
       "kind": "heading"
      }
     ],
     "headingSummary": {
-     "count": 12,
+     "count": 11,
      "maxLines": 1,
      "over2Lines": 0,
      "statements": 5,
@@ -1011,13 +933,13 @@
     "type": {
      "families": [
       {
-       "family": "Jost",
-       "share": 0.89,
+       "family": "-apple-system",
+       "share": 0.88,
        "mono": false
       },
       {
-       "family": "Bodoni Moda",
-       "share": 0.11,
+       "family": "Playfair Display",
+       "share": 0.12,
        "mono": false
       }
      ],
@@ -1032,19 +954,19 @@
      "sizeCount": 5,
      "notLoaded": [],
      "body": {
-      "font": "Jost",
+      "font": "-apple-system",
       "size": 17.9,
       "leading": 1.6,
       "weight": 400,
       "tracking": 0.01,
       "contrast": 11.4
      },
-     "measureChars": 50,
+     "measureChars": 78,
      "max": {
       "size": 46.8,
       "vw": 6.1,
-      "font": "Bodoni Moda",
-      "text": "Your deadlines find you."
+      "font": "Playfair Display",
+      "text": "No more guessing"
      },
      "monoShare": 0,
      "monoProseShare": 0,
@@ -1053,7 +975,7 @@
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0,
+     "upperShare": 0.01,
      "centerShare": 0,
      "smallText": 0
     },
@@ -1079,7 +1001,7 @@
       },
       {
        "color": "#2456d6",
-       "top": 6151,
+       "top": 4549,
        "hsl": {
         "h": 223,
         "s": 0.71,
@@ -1090,23 +1012,23 @@
      "textColors": [
       {
        "color": "#26251e",
-       "share": 0.64
+       "share": 0.77
       },
       {
        "color": "#46443d",
-       "share": 0.21
-      },
-      {
-       "color": "#a8a79f",
-       "share": 0.06
+       "share": 0.16
       },
       {
        "color": "#ffffff",
        "share": 0.04
       },
       {
+       "color": "#cfcec8",
+       "share": 0.01
+      },
+      {
        "color": "#1b43ad",
-       "share": 0.03
+       "share": 0.01
       }
      ],
      "button": {
@@ -1148,7 +1070,7 @@
      "blurred": 0,
      "roundedBoxes": 0,
      "boxRadius": 0,
-     "squareMedia": 2,
+     "squareMedia": 0,
      "roundedMedia": 0,
      "mediaRadius": 0,
      "textShadow": 0,
@@ -1163,8 +1085,7 @@
      "blur": false
     },
     "fontsLoaded": [
-     "bodoni moda",
-     "jost"
+     "playfair display"
     ]
    },
    "layout": {
@@ -1172,10 +1093,10 @@
      "w": 768,
      "h": 1024
     },
-    "pageH": 7522,
+    "pageH": 5167,
     "margins": {
      "left": 34,
-     "right": 34
+     "right": 51
     },
     "sections": [
      {
@@ -1183,14 +1104,14 @@
       "tag": "aside",
       "top": 0,
       "height": 471,
-      "words": 20,
+      "words": 17,
       "media": 0,
       "middle": 0,
       "heading": null,
       "left": 243,
-      "right": 299,
+      "right": 296,
       "textLeft": 243,
-      "textRight": 299,
+      "textRight": 296,
       "fullBleed": false,
       "footer": false,
       "hero": true,
@@ -1201,15 +1122,15 @@
       "sel": "div.opening",
       "tag": "div",
       "top": 633,
-      "height": 341,
-      "words": 45,
+      "height": 257,
+      "words": 37,
       "media": 0,
       "middle": 0,
       "heading": null,
       "left": 34,
-      "right": 310,
+      "right": 98,
       "textLeft": 34,
-      "textRight": 310,
+      "textRight": 98,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1219,20 +1140,16 @@
      {
       "sel": "section#day",
       "tag": "section",
-      "top": 1059,
+      "top": 975,
       "height": 239,
-      "words": 13,
+      "words": 11,
       "media": 0,
       "middle": 0,
-      "heading": {
-       "text": "One Tuesday",
-       "size": 45,
-       "tag": "h2"
-      },
+      "heading": null,
       "left": 34,
-      "right": 183,
+      "right": 203,
       "textLeft": 34,
-      "textRight": 183,
+      "textRight": 203,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1242,9 +1159,9 @@
      {
       "sel": "section#pets",
       "tag": "section",
-      "top": 1382,
-      "height": 1150,
-      "words": 59,
+      "top": 1299,
+      "height": 975,
+      "words": 18,
       "media": 1,
       "middle": 0,
       "heading": {
@@ -1253,9 +1170,9 @@
        "tag": "h2"
       },
       "left": 34,
-      "right": 251,
+      "right": 342,
       "textLeft": 34,
-      "textRight": 251,
+      "textRight": 342,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1265,20 +1182,20 @@
      {
       "sel": "section#what",
       "tag": "section",
-      "top": 2617,
-      "height": 1678,
-      "words": 180,
+      "top": 2359,
+      "height": 1563,
+      "words": 145,
       "media": 0,
-      "middle": 108,
+      "middle": 0,
       "heading": {
        "text": "What it does",
        "size": 45,
        "tag": "h2"
       },
       "left": 34,
-      "right": 54,
+      "right": 36,
       "textLeft": 34,
-      "textRight": 54,
+      "textRight": 36,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1288,9 +1205,9 @@
      {
       "sel": "section#setup",
       "tag": "section",
-      "top": 4379,
-      "height": 510,
-      "words": 102,
+      "top": 4006,
+      "height": 453,
+      "words": 107,
       "media": 0,
       "middle": 0,
       "heading": {
@@ -1299,9 +1216,9 @@
        "tag": "h2"
       },
       "left": 34,
-      "right": 271,
+      "right": 66,
       "textLeft": 34,
-      "textRight": 271,
+      "textRight": 66,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1309,45 +1226,22 @@
       "pinned": false
      },
      {
-      "sel": "section.band",
-      "tag": "section",
-      "top": 4979,
-      "height": 1172,
-      "words": 43,
-      "media": 1,
-      "middle": 0,
-      "heading": {
-       "text": "Printed deadlines, since 1655",
-       "size": 45,
-       "tag": "h2"
-      },
-      "left": 34,
-      "right": 34,
-      "textLeft": 34,
-      "textRight": 157,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": false,
-      "pinned": false
-     },
-     {
       "sel": "section.closer",
       "tag": "section",
-      "top": 6151,
-      "height": 1043,
-      "words": 21,
-      "media": 1,
+      "top": 4549,
+      "height": 384,
+      "words": 18,
+      "media": 0,
       "middle": 0,
       "heading": {
-       "text": "It is waiting.",
+       "text": "Put it on your desktop.",
        "size": 47,
        "tag": "h2"
       },
       "left": 34,
-      "right": 34,
+      "right": 274,
       "textLeft": 34,
-      "textRight": 328,
+      "textRight": 274,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1357,16 +1251,16 @@
      {
       "sel": "footer",
       "tag": "footer",
-      "top": 7194,
+      "top": 4933,
       "height": 234,
-      "words": 10,
+      "words": 12,
       "media": 0,
       "middle": 0,
       "heading": null,
       "left": 34,
-      "right": 472,
+      "right": 426,
       "textLeft": 34,
-      "textRight": 472,
+      "textRight": 426,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -1377,7 +1271,7 @@
     "gaps": [],
     "h1s": [
      {
-      "text": "Your deadlines find you.",
+      "text": "No more guessing",
       "size": 47,
       "top": 633,
       "firstScreen": true
@@ -1387,14 +1281,14 @@
     "edges": [
      {
       "x": 34,
-      "n": 19
+      "n": 15
      },
      {
       "x": 54,
-      "n": 4
+      "n": 3
      }
     ],
-    "leftBlocks": 23,
+    "leftBlocks": 18,
     "bodySize": 18,
     "stage": false,
     "explains": true,
@@ -1409,21 +1303,18 @@
    "width": 390,
    "height": 844,
    "load": "load",
-   "screens": 9,
+   "screens": 6,
    "filled": [
-    0.61,
-    0.52,
-    0.33,
-    0.62,
-    0.73,
-    0.78,
-    1,
-    0.99,
-    0.77
+    0.47,
+    0.3,
+    0.44,
+    0.74,
+    0.74,
+    0.69
    ],
    "motion": {
-    "elements": 31,
-    "css": 31,
+    "elements": 27,
+    "css": 27,
     "transitions": 0,
     "scripted": 0,
     "videos": 0,
@@ -1435,26 +1326,22 @@
      "h": 844
     },
     "page": {
-     "height": 7502,
-     "screens": 8.9,
-     "words": 570,
-     "img": 12,
+     "height": 4989,
+     "screens": 5.9,
+     "words": 376,
+     "img": 10,
      "video": 0,
      "canvas": 0,
      "svg": 0,
-     "sections": 6,
+     "sections": 5,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 5,
      "uiAbuse": false,
-     "realPictures": 3,
+     "realPictures": 0,
      "videoCount": 0,
      "uiPictures": 5,
-     "pictureSamples": [
-      "ghost.png",
-      "astrology-almanac-utrecht-1655-letterpress.webp",
-      "almanac-scroll.jpg"
-     ],
+     "pictureSamples": [],
      "blendText": 0,
      "sideScrollers": 0,
      "brokenImages": [],
@@ -1462,14 +1349,14 @@
      "videosNoPoster": 0
     },
     "hero": {
-     "text": "Your deadlines find you.",
-     "words": 4,
-     "chars": 24,
-     "lines": 2,
-     "size": 40,
-     "vw": 10.3,
-     "font": "Bodoni Moda",
-     "weight": 500,
+     "text": "No more guessing",
+     "words": 3,
+     "chars": 16,
+     "lines": 1,
+     "size": 33.6,
+     "vw": 8.6,
+     "font": "Playfair Display",
+     "weight": 600,
      "tracking": -0.02,
      "leading": 0.9,
      "upper": false,
@@ -1478,27 +1365,27 @@
      "align": "left",
      "position": "center",
      "widthRatio": 0.88,
-     "top": 523,
+     "top": 473,
      "tag": "h1",
      "kind": "heading"
     },
     "h1": {
-     "text": "Your deadlines find you.",
-     "words": 4,
-     "lines": 2,
-     "size": 40,
-     "font": "Bodoni Moda"
+     "text": "No more guessing",
+     "words": 3,
+     "lines": 1,
+     "size": 33.6,
+     "font": "Playfair Display"
     },
     "headings": [
      {
-      "text": "Your deadlines find you.",
-      "words": 4,
-      "chars": 24,
-      "lines": 2,
-      "size": 40,
-      "vw": 10.3,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "text": "No more guessing",
+      "words": 3,
+      "chars": 16,
+      "lines": 1,
+      "size": 33.6,
+      "vw": 8.6,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.9,
       "upper": false,
@@ -1507,7 +1394,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.88,
-      "top": 523,
+      "top": 473,
       "tag": "h1",
       "kind": "heading"
      },
@@ -1518,8 +1405,8 @@
       "lines": 1,
       "size": 33.3,
       "vw": 8.5,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.95,
       "upper": false,
@@ -1528,7 +1415,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.88,
-      "top": 987,
+      "top": 865,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1539,8 +1426,8 @@
       "lines": 1,
       "size": 33.3,
       "vw": 8.5,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.95,
       "upper": false,
@@ -1549,114 +1436,9 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.88,
-      "top": 1386,
+      "top": 1265,
       "tag": "h2",
       "kind": "heading"
-     },
-     {
-      "text": "Boo",
-      "words": 1,
-      "chars": 3,
-      "lines": 1,
-      "size": 33.3,
-      "vw": 8.5,
-      "font": "Bodoni Moda",
-      "weight": 400,
-      "tracking": 0.005,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "center",
-      "widthRatio": 0.81,
-      "top": 1560,
-      "tag": "label",
-      "kind": "statement"
-     },
-     {
-      "text": "Mochi",
-      "words": 1,
-      "chars": 5,
-      "lines": 1,
-      "size": 33.3,
-      "vw": 8.5,
-      "font": "Bodoni Moda",
-      "weight": 400,
-      "tracking": 0.005,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "center",
-      "widthRatio": 0.81,
-      "top": 1752,
-      "tag": "label",
-      "kind": "statement"
-     },
-     {
-      "text": "Jelly",
-      "words": 1,
-      "chars": 5,
-      "lines": 1,
-      "size": 33.3,
-      "vw": 8.5,
-      "font": "Bodoni Moda",
-      "weight": 400,
-      "tracking": 0.005,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "center",
-      "widthRatio": 0.81,
-      "top": 1944,
-      "tag": "label",
-      "kind": "statement"
-     },
-     {
-      "text": "Ember",
-      "words": 1,
-      "chars": 5,
-      "lines": 1,
-      "size": 33.3,
-      "vw": 8.5,
-      "font": "Bodoni Moda",
-      "weight": 400,
-      "tracking": 0.005,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "center",
-      "widthRatio": 0.81,
-      "top": 2136,
-      "tag": "label",
-      "kind": "statement"
-     },
-     {
-      "text": "Maple",
-      "words": 1,
-      "chars": 5,
-      "lines": 1,
-      "size": 33.3,
-      "vw": 8.5,
-      "font": "Bodoni Moda",
-      "weight": 400,
-      "tracking": 0.005,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "center",
-      "widthRatio": 0.81,
-      "top": 2329,
-      "tag": "label",
-      "kind": "statement"
      },
      {
       "text": "What it does",
@@ -1665,8 +1447,8 @@
       "lines": 1,
       "size": 33.3,
       "vw": 8.5,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.95,
       "upper": false,
@@ -1675,7 +1457,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.88,
-      "top": 2578,
+      "top": 2034,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1684,10 +1466,10 @@
       "words": 1,
       "chars": 5,
       "lines": 1,
-      "size": 40,
-      "vw": 10.3,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "size": 33.6,
+      "vw": 8.6,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.8,
       "upper": false,
@@ -1696,40 +1478,19 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.88,
-      "top": 4420,
+      "top": 3777,
       "tag": "h2",
       "kind": "heading"
      },
      {
-      "text": "Printed deadlines, since 1655",
-      "words": 4,
-      "chars": 29,
-      "lines": 2,
-      "size": 33.3,
-      "vw": 8.5,
-      "font": "Bodoni Moda",
-      "weight": 500,
-      "tracking": -0.02,
-      "leading": 0.95,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "center",
-      "widthRatio": 0.88,
-      "top": 5112,
-      "tag": "h2",
-      "kind": "heading"
-     },
-     {
-      "text": "It is waiting.",
-      "words": 3,
-      "chars": 14,
+      "text": "Put it on your desktop.",
+      "words": 5,
+      "chars": 23,
       "lines": 1,
-      "size": 40,
-      "vw": 10.3,
-      "font": "Bodoni Moda",
-      "weight": 500,
+      "size": 33.6,
+      "vw": 8.6,
+      "font": "Playfair Display",
+      "weight": 600,
       "tracking": -0.02,
       "leading": 0.9,
       "upper": false,
@@ -1738,30 +1499,30 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.88,
-      "top": 6286,
+      "top": 4542,
       "tag": "h2",
       "kind": "heading"
      }
     ],
     "headingSummary": {
-     "count": 12,
-     "maxLines": 2,
+     "count": 6,
+     "maxLines": 1,
      "over2Lines": 0,
-     "statements": 5,
+     "statements": 0,
      "centered": 0,
-     "medianWords": 1,
+     "medianWords": 3,
      "mixedFontHeadings": 0
     },
     "type": {
      "families": [
       {
-       "family": "Jost",
-       "share": 0.89,
+       "family": "-apple-system",
+       "share": 0.88,
        "mono": false
       },
       {
-       "family": "Bodoni Moda",
-       "share": 0.11,
+       "family": "Playfair Display",
+       "share": 0.12,
        "mono": false
       }
      ],
@@ -1771,12 +1532,12 @@
       17,
       20,
       33,
-      40
+      34
      ],
      "sizeCount": 5,
      "notLoaded": [],
      "body": {
-      "font": "Jost",
+      "font": "-apple-system",
       "size": 17,
       "leading": 1.6,
       "weight": 400,
@@ -1785,10 +1546,10 @@
      },
      "measureChars": 40,
      "max": {
-      "size": 40,
-      "vw": 10.3,
-      "font": "Bodoni Moda",
-      "text": "Your deadlines find you."
+      "size": 33.6,
+      "vw": 8.6,
+      "font": "Playfair Display",
+      "text": "No more guessing"
      },
      "monoShare": 0,
      "monoProseShare": 0,
@@ -1797,7 +1558,7 @@
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0,
+     "upperShare": 0.01,
      "centerShare": 0,
      "smallText": 0
     },
@@ -1823,7 +1584,7 @@
       },
       {
        "color": "#d3d2ce",
-       "top": 4462,
+       "top": 3812,
        "hsl": {
         "h": 48,
         "s": 0.05,
@@ -1832,7 +1593,7 @@
       },
       {
        "color": "#2456d6",
-       "top": 6194,
+       "top": 4450,
        "hsl": {
         "h": 223,
         "s": 0.71,
@@ -1843,23 +1604,23 @@
      "textColors": [
       {
        "color": "#26251e",
-       "share": 0.64
+       "share": 0.77
       },
       {
        "color": "#46443d",
-       "share": 0.21
-      },
-      {
-       "color": "#a8a79f",
-       "share": 0.06
+       "share": 0.16
       },
       {
        "color": "#ffffff",
        "share": 0.04
       },
       {
+       "color": "#cfcec8",
+       "share": 0.01
+      },
+      {
        "color": "#1b43ad",
-       "share": 0.03
+       "share": 0.01
       }
      ],
      "button": {
@@ -1901,7 +1662,7 @@
      "blurred": 0,
      "roundedBoxes": 0,
      "boxRadius": 0,
-     "squareMedia": 2,
+     "squareMedia": 0,
      "roundedMedia": 0,
      "mediaRadius": 0,
      "textShadow": 0,
@@ -1916,8 +1677,7 @@
      "blur": false
     },
     "fontsLoaded": [
-     "bodoni moda",
-     "jost"
+     "playfair display"
     ]
    },
    "layout": {
@@ -1925,25 +1685,25 @@
      "w": 390,
      "h": 844
     },
-    "pageH": 7502,
+    "pageH": 4989,
     "margins": {
      "left": 24,
-     "right": 24
+     "right": 27
     },
     "sections": [
      {
       "sel": "aside.stage",
       "tag": "aside",
       "top": 0,
-      "height": 388,
-      "words": 20,
+      "height": 338,
+      "words": 17,
       "media": 0,
       "middle": 0,
       "heading": null,
       "left": 54,
-      "right": 112,
+      "right": 109,
       "textLeft": 54,
-      "textRight": 112,
+      "textRight": 109,
       "fullBleed": false,
       "footer": false,
       "hero": true,
@@ -1953,16 +1713,16 @@
      {
       "sel": "div.opening",
       "tag": "div",
-      "top": 523,
-      "height": 372,
-      "words": 45,
+      "top": 473,
+      "height": 301,
+      "words": 37,
       "media": 0,
       "middle": 0,
       "heading": null,
       "left": 24,
-      "right": 24,
+      "right": 36,
       "textLeft": 24,
-      "textRight": 24,
+      "textRight": 36,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1972,7 +1732,7 @@
      {
       "sel": "section#day",
       "tag": "section",
-      "top": 967,
+      "top": 845,
       "height": 299,
       "words": 17,
       "media": 0,
@@ -1983,9 +1743,9 @@
        "tag": "h2"
       },
       "left": 24,
-      "right": 67,
+      "right": 52,
       "textLeft": 24,
-      "textRight": 67,
+      "textRight": 52,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1995,10 +1755,10 @@
      {
       "sel": "section#pets",
       "tag": "section",
-      "top": 1366,
-      "height": 1120,
-      "words": 59,
-      "media": 1,
+      "top": 1245,
+      "height": 698,
+      "words": 18,
+      "media": 0,
       "middle": 0,
       "heading": {
        "text": "Five of them",
@@ -2006,9 +1766,9 @@
        "tag": "h2"
       },
       "left": 24,
-      "right": 46,
+      "right": 36,
       "textLeft": 24,
-      "textRight": 46,
+      "textRight": 36,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -2018,9 +1778,9 @@
      {
       "sel": "section#what",
       "tag": "section",
-      "top": 2558,
-      "height": 1770,
-      "words": 180,
+      "top": 2014,
+      "height": 1671,
+      "words": 145,
       "media": 0,
       "middle": 0,
       "heading": {
@@ -2029,9 +1789,9 @@
        "tag": "h2"
       },
       "left": 24,
-      "right": 26,
+      "right": 27,
       "textLeft": 24,
-      "textRight": 26,
+      "textRight": 27,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -2041,20 +1801,20 @@
      {
       "sel": "section#setup",
       "tag": "section",
-      "top": 4400,
-      "height": 542,
-      "words": 79,
+      "top": 3757,
+      "height": 622,
+      "words": 136,
       "media": 0,
       "middle": 0,
       "heading": {
        "text": "Setup",
-       "size": 40,
+       "size": 34,
        "tag": "h2"
       },
       "left": 24,
-      "right": 45,
+      "right": 52,
       "textLeft": 24,
-      "textRight": 45,
+      "textRight": 52,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -2062,45 +1822,22 @@
       "pinned": false
      },
      {
-      "sel": "section.band",
-      "tag": "section",
-      "top": 5020,
-      "height": 1173,
-      "words": 43,
-      "media": 1,
-      "middle": 0,
-      "heading": {
-       "text": "Printed deadlines, since 1655",
-       "size": 33,
-       "tag": "h2"
-      },
-      "left": 24,
-      "right": 24,
-      "textLeft": 24,
-      "textRight": 29,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": false,
-      "pinned": false
-     },
-     {
       "sel": "section.closer",
       "tag": "section",
-      "top": 6194,
-      "height": 988,
-      "words": 21,
-      "media": 1,
+      "top": 4450,
+      "height": 332,
+      "words": 18,
+      "media": 0,
       "middle": 0,
       "heading": {
-       "text": "It is waiting.",
-       "size": 40,
+       "text": "Put it on your desktop.",
+       "size": 34,
        "tag": "h2"
       },
       "left": 24,
-      "right": 24,
+      "right": 36,
       "textLeft": 24,
-      "textRight": 32,
+      "textRight": 36,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -2110,16 +1847,16 @@
      {
       "sel": "footer",
       "tag": "footer",
-      "top": 7182,
+      "top": 4782,
       "height": 207,
-      "words": 10,
+      "words": 12,
       "media": 0,
       "middle": 0,
       "heading": null,
       "left": 24,
-      "right": 111,
+      "right": 67,
       "textLeft": 24,
-      "textRight": 111,
+      "textRight": 67,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -2130,9 +1867,9 @@
     "gaps": [],
     "h1s": [
      {
-      "text": "Your deadlines find you.",
-      "size": 40,
-      "top": 523,
+      "text": "No more guessing",
+      "size": 34,
+      "top": 473,
       "firstScreen": true
      }
     ],
@@ -2140,14 +1877,14 @@
     "edges": [
      {
       "x": 24,
-      "n": 19
+      "n": 15
      },
      {
       "x": 44,
-      "n": 4
+      "n": 3
      }
     ],
-    "leftBlocks": 23,
+    "leftBlocks": 18,
     "bodySize": 17,
     "stage": false,
     "explains": true,
@@ -2169,10 +1906,27 @@
   },
   {
    "level": "WARN",
+   "id": "font-not-dealt",
+   "width": 1440,
+   "message": "The sheet dealt Bodoni Moda and Jost, but the page renders -apple-system, Playfair Display.",
+   "fix": "Load the dealt face (the link on the sheet) and put it first in font-family. A build that falls back to a default face lands on the default look."
+  },
+  {
+   "level": "WARN",
    "id": "off-centre",
    "width": 1440,
-   "message": "The margins differ: 63px on the left, 83px on the right, at 1440px.",
-   "fix": "Put the navigation and the content on one pair of margins; check for padding on one side only, a scrollbar gutter, or a header on another inset than the page."
+   "message": "The margins differ: 63px on the left, 85px on the right, at 1440px.",
+   "fix": "Put the navigation and the content on one pair of margins; check for padding on one side only, a scrollbar gutter, or a header on another inset than the page.",
+   "alsoAt": [
+    768
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "lopsided",
+   "width": 768,
+   "message": "A section keeps its content on one side and leaves 342px of the width empty: \"Five of them\".",
+   "fix": "Fill the other side with what the section has (its picture, a second column, the figure), or defend the void in one sentence."
   }
  ],
  "images": [
@@ -2182,8 +1936,7 @@
    "fold": "/home/knaramdev/yourassitant/.taste-skill/after/desktop-fold.jpg",
    "pages": [
     "/home/knaramdev/yourassitant/.taste-skill/after/desktop-page-01.jpg",
-    "/home/knaramdev/yourassitant/.taste-skill/after/desktop-page-02.jpg",
-    "/home/knaramdev/yourassitant/.taste-skill/after/desktop-page-03.jpg"
+    "/home/knaramdev/yourassitant/.taste-skill/after/desktop-page-02.jpg"
    ],
    "film": []
   },
@@ -2192,8 +1945,7 @@
    "width": 768,
    "fold": "/home/knaramdev/yourassitant/.taste-skill/after/tablet-fold.jpg",
    "pages": [
-    "/home/knaramdev/yourassitant/.taste-skill/after/tablet-page-01.jpg",
-    "/home/knaramdev/yourassitant/.taste-skill/after/tablet-page-02.jpg"
+    "/home/knaramdev/yourassitant/.taste-skill/after/tablet-page-01.jpg"
    ],
    "film": []
   },
@@ -2202,8 +1954,7 @@
    "width": 390,
    "fold": "/home/knaramdev/yourassitant/.taste-skill/after/mobile-fold.jpg",
    "pages": [
-    "/home/knaramdev/yourassitant/.taste-skill/after/mobile-page-01.jpg",
-    "/home/knaramdev/yourassitant/.taste-skill/after/mobile-page-02.jpg"
+    "/home/knaramdev/yourassitant/.taste-skill/after/mobile-page-01.jpg"
    ],
    "film": []
   }

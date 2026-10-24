@@ -14,7 +14,7 @@ use std::{
 use tauri::{ActivationPolicy, AppHandle, Emitter, Listener, LogicalPosition, LogicalSize, Manager, WebviewWindow};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone, Copy)]
 struct Area {
     x: f64,
     y: f64,
@@ -40,17 +40,27 @@ fn win(app: &AppHandle, label: &str) -> Result<WebviewWindow, String> {
 }
 
 fn screen_of(app: &AppHandle) -> Option<Screen> {
-    let m = app.primary_monitor().ok()??;
+    // The display the pet is on, so it can live on any monitor.
+    let m = app
+        .get_webview_window("pet")
+        .and_then(|w| w.current_monitor().ok().flatten())
+        .or_else(|| app.primary_monitor().ok().flatten())?;
     let s = m.scale_factor();
-    let wa = m.work_area();
-    let work = Area {
-        x: wa.position.x as f64 / s,
-        y: wa.position.y as f64 / s,
-        w: wa.size.width as f64 / s,
-        h: wa.size.height as f64 / s,
+    let (mp, ms, wa) = (m.position(), m.size(), m.work_area());
+    let frame = Area { x: mp.x as f64 / s, y: mp.y as f64 / s, w: ms.width as f64 / s, h: ms.height as f64 / s };
+    // A full-screen app has no Dock or menu bar, so the pet can use the whole display.
+    let work = if mac::fullscreen_app_on(frame.x, frame.y, frame.w, frame.h) {
+        frame
+    } else {
+        Area {
+            x: wa.position.x as f64 / s,
+            y: wa.position.y as f64 / s,
+            w: wa.size.width as f64 / s,
+            h: wa.size.height as f64 / s,
+        }
     };
     // Until the menu bar item has been laid out, aim at the right end of the menu bar.
-    let menu_bar_mid = (m.position().y as f64 / s + work.y) / 2.0;
+    let menu_bar_mid = (frame.y + work.y) / 2.0;
     let (x, y) = tray::icon_centre(app).unwrap_or((work.x + work.w - 160.0, menu_bar_mid));
     Some(Screen { work, tray: Point { x, y } })
 }
