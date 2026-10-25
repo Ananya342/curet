@@ -10,6 +10,8 @@
 A desktop pet that tracks your deadlines, books study time, nudges you back on track and reminds you to rest.
 </p>
 
+> Students rarely miss deadlines because they don't care. The dates are scattered across syllabi, Brightspace and calendars, and nothing turns them into a plan. Curet does, and it sits right on your desktop so you actually see it.
+
 <p align="center">
   <a href="https://github.com/Ananya342/curet/releases">Download</a> ·
   <a href="#set-it-up">Set it up</a> ·
@@ -22,8 +24,8 @@ A desktop pet that tracks your deadlines, books study time, nudges you back on t
 ## Features
 
 **Deadlines, before they're due**
-- Reads **Brightspace** and **Google Calendar**. Reminders arrive as speech bubbles 24 hours and 2 hours ahead, with a **Join** button for Meet, Zoom and Teams links.
-- **Today** lists your classes, deadlines and exams, with the most pressing deadline first.
+- Reads **Brightspace** and **Google Calendar**. The pet reminds you in a speech bubble: deadlines 24 hours and 2 hours ahead, classes and meetings 10 minutes and 1 minute before, with a **Join** button for Meet, Zoom and Teams links.
+- **Today** lists your classes, deadlines and exams, with a to-do list you can tick off.
 - A menu bar icon counts down to your next event. Click it for **Up next**, with buttons to tuck the pet in, chat, or plan.
 
 **Syllabus in, semester planned**
@@ -79,7 +81,7 @@ That's it. Curet wakes up with a morning briefing and takes it from there.
 |---|---|
 | Desktop app | [Tauri 2](https://tauri.app) (Rust): floating pet and panel windows, menu bar icon, global shortcut, scheduler |
 | Interface | React, TypeScript, Vite, Motion |
-| Storage | SQLite (local) and the macOS Keychain for keys |
+| Storage | SQLite (local); API keys and sign-in tokens in the macOS Keychain |
 | AI | Google Gemini (chat with tool calling, syllabus reading) |
 | Voice | ElevenLabs text-to-speech |
 | Calendars | Google Calendar API (OAuth), iCal / Brightspace feeds |
@@ -88,7 +90,9 @@ That's it. Curet wakes up with a morning briefing and takes it from there.
 
 ## Privacy
 
-Your settings, calendar links, tasks, chat and journal live in a local SQLite file on your computer (`~/Library/Application Support/com.sid.lifepet/lifepet.db` on macOS). Nothing leaves it except calls to Google (calendar, Gemini), ElevenLabs if voice is on, and your own calendar feed URLs.
+- Your settings, calendar links, tasks, chat and journal stay in a local SQLite file on your computer (`~/Library/Application Support/com.sid.lifepet/lifepet.db` on macOS). API keys and Google sign-in tokens are kept in the macOS Keychain.
+- Before anything personal is sent to Gemini or ElevenLabs, Curet asks once, in plain words, what it will share.
+- Nothing else leaves your computer: only calls to Google (calendar, Gemini), ElevenLabs if voice is on, and your own calendar feed URLs.
 
 ## Develop
 
