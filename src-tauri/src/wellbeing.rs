@@ -32,6 +32,7 @@ struct Week {
 }
 
 /// Seconds since the last keyboard or mouse event (needs no special permission).
+#[cfg(target_os = "macos")]
 fn idle_seconds() -> f64 {
     #[link(name = "ApplicationServices", kind = "framework")]
     unsafe extern "C" {
@@ -39,6 +40,26 @@ fn idle_seconds() -> f64 {
     }
     // state 0 = combined session, event type u32::MAX = any input event
     unsafe { CGEventSourceSecondsSinceLastEventType(0, u32::MAX) }
+}
+
+#[cfg(windows)]
+fn idle_seconds() -> f64 {
+    use windows_sys::Win32::{
+        System::SystemInformation::GetTickCount,
+        UI::Input::KeyboardAndMouse::{GetLastInputInfo, LASTINPUTINFO},
+    };
+    let mut info = LASTINPUTINFO { cbSize: std::mem::size_of::<LASTINPUTINFO>() as u32, dwTime: 0 };
+    // SAFETY: `info` is a valid, correctly sized LASTINPUTINFO for the duration of the call.
+    if unsafe { GetLastInputInfo(&mut info) } == 0 {
+        return 0.0;
+    }
+    unsafe { GetTickCount() }.wrapping_sub(info.dwTime) as f64 / 1000.0
+}
+
+/// No idle detection on other platforms: the pet never decides you stepped away.
+#[cfg(not(any(target_os = "macos", windows)))]
+fn idle_seconds() -> f64 {
+    0.0
 }
 
 fn setting(db: &Db, key: &str, default: &str) -> String {

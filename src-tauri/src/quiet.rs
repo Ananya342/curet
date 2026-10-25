@@ -4,6 +4,7 @@
 //! out loud in a library. This reports both so the voice can hold its tongue.
 
 use serde::Serialize;
+#[cfg(target_os = "macos")]
 use std::{path::Path, process::Command};
 
 #[derive(Serialize, Clone, Copy, Default)]
@@ -24,6 +25,12 @@ pub struct Quiet {
 /// app, which would trip a TCC dialog. Querying CoreAudio directly would avoid the process spawn,
 /// but this only runs when a notification is about to speak (a few times an hour at most), so the
 /// simpler call that is far harder to get subtly wrong wins.
+#[cfg(not(target_os = "macos"))]
+fn audio() -> Option<(bool, i64)> {
+    None
+}
+
+#[cfg(target_os = "macos")]
 fn audio() -> Option<(bool, i64)> {
     let out = Command::new("/usr/bin/osascript")
         .args([
@@ -53,6 +60,12 @@ fn audio() -> Option<(bool, i64)> {
 /// this does not evaluate — so a scheduled Focus will not silence the pet. Unreadable or missing
 /// files mean "not in Focus": failing the other way would make the voice look broken on any macOS
 /// release that moves this file.
+#[cfg(not(target_os = "macos"))]
+fn dnd() -> bool {
+    false
+}
+
+#[cfg(target_os = "macos")]
 fn dnd() -> bool {
     let Some(home) = std::env::var_os("HOME") else { return false };
     let path = Path::new(&home).join("Library/DoNotDisturb/DB/Assertions.json");

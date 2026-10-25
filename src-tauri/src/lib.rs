@@ -1,6 +1,10 @@
 mod calendar;
 mod db;
 mod hit;
+#[cfg(target_os = "macos")]
+mod mac;
+#[cfg(not(target_os = "macos"))]
+#[path = "mac_other.rs"]
 mod mac;
 mod quiet;
 mod scheduler;
@@ -12,7 +16,9 @@ use std::{
     sync::Mutex,
     time::{Duration, Instant},
 };
-use tauri::{ActivationPolicy, AppHandle, Emitter, Listener, LogicalPosition, LogicalSize, Manager, WebviewWindow};
+#[cfg(target_os = "macos")]
+use tauri::ActivationPolicy;
+use tauri::{AppHandle, Emitter, Listener, LogicalPosition, LogicalSize, Manager, WebviewWindow};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
 #[derive(Serialize, Clone, Copy)]
@@ -272,7 +278,11 @@ fn toggle_hide(app: &AppHandle) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // ⌥⌘L on a Mac, Ctrl+Alt+L elsewhere (the Windows key is reserved by the OS).
+    #[cfg(target_os = "macos")]
     let toggle = Shortcut::new(Some(Modifiers::ALT | Modifiers::SUPER), Code::KeyL);
+    #[cfg(not(target_os = "macos"))]
+    let toggle = Shortcut::new(Some(Modifiers::ALT | Modifiers::CONTROL), Code::KeyL);
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(
@@ -321,6 +331,7 @@ pub fn run() {
         ])
         .setup(move |app| {
             // LIFEPET_DOCK=1 keeps a Dock icon, which automation tools need to see the app.
+            #[cfg(target_os = "macos")]
             app.set_activation_policy(if std::env::var_os("LIFEPET_DOCK").is_some() {
                 ActivationPolicy::Regular
             } else {
