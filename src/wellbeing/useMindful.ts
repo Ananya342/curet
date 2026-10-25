@@ -3,6 +3,7 @@ import { listen } from "@tauri-apps/api/event";
 import { eventsRange, kvSet, nowSec } from "../api";
 import { weekKey, weekStart } from "./recap";
 import { deadlinesMet } from "../study/plans";
+import { lateLine } from "./night";
 
 type Action = { label: string; run: () => void };
 export interface MindfulCtx {
@@ -42,7 +43,7 @@ export function useMindful(c: MindfulCtx) {
       if (away()) return;
       await rouse();
       const { say, hush, fallAsleep } = ctx.current;
-      say("It's getting late. Your brain does its best filing while you sleep. Wind down soon?", {
+      say(lateLine(), {
         ms: 20000,
         actions: [
           { label: "Good night", run: () => { hush(); say("Sleep well.", { ms: 1800 }); window.setTimeout(() => fallAsleep(), 1900); } },

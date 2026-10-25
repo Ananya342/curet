@@ -121,15 +121,20 @@ pub fn tick(app: &AppHandle, st: &mut State) {
         }
     }
 
-    // ---- late night: one gentle wind-down nudge per night, and a note for the weekly recap -------------
+    // ---- late night: a "why are you still up?" nudge every 45 min while you're active, and a note for the
+    // weekly recap (logged once per night) -----------------------------------------------------------------
     let local = Local::now();
     let (h, m) = (local.hour(), local.minute());
     let night = (h == 0 && m >= 30) || (1..4).contains(&h);
     let tonight = local.format("%Y-%m-%d").to_string();
-    if night && idle < 120.0 && db::get(&db, "last_late_night").as_deref() != Some(&tonight) {
-        db::set(&db, "last_late_night", Some(&tonight));
-        db::log_time(&db, "late_nights_log", now);
-        if !focusing && setting(&db, "late_nudge", "on") == "on" {
+    if night && idle < 120.0 {
+        if db::get(&db, "last_late_night").as_deref() != Some(&tonight) {
+            db::set(&db, "last_late_night", Some(&tonight));
+            db::log_time(&db, "late_nights_log", now);
+        }
+        let last: i64 = db::get(&db, "last_late_nudge_at").and_then(|v| v.parse().ok()).unwrap_or(0);
+        if now - last >= 45 * 60 && !focusing && setting(&db, "late_nudge", "on") == "on" {
+            db::set(&db, "last_late_nudge_at", Some(&now.to_string()));
             let _ = app.emit("late-night", ());
         }
     }

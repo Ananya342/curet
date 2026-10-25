@@ -14,6 +14,7 @@ import { Laptop } from "../wellbeing/FocusGear";
 import { useWellbeing } from "../wellbeing/useWellbeing";
 import { speak, stopSpeaking } from "../voice/tts";
 import { useMindful } from "../wellbeing/useMindful";
+import { isLateNight, lateLine } from "../wellbeing/night";
 import { useStudy } from "../study/useStudy";
 import { courseCode } from "../study/titles";
 import { MoodInfo, currentMood } from "../study/mood";
@@ -620,6 +621,7 @@ export default function Pet() {
       animate(sy, [1, 0.8, 1.06, 1], { duration: 0.35 });
       animate(sx, [1, 1.14, 0.97, 1], { duration: 0.35 });
       if (menu) { closeMenu(); return; }
+      if (isLateNight()) { say(lateLine(), { ms: 3500 }); return; }
       const m = moodRef.current;
       say(m.mood === "sad" ? `${m.why}…` : m.mood === "worried" ? `${m.why}!` : pick(d2.boops), { ms: m.mood === "happy" ? 1500 : 3000 });
       return;

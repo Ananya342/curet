@@ -1,6 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { emitTo } from "@tauri-apps/api/event";
 import { PET_IDS, PetId } from "./pets";
+import { isLateNight, lateLine } from "./wellbeing/night";
 
 export interface CalEvent {
   id: string; source: string; title: string; start: number; end: number;
@@ -67,6 +68,7 @@ export async function upcoming(limit = 3): Promise<CalEvent[]> {
 
 export async function greeting(): Promise<string> {
   const now = new Date();
+  if (isLateNight(now)) return lateLine(now);
   const day = startOfDay(now);
   const evs = (await eventsRange(day, day + 86400)).filter((e) => e.end > nowSec());
   const open = (await tasks.list()).length;
