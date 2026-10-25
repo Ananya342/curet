@@ -13,6 +13,33 @@ const copy = hero?.querySelector(".hero-copy");
 const catPeek = document.querySelector(".peek-cat .crop");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+// ---- the hero bubble: what the pet actually says, one nudge after another ----------------------------------
+
+const NUDGES = [
+  ["Essay 2 is due in 2 hours (11:59 pm).", ["Open", "Got it"]],
+  ["CS 241 starts in 10 minutes.", ["Join", "Later"]],
+  ["“Lab report” is due at 3, and we’re on YouTube.", ["Lock in 25 min", "5 more min"]],
+  ["Midterm Friday. You’re free Tuesday 3–6. Book it?", ["Book it", "Other time"]],
+  ["20 minutes staring at the screen. Rest your eyes?", ["Okay", "Skip"]],
+  ["It’s getting late. Wind down soon?", ["Goodnight", "10 more min"]],
+];
+const bubbleActions = bubble?.querySelector(".bubble-actions");
+const setActions = (labels) => {
+  bubbleActions.innerHTML = labels.map((l, i) => `<span class="b${i ? "" : " go"}">${l}</span>`).join("");
+};
+// The bubble keeps the height of its longest nudge, so changing lines never nudges the pets around it.
+function lockBubble() {
+  if (!bubble) return;
+  bubble.style.minHeight = "";
+  let tallest = 0;
+  for (const [text, labels] of NUDGES) {
+    bubbleText.textContent = text; setActions(labels);
+    tallest = Math.max(tallest, bubble.offsetHeight);
+  }
+  bubble.style.minHeight = `${tallest}px`;
+}
+lockBubble();
+
 // ---- the pets ---------------------------------------------------------------------------------------------
 
 const PETS = {
@@ -300,13 +327,47 @@ function placeTip(el) {
   else if (under > 0) tip.style.setProperty("--shift", `${under}px`);
 }
 
-const base = bubbleText?.textContent ?? "";
-let lineTimer = 0;
+let nudge = 0, nudgeTimer = 0, typeTimer = 0, held = false;
+function showNudge(i) {
+  if (!bubbleText) return;
+  clearTimeout(nudgeTimer); clearInterval(typeTimer);
+  nudge = i % NUDGES.length;
+  const [text, labels] = NUDGES[nudge];
+  setActions(labels);
+  const done = () => {
+    bubbleActions.style.visibility = "";
+    nudgeTimer = setTimeout(next, reduce ? 6000 : 4200);
+  };
+  if (reduce) { bubbleText.textContent = text; done(); return; }
+  // Type it out, then show the buttons, the way the app's bubble talks.
+  bubbleActions.style.visibility = "hidden";
+  bubble.classList.remove("talk"); void bubble.offsetWidth; bubble.classList.add("talk");
+  let n = 0;
+  typeTimer = setInterval(() => {
+    bubbleText.textContent = text.slice(0, ++n);
+    if (n >= text.length) { clearInterval(typeTimer); done(); }
+  }, 24);
+}
+function next() {
+  if (held) { nudgeTimer = setTimeout(next, 800); return; }
+  showNudge(nudge + 1);
+}
+// A pet you click says its own line for a moment, then the nudges carry on.
 function say(text) {
   if (!bubbleText) return;
+  clearTimeout(nudgeTimer); clearInterval(typeTimer);
   bubbleText.textContent = text;
-  clearTimeout(lineTimer);
-  lineTimer = setTimeout(() => { bubbleText.textContent = base; }, 2400);
+  bubbleActions.style.visibility = "hidden";
+  nudgeTimer = setTimeout(next, 2400);
+}
+if (bubble) {
+  bubble.addEventListener("pointerenter", () => { held = true; });
+  bubble.addEventListener("pointerleave", () => { held = false; });
+  let resizeTimer = 0;
+  const relock = () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { lockBubble(); showNudge(nudge); }, 200); };
+  addEventListener("resize", relock);
+  document.fonts?.ready.then(relock);
+  showNudge(0);
 }
 
 function play(el, cls, ms) {

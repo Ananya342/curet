@@ -412,47 +412,24 @@ export default function Pet() {
     setMode("hiding");
     await invoke("hide_panel").catch(() => {});
     animate(lid, 0, { duration: 0.1 });
-    const cat = petRef.current.id === "cat";
     const bb = bounds();
     const from = { ...pos.current };
-    const topY = bb.minY - 180;
+    const topY = bb.minY - 220;
     setFading(true);
-    if (cat) {
-      // Let go like a balloon losing air: spin, zig-zag up, shrinking as it deflates.
-      await Promise.all([animate(sx, 1.18, { duration: 0.14 }), animate(sy, 0.85, { duration: 0.14 })]);
-      await animate(0, 1, {
-        duration: 1.15, ease: [0.55, 0, 0.85, 0.6],
-        onUpdate: (k) => {
-          const wob = Math.sin(k * 15) * 90 * (1 - k * 0.35);
-          moveTo(from.x + wob, from.y + (topY - from.y) * k);
-          rot.set(k * 1080);
-          const squeeze = 1 + Math.sin(k * 40) * 0.12;
-          sx.set(squeeze); sy.set(2 - squeeze);
-          fly.set(Math.max(0.08, 1 - k * 0.92));
-          op.set(k > 0.85 ? (1 - k) / 0.15 : 1);
-        },
-      });
-    } else {
-      // Swell up, hover with a tilt, then zip off toward the top of the screen.
-      await Promise.all([
-        animate(sx, [1, 1.2, 1.45, 1.4], { duration: 0.5, ease: "easeOut" }),
-        animate(sy, [1, 0.85, 1.45, 1.4], { duration: 0.5, ease: "easeOut" }),
-        animate(rot, [0, -5, 5, -3, 0], { duration: 0.5 }),
-      ]);
-      await animate(0, 1, { duration: 0.35, ease: "easeInOut", onUpdate: (k) => { moveTo(from.x + Math.sin(k * 6) * 24, from.y - 30 * k); rot.set(Math.sin(k * 8) * 9); } });
-      const hover = { x: pos.current.x, y: pos.current.y };
-      const dir = hover.x < bb.minX + (bb.maxX - bb.minX) / 2 ? 1 : -1;
-      await animate(0, 1, {
-        duration: 0.42, ease: [0.6, 0, 1, 0.5],
-        onUpdate: (k) => {
-          moveTo(hover.x + dir * 220 * k, hover.y + (topY - hover.y) * k);
-          rot.set(dir * 14 * k);
-          sx.set(1.4 - 0.75 * k); sy.set(1.4 + 0.5 * k);
-          fly.set(Math.max(0.05, 1 - k * 0.95));
-          op.set(k > 0.8 ? (1 - k) / 0.2 : 1);
-        },
-      });
-    }
+    // A quick crouch, then a twisting corkscrew straight up and gone: spinning, stretching thin, speeding up.
+    await Promise.all([animate(sx, 1.25, { duration: 0.1, ease: "easeOut" }), animate(sy, 0.76, { duration: 0.1, ease: "easeOut" })]);
+    await animate(0, 1, {
+      duration: 0.55, ease: [0.45, 0, 0.9, 0.35],
+      onUpdate: (k) => {
+        moveTo(from.x + Math.sin(k * 14) * 34 * (1 - k), from.y + (topY - from.y) * k);
+        rot.set(k * 720);
+        // Spinning about its own upright axis too: it narrows and widens as it turns, thinner the higher it goes.
+        sx.set((0.3 + 0.7 * Math.abs(Math.cos(k * Math.PI * 3))) * (1 - k * 0.5));
+        sy.set(1 + k * 0.7);
+        fly.set(Math.max(0.05, 1 - k * 0.95));
+        op.set(k > 0.7 ? (1 - k) / 0.3 : 1);
+      },
+    });
     await invoke("set_pet_visible", { visible: false });
     setPoof(null); setFading(false);
     sx.set(1); sy.set(1); ty.set(0); rot.set(0); fly.set(1); op.set(1);

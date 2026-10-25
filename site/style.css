@@ -92,18 +92,31 @@ code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.86em
 
 /* A pet peeking over the top edge of a chapter: only the top of the picture is shown, cut flat on the edge. */
 .peek { position: absolute; z-index: 4; left: var(--x); top: 0; width: var(--w); transform: translate(-50%, -100%); pointer-events: none; }
-.peek .crop { height: calc(var(--w) * var(--r) * 0.6); overflow: hidden; }
+/* Cut flat only along the bottom edge, so ears and sides stay whole while it sways or walks. */
+.peek .crop { height: calc(var(--w) * var(--r) * 0.6); clip-path: inset(-40% -40% 0 -40%); }
 .peek .crop img { width: 100%; height: auto; transform-origin: 50% 100%; animation: peek-bob 5.5s ease-in-out infinite; }
 /* the signature move: the hero cat opens from the bottom edge like a shutter */
 .peek-cat .crop { animation: shutter 1.1s var(--ease) 0.25s both; transform-origin: 50% 100%; }
-@keyframes shutter { from { clip-path: inset(100% 0 0 0); transform: scale(1.12); } to { clip-path: inset(0 0 0 0); transform: none; } }
+@keyframes shutter { from { clip-path: inset(100% -40% 0 -40%); transform: scale(1.12); } to { clip-path: inset(-40% -40% 0 -40%); transform: none; } }
 @keyframes peek-bob { 0%, 100% { transform: translateY(2%) rotate(-1.2deg); } 50% { transform: translateY(0) rotate(1.2deg); } }
+/* The cat's front paws over the edge, in its own cream fur with soft shading so they read as part of the picture. */
 .paw {
-  position: absolute; bottom: calc(var(--w) * -0.035); width: calc(var(--w) * 0.2); height: calc(var(--w) * 0.14);
-  background: var(--paper); border-radius: 55% 55% 48% 48%; border: 3px solid var(--ink);
+  position: absolute; bottom: calc(var(--w) * -0.03); width: calc(var(--w) * 0.19); height: calc(var(--w) * 0.12);
+  border-radius: 50% 50% 44% 44% / 62% 62% 38% 38%;
+  background: radial-gradient(120% 110% at 42% 22%, #fffdf8 0%, #fbe9d3 48%, #ecc79f 100%);
+  box-shadow: 0 3px 6px rgba(70, 38, 20, 0.22), inset 0 -3px 5px rgba(196, 128, 72, 0.25);
+  transform-origin: 50% 100%;
 }
-.paw::after { content: ""; position: absolute; left: 50%; top: 52%; width: 34%; height: 30%; margin-left: -17%; border-radius: 50%; background: var(--pink); }
-.paw.l { left: 24%; } .paw.r { right: 24%; }
+/* two soft creases for toes */
+.paw::before, .paw::after { content: ""; position: absolute; top: 18%; width: 2px; height: 34%; border-radius: 2px; background: rgba(196, 128, 72, 0.35); }
+.paw::before { left: 36%; } .paw::after { right: 36%; }
+.paw.l { left: 22%; } .paw.r { right: 22%; }
+/* Walking in: paws patter one after the other and the body sways, until it stops. */
+.peek-cat.walking .paw { animation: patter 0.34s ease-in-out infinite alternate; }
+.peek-cat.walking .paw.r { animation-delay: -0.17s; }
+.peek-cat.walking .crop img { animation: waddle 0.34s ease-in-out infinite alternate; }
+@keyframes patter { from { transform: translateY(0) scaleY(1); } to { transform: translateY(-38%) scaleY(1.06); } }
+@keyframes waddle { from { transform: translateY(1%) rotate(-3deg); } to { transform: translateY(-1%) rotate(3deg); } }
 
 section { position: relative; }
 
@@ -122,10 +135,13 @@ section { position: relative; }
   --bw: min(300px, 28vw);
   position: absolute; z-index: 3; width: var(--bw); transform-origin: 50% 100%;
   /* centred over the peeking cat at 84%, kept on screen, and stood just above the cat's ears at any height */
-  left: min(calc(84% - var(--bw) / 2), calc(100% - var(--bw) - 16px));
+  /* --bx follows the cat as it walks in (main.js) */
+  left: min(calc(var(--bx, 84%) - var(--bw) / 2), calc(100% - var(--bw) - 16px));
   bottom: calc(var(--cat-w) * 1.19 * 0.6 + 26px);
 }
 .hero-bubble::after { left: 50%; }
+.hero-bubble.talk { animation: nudge-in 0.28s var(--ease); }
+@keyframes nudge-in { from { transform: translateY(5px) scale(0.98); } }
 
 /* The seven pets in the hero, dressed up (hero-pets.js places them). Each sits in its own spot; hovering lifts
    it and shows its tagline, clicking makes it jump. Hops and jumps move only the inner .hp-hop, hover only
@@ -187,8 +203,10 @@ section { position: relative; }
 html.js .day.is-live .scene-stage { display: block; background: var(--sky); }
 .day.is-live .field { position: absolute; inset: 0; min-height: 0; padding: 0; isolation: isolate; }
 .day.is-live .time { font-size: clamp(100px, 22.1vw, 390px); left: var(--margin); top: 21%; line-height: 0.92; }
-.day.is-live .card { left: auto; right: var(--margin); top: 30%; width: min(400px, 34vw); }
-.day.is-live .card .bubble-text { font-size: 18px; }
+.day.is-live .card { left: auto; right: var(--margin); top: 30%; width: min(480px, 41vw); padding: 17px 19px; border-radius: 24px; }
+.day.is-live .card .bubble-text { font-size: 21.6px; }
+.day.is-live .card .b { font-size: 21.6px; padding: 6px 16px; }
+.day.is-live .card .bubble-actions { gap: 10px; margin-top: 12px; }
 .day.is-live .clause { position: absolute; left: var(--margin); bottom: 72px; font-size: clamp(26px, 3.64vw, 57.2px); max-width: 11em; }
 .day.is-live .walker { display: block; position: absolute; z-index: 4; bottom: -4px; left: 0; width: clamp(110px, 11vw, 180px); height: auto; transform-origin: 50% 100%; }
 
@@ -405,6 +423,7 @@ button.b:disabled { opacity: 0.6; cursor: default; }
 .dialog p + p { margin-top: 18px; }
 
 @media (max-width: 1180px) and (min-width: 861px) {
+  .day.is-live .card { width: min(480px, 44vw); top: max(46%, calc(21% + 20vw + 10px)); } /* below the time, which fills the width here */
   .plan-flow { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
   .plan-flow > .step:last-child { grid-column: 1 / -1; }
   .offer { flex-direction: row; align-items: flex-end; justify-content: center; gap: 24px; }
@@ -430,7 +449,7 @@ button.b:disabled { opacity: 0.6; cursor: default; }
   .day:not(.is-live) .clause { font-size: var(--t-clause); order: 1; }
   /* the live scene on a tablet: a smaller clock beside a narrower bubble */
   .day.is-live .time { font-size: 13.5vw; }
-  .day.is-live .card { width: min(400px, 31vw); }
+  .day.is-live .card { width: min(480px, 37vw); }
   .day.is-live .clause { font-size: clamp(24px, 3.4vw, 40px); }
 
   .pets .scene-stage { padding: 110px var(--margin) 60px; }

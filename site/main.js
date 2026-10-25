@@ -83,3 +83,26 @@ choose("ghost");
 // ---- the live Three.js layer: the hero's pets standing together, and a spinning showcase pet.
 // It loads only when motion is welcome, and the page is complete without it.
 if (!reduce) import("./three-scene.js").catch(() => {});
+
+// The cat peeking over "One Tuesday" walks in from under the hero bubble to the middle as you scroll down to it.
+const walker = document.querySelector(".peek-cat"), daySec = document.getElementById("day");
+const heroBubble = document.querySelector(".hero-bubble"); // rides along above the cat
+if (walker && daySec && !reduce) {
+  let last = -1, stopTimer = 0;
+  const ease = (t) => t * t * (3 - 2 * t);
+  const step = () => {
+    const p = Math.min(1, Math.max(0, (innerHeight - daySec.getBoundingClientRect().top) / (innerHeight * 0.75)));
+    const x = 84 - 34 * ease(p);
+    if (Math.abs(x - last) < 0.05) return;
+    walker.style.setProperty("--x", `${x}%`);
+    if (heroBubble && innerWidth > 860) heroBubble.style.setProperty("--bx", `${x}%`);
+    if (last >= 0) {
+      walker.classList.add("walking");
+      clearTimeout(stopTimer);
+      stopTimer = setTimeout(() => walker.classList.remove("walking"), 180);
+    }
+    last = x;
+  };
+  addEventListener("scroll", () => requestAnimationFrame(step), { passive: true });
+  step();
+}
