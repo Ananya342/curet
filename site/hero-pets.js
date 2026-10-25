@@ -257,7 +257,7 @@ function area() {
   return width < 860
     // on a phone the bubble sits under the button; the pets get the room below it, clear of the peeking cat
     ? { left: side, right: width - side, top: bBottom + 26, bottom: height - (catPeek ? catPeek.offsetHeight : 60) - 8 }
-    : { left: Math.max(width * 0.5, textRight() + 32), right: width - side, top: navBottom + 4, bottom: bTop - 14 };
+    : { left: Math.max(width * 0.46, textRight() + 24), right: width - side, top: navBottom + 4, bottom: bTop - 12 };
 }
 
 // A pet's box is size × size; its picture fits inside, and a hat may rise above it.

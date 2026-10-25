@@ -24,7 +24,7 @@
 
   --margin: clamp(18px, 4vw, 60px);
   /* the cat peeking over the top of "One Tuesday"; the hero bubble points down at it, so both share this */
-  --cat-w: min(24vw, 330px, 40svh);
+  --cat-w: min(20vw, 290px, 34svh);
   --radius: 22px;
 
   /* five type steps */
@@ -130,11 +130,13 @@ section { position: relative; }
 .nav nav a:hover { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 6px; }
 .hero-disc { position: absolute; z-index: 0; width: 112vh; height: 112vh; border-radius: 50%; background: var(--pink); left: calc(82vw - 56vh); top: calc(54svh - 56vh); }
 .hero-copy { position: relative; z-index: 2; max-width: 46rem; }
-.hero-copy h1 { font-size: var(--t-hero); }
-.hero-copy > p { margin-top: 28px; max-width: 30em; }
-.hero-copy > p:first-of-type { margin-top: 36px; }
+.hero-copy h1 { font-size: clamp(50px, 6.2vw, 108px); line-height: 1.02; letter-spacing: -0.035em; max-width: 10em; }
+/* the second half always starts its own line */
+.hero-copy h1 .nb { display: block; }
+.hero-copy > p { margin-top: 32px; max-width: 30em; }
+.hero-copy > p:first-of-type { margin-top: clamp(24px, 3vw, 44px); }
 .hero-bubble {
-  --bw: min(300px, 28vw);
+  --bw: min(390px, 30vw); /* wide enough that every nudge fits in two lines, so it stays short and the pets get the height */
   position: absolute; z-index: 3; width: var(--bw); transform-origin: 50% 100%;
   /* centred over the peeking cat at 84%, kept on screen, and stood just above the cat's ears at any height */
   /* --bx follows the cat as it walks in (main.js) */
@@ -436,8 +438,8 @@ button.b:disabled { opacity: 0.6; cursor: default; }
 /* ---------------------------------------------------------- phones */
 @media (max-width: 860px) {
   .nav nav a:nth-child(n+3) { display: none; }
-  .hero { padding: 110px var(--margin) 0; justify-content: flex-start; min-height: 100svh; }
-  .hero-copy h1 { font-size: 11.5vw; }
+  .hero { padding: 110px var(--margin) 210px; justify-content: flex-start; min-height: 100svh; } /* room under the bubble for the pets */
+  .hero-copy h1 { font-size: clamp(36px, 10.5vw, 64px); }
   .hero-disc { width: 130vw; height: 130vw; left: -15vw; top: 58svh; }
   .hero-bubble { position: relative; left: auto; bottom: auto; width: min(300px, 100%); margin-top: 28px; }
   .hero-bubble::after { left: 24%; }
