@@ -135,6 +135,7 @@ section { position: relative; }
 .hero-copy h1 .nb { display: block; }
 .hero-copy > p { margin-top: 32px; max-width: 30em; }
 .hero-copy > p:first-of-type { margin-top: clamp(24px, 3vw, 44px); }
+.hero-copy .lede { font-size: clamp(19px, 1.6vw, 26px); font-weight: 800; letter-spacing: -0.01em; }
 .hero-bubble {
   --bw: min(390px, 30vw); /* wide enough that every nudge fits in two lines, so it stays short and the pets get the height */
   position: absolute; z-index: 3; width: var(--bw); transform-origin: 50% 100%;
