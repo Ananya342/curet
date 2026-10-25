@@ -45,8 +45,23 @@ export default function Settings(_: { petId: PetId }) {
     load();
     kvGet("gemini_key").then((v) => setKey(v ?? ""));
     kvGet("gemini_model").then((v) => setModel(v ?? ""));
-    kvGet("eleven_key").then((v) => setVKey(v ?? ""));
-    kvGet("eleven_voice").then((v) => setVoice(v ?? ""));
+    // Load the account's voices straight away when a key is already saved, so the picker shows the current voice
+    // instead of staying hidden until "Save key" is pressed again.
+    (async () => {
+      const [k, v] = await Promise.all([kvGet("eleven_key"), kvGet("eleven_voice")]);
+      setVKey(k ?? "");
+      setVoice(v ?? "");
+      const useKey = k || ENV_ELEVEN_KEY;
+      if (!useKey) return;
+      const list = await listVoices(useKey).catch(() => [] as Voice[]);
+      setVoices(list);
+      // Nothing picked yet (or it no longer exists): show and keep the one speech falls back to, the first voice.
+      if (list.length && !list.some((x) => x.voice_id === v)) {
+        setVoice(list[0].voice_id);
+        await kvSet("eleven_voice", list[0].voice_id);
+        resetVoiceCache();
+      }
+    })();
     kvGet("voice_on").then((v) => setVoiceOn(v !== "off"));
     quietState().then(setQuiet).catch(() => setQuiet(null));
     const un = listen("events-updated", load);
@@ -268,20 +283,20 @@ export default function Settings(_: { petId: PetId }) {
             Reminders will still appear in a bubble.
           </p>
         )}
-        <details open={!ENV_ELEVEN_KEY}>
-          <summary>Key and voice</summary>
+        {voices.length > 0 && (
+          <div className="inline-form">
+            <div className="grow"><Select label="Voice" value={voice} onChange={pickVoice} options={voices.map((v) => [v.voice_id, v.name] as [string, string])} /></div>
+            <button className="btn soft" onClick={testVoice} disabled={busy === "test"}>{busy === "test" ? "Playing…" : "Test"}</button>
+          </div>
+        )}
+        <details open={!ENV_ELEVEN_KEY && !voices.length}>
+          <summary>{voices.length ? "Change key" : "Key and voice"}</summary>
           <form className="stack" onSubmit={saveVoice} noValidate>
             <input type="password" value={vKey} onChange={(e) => setVKey(e.target.value)} placeholder="sk_…" aria-label="ElevenLabs API key" autoComplete="off" spellCheck={false} />
             <button type="submit" className="btn" disabled={busy === "voice"}>{busy === "voice" ? "Checking…" : "Save key"}</button>
           </form>
-          {voices.length > 0 && (
-            <div className="stack">
-              <Select label="Voice" value={voice} onChange={pickVoice} options={voices.map((v) => [v.voice_id, v.name] as [string, string])} />
-              <button className="btn quiet" onClick={testVoice} disabled={busy === "test"}>{busy === "test" ? "Playing…" : "Test voice"}</button>
-            </div>
-          )}
-          <Status where="voice" />
         </details>
+        <Status where="voice" />
       </section>
 
       <footer>
