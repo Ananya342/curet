@@ -73,7 +73,9 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
       case "task_list": return args.includeDone ? tasks : tasks.filter((t) => !t.done);
       case "task_done": { const t = tasks.find((x) => x.id === args.id); if (t) { t.done = args.done; t.done_at = args.done ? Math.floor(Date.now() / 1000) : null; } return; }
       case "memory_list": case "feeds_list": return [];
-      case "google_status": return { connected: false, configured: true, email: null };
+      case "google_status": return new URLSearchParams(location.search).has("google") // ?mock&google acts signed in
+        ? { connected: true, configured: true, email: "you@example.com", can_write: true }
+        : { connected: false, configured: true, email: null };
       case "window_rect": return { x: 0, y: 0, w: 440, h: 180 };
       case "google_add_event": {
         const e = args.event;

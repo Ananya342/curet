@@ -5,6 +5,7 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import { CalEvent, Task, addCalendarEvent, eventsRange, fmtDay, fmtTime, nowSec, refreshEvents, startOfDay, tasks, untilLabel } from "../api";
 import { StudyPlan, deadlineKey, deadlinesDone, isExam, setDeadlineDone, studyPlans } from "../study/plans";
 import Syllabus from "./Syllabus";
+import DatePicker from "./DatePicker";
 
 export default function Today() {
   const [today, setToday] = useState<CalEvent[]>([]);
@@ -147,7 +148,7 @@ export default function Today() {
           <form className="stack" onSubmit={addEvent} noValidate>
             <input value={ev.title} onChange={(e) => setEv({ ...ev, title: e.target.value })} placeholder="Dentist appointment…" aria-label="Event title" autoComplete="off" />
             <div className="fields">
-              <input type="date" value={ev.date} onChange={(e) => setEv({ ...ev, date: e.target.value })} aria-label="Date" />
+              <DatePicker value={ev.date} onChange={(date) => setEv({ ...ev, date })} />
               <input type="time" value={ev.time} onChange={(e) => setEv({ ...ev, time: e.target.value })} aria-label="Start time" disabled={ev.len === "allday"} />
               <select value={ev.len} onChange={(e) => setEv({ ...ev, len: e.target.value })} aria-label="Length">
                 <option value="30">30 min</option>

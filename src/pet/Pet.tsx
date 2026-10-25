@@ -69,6 +69,8 @@ export default function Pet() {
   const setMode = (m: Mode) => { modeRef.current = m; _setMode(m); };
 
   const [bubble, setBubble] = useState<Bubble | null>(null);
+  const bubbleIdRef = useRef(0);
+  bubbleIdRef.current = bubble?.id ?? 0;
   const [menu, setMenu] = useState<null | "main" | "picker">(null);
   const menuRef = useRef(menu);
   menuRef.current = menu;
@@ -159,15 +161,30 @@ export default function Pet() {
   // `speak` is opt-in rather than automatic: the pet chatters constantly (boops, pokes, greetings)
   // and voicing all of it would be both irritating and a waste of ElevenLabs credits. Only the
   // things the pet interrupts you *for* — reminders, briefings, breaks, nudges — pass it.
-  const say = useCallback((text: string, opts: { ms?: number; actions?: Bubble["actions"]; rich?: boolean; speak?: boolean } = {}) => {
+  // A bubble stays while you hover it or while it's being read aloud, then lingers a moment before going.
+  const bubbleHover = useRef(false);
+  const armBubble = useCallback((id: number, ms: number) => {
     window.clearTimeout(bubbleTimer.current);
+    // Back to 0 once the bubble is gone, so the idle loop knows the pet is free to wander again.
+    bubbleTimer.current = window.setTimeout(() => {
+      if (bubbleHover.current) return;
+      bubbleTimer.current = 0;
+      setBubble((cur) => (cur?.id === id ? null : cur));
+    }, ms);
+  }, []);
+  const say = useCallback((text: string, opts: { ms?: number; actions?: Bubble["actions"]; rich?: boolean; speak?: boolean } = {}) => {
     const b: Bubble = { id: Date.now(), text, actions: opts.actions, rich: opts.rich };
     setBubble(b);
-    if (opts.speak) speak(text);
-    const ms = opts.ms ?? Math.max(3000, text.length * 70);
-    // Back to 0 once the bubble is gone, so the idle loop knows the pet is free to wander again.
-    bubbleTimer.current = window.setTimeout(() => { bubbleTimer.current = 0; setBubble((cur) => (cur?.id === b.id ? null : cur)); }, ms);
-  }, []);
+    bubbleHover.current = false;
+    const ms = opts.ms ?? Math.max(4500, text.length * 85);
+    if (!opts.speak) { armBubble(b.id, ms); return; }
+    // Wait for the voice to finish (with a generous cap in case it never reports back), then keep it up a little longer.
+    const t0 = Date.now();
+    armBubble(b.id, ms + 30000);
+    speak(text).then(() => {
+      if (bubbleIdRef.current === b.id) armBubble(b.id, Math.max(2500, ms - (Date.now() - t0)));
+    });
+  }, [armBubble]);
   const hush = () => { window.clearTimeout(bubbleTimer.current); bubbleTimer.current = 0; setBubble(null); stopSpeaking(); };
 
   const closeMenu = () => { window.clearTimeout(menuTimer.current); setMenu(null); };
@@ -922,7 +939,14 @@ export default function Pet() {
   return (
     <div className="stage" data-mode={mode} data-mood={mood.mood} data-fading={fading || undefined} style={{ width: WIN_W, height: WIN_H }}>
       {bubble && !menu && (
-        <div className={`bubble${bubble.rich ? " rich" : ""}`} role="status" aria-live="polite" data-hit style={{ bottom: FLOOR_PAD + sh + hatRoom + 12, maxHeight: WIN_H - (FLOOR_PAD + sh + hatRoom + 12) - 8, left: bubbleCx, ["--tail" as string]: `${tailShift}px` }} onClick={() => { touch(); hush(); setBadge(false); if (modeRef.current === "alert") setMode("idle"); }}>
+        <div className={`bubble${bubble.rich ? " rich" : ""}`} role="status" aria-live="polite" data-hit style={{ bottom: FLOOR_PAD + sh + hatRoom + 12, maxHeight: WIN_H - (FLOOR_PAD + sh + hatRoom + 12) - 8, left: bubbleCx, ["--tail" as string]: `${tailShift}px` }} 
+          // Clicking the bubble keeps it (and its voice) going; the × or a button puts it away.
+          onClick={() => { touch(); setBadge(false); if (modeRef.current === "alert") setMode("idle"); }}
+          onPointerEnter={() => { bubbleHover.current = true; window.clearTimeout(bubbleTimer.current); }}
+          onPointerLeave={() => { bubbleHover.current = false; armBubble(bubble.id, 2500); }}>
+          <button className="bubble-close" data-hit aria-label="Close" onClick={(e) => { e.stopPropagation(); hush(); }}>
+            <svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true"><path d="M4 4l8 8m0-8l-8 8" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" fill="none" /></svg>
+          </button>
           <div className="bubble-text">{bubble.text}</div>
           {bubble.actions && (
             <div className="bubble-actions">

@@ -119,7 +119,12 @@ export async function synthesize(text: string, key: string, voiceId: string, mod
   audio.addEventListener("ended", () => { if (current === audio) stopSpeaking(); }, { once: true });
   // Autoplay can be refused before the user has interacted with the window; that is not worth
   // surfacing to anyone, the bubble is already on screen either way.
-  await audio.play().catch(() => {});
+  const played = await audio.play().then(() => true, () => false);
+  if (!played) return;
+  // Resolve once it's finished (or was stopped), so the bubble can stay up for exactly as long as it's heard.
+  await new Promise<void>((done) => {
+    for (const ev of ["ended", "pause", "error"]) audio.addEventListener(ev, () => done(), { once: true });
+  });
 }
 
 /**

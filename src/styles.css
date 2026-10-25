@@ -133,6 +133,9 @@ img { -webkit-user-drag: none; }
   transform: rotate(45deg); border-radius: 3px;
 }
 .bubble-actions { display: flex; gap: 6px; justify-content: center; margin-top: 8px; }
+.bubble { cursor: default; }
+.bubble-close { position: absolute; top: -9px; right: -9px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; padding: 0; border: 2px solid #3a2a2a; background: #fffdf7; color: #3a2a2a; cursor: pointer; box-shadow: 0 2px 0 #3a2a2a; opacity: 0; transition: opacity 0.15s; }
+.bubble:hover .bubble-close, .bubble-close:focus-visible { opacity: 1; }
 .bubble-actions button {
   border-radius: 999px; padding: 5px 12px; font: inherit; font-size: 12.5px; cursor: pointer;
 }
@@ -292,6 +295,31 @@ img { -webkit-user-drag: none; }
 .panel input::placeholder, .panel textarea::placeholder { color: var(--ink-soft); opacity: 0.7; }
 .panel input:focus-visible, .panel textarea:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--pet), 0 2px 0 var(--pop); }
 .inline-form { display: flex; gap: 8px; align-items: flex-start; }
+
+/* date picker: a sticker field that opens a little calendar card */
+.datepick { position: relative; min-width: 0; }
+.date-field { width: 100%; display: flex; align-items: center; gap: 8px; padding: 9px 12px; min-height: 40px; border-radius: 14px; border: 2px solid var(--edge); background: var(--raised); color: var(--ink); font: inherit; font-weight: 700; box-shadow: 0 2px 0 var(--pop); cursor: pointer; white-space: nowrap; overflow: hidden; }
+.date-field svg { flex: none; color: var(--ink-soft); }
+.date-field span { overflow: hidden; text-overflow: ellipsis; }
+.date-field:active { transform: translateY(2px); box-shadow: 0 0 0 var(--pop); }
+.date-field[aria-expanded="true"] { box-shadow: 0 0 0 4px var(--pet), 0 2px 0 var(--pop); }
+.cal { position: absolute; z-index: 20; top: calc(100% + 8px); left: 0; width: 264px; padding: 10px; border-radius: 20px; background: var(--raised); border: 2.5px solid var(--edge); box-shadow: 0 4px 0 var(--pop), 0 14px 28px rgba(58, 42, 42, 0.22); animation: cal-in 0.18s cubic-bezier(0.3, 1.4, 0.5, 1); transform-origin: 20% 0; }
+@keyframes cal-in { from { transform: scale(0.92) translateY(-4px); opacity: 0; } }
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.cal-head b { font-size: 14.5px; font-weight: 900; }
+.cal-nav { width: 30px; height: 30px; border-radius: 10px; border: 2px solid var(--edge); background: var(--wash); color: var(--ink); font: inherit; font-size: 18px; font-weight: 900; line-height: 1; cursor: pointer; box-shadow: 0 2px 0 var(--pop); }
+.cal-nav:active { transform: translateY(2px); box-shadow: 0 0 0 var(--pop); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-dow { text-align: center; font-size: 11px; font-weight: 800; color: var(--ink-soft); padding: 2px 0 4px; }
+.cal-day { aspect-ratio: 1; border: 2px solid transparent; border-radius: 10px; background: none; color: var(--ink); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; padding: 0; font-variant-numeric: tabular-nums; }
+.cal-day:hover { background: var(--wash); border-color: var(--soft-line); }
+.cal-day.other { color: var(--ink-soft); opacity: 0.45; }
+.cal-day.today { border-color: var(--edge); border-style: dashed; }
+.cal-day.on { background: var(--pet); border: 2px solid var(--edge); color: var(--on-candy); font-weight: 900; box-shadow: 0 2px 0 var(--pop); }
+.cal-day:focus-visible { outline: 3px solid var(--ink); outline-offset: 1px; }
+.cal-quick { display: flex; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 2px dashed var(--soft-line); }
+.cal-quick button { flex: 1; border: 2px solid var(--edge); background: var(--wash); color: var(--ink); font: inherit; font-size: 12px; font-weight: 800; padding: 4px 6px; min-height: 28px; border-radius: 999px; cursor: pointer; }
+.cal-quick button:hover { background: var(--pet); color: var(--on-candy); }
 .stack { display: flex; flex-direction: column; gap: 10px; }
 
 /* chat */
