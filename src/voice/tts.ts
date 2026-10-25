@@ -3,23 +3,21 @@ import { kvGet } from "../api";
 import { PETS, PetId } from "../pets";
 
 /** Default key from .env.local, used when none is saved in Settings (same deal as Gemini). */
-export const ENV_ELEVEN_KEY = import.meta.env.LIFEPET_ELEVEN_KEY?.trim() || "";
 
-export const elevenKey = async () => (await kvGet("eleven_key")) || ENV_ELEVEN_KEY || null;
+/** Whether a key is saved, asked of Rust. The key itself never crosses the boundary. */
+export const hasElevenKey = () => invoke<boolean>("secret_is_set", { name: "eleven_key" });
 
 /** ElevenLabs' own documented default. Overridable in Settings if you want a faster one. */
 export const DEFAULT_TTS_MODEL = "eleven_multilingual_v2";
 
-const API = "https://api.elevenlabs.io/v1";
 
 export interface Voice { voice_id: string; name: string }
+export type VoiceSettings = { stability: number; similarity_boost: number; style: number; speed: number };
 
 /** The voices on the account behind `key`, for the Settings picker. */
-export async function listVoices(key: string): Promise<Voice[]> {
-  const res = await fetch(`${API}/voices`, { headers: { "xi-api-key": key } });
-  if (!res.ok) throw new Error(await errorText(res));
-  const body = (await res.json()) as { voices?: Voice[] };
-  return (body.voices ?? []).map((v) => ({ voice_id: v.voice_id, name: v.name }));
+/** The voices on the saved account. The key stays in Rust; this just asks for the list. */
+export async function listVoices(): Promise<Voice[]> {
+  return invoke<Voice[]>("tts_voices");
 }
 
 /**
@@ -83,14 +81,14 @@ export async function voiceFor(petId: PetId): Promise<string> {
 }
 
 /** A voice for when a pet's own isn't available on this account: the old single-voice setting, else the first voice. */
-async function fallbackVoice(key: string): Promise<string | null> {
+async function fallbackVoice(): Promise<string | null> {
   const saved = await kvGet("eleven_voice");
   if (saved) return saved;
   if (cachedVoice) return cachedVoice;
   // No voice picked yet: fall back to the first on the account rather than a hardcoded id,
   // which would break the moment ElevenLabs retires it.
   try {
-    cachedVoice = (await listVoices(key))[0]?.voice_id ?? null;
+    cachedVoice = (await listVoices())[0]?.voice_id ?? null;
   } catch {
     cachedVoice = null;
   }
@@ -100,40 +98,24 @@ async function fallbackVoice(key: string): Promise<string | null> {
 /** Forget the cached voice so the next `speak` picks up a change made in Settings. */
 export const resetVoiceCache = () => { cachedVoice = null; };
 
-async function errorText(res: Response): Promise<string> {
-  const raw = await res.text().catch(() => "");
-  try {
-    const d = JSON.parse(raw)?.detail;
-    const msg = typeof d === "string" ? d : d?.message;
-    if (msg) return msg;
-  } catch { /* not JSON, fall through */ }
-  if (res.status === 401) return "ElevenLabs rejected that API key.";
-  if (res.status === 429) return "ElevenLabs rate limit or quota reached.";
-  return `ElevenLabs answered with ${res.status}.`;
-}
-
 /** Generate `text` as speech and play it. Throws, so callers that can show an error can catch. */
-export async function synthesize(text: string, key: string, voiceId: string, model?: string) {
-  const res = await fetch(`${API}/text-to-speech/${voiceId}`, {
-    method: "POST",
-    headers: { "xi-api-key": key, "Content-Type": "application/json" },
-    body: JSON.stringify({ text, model_id: model || DEFAULT_TTS_MODEL }),
-  });
-  if (!res.ok) throw Object.assign(new Error(await errorText(res)), { status: res.status });
+export async function synthesize(
+  text: string,
+  voiceId: string,
+  model?: string,
+  settings?: VoiceSettings,
+) {
+  const b64 = await invoke<string>("tts_speak", { text, voiceId, model: model ?? null, settings: settings ?? null });
+  const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
 
   stopSpeaking();
-  const url = URL.createObjectURL(await res.blob());
+  const url = URL.createObjectURL(new Blob([bytes], { type: "audio/mpeg" }));
   const audio = new Audio(url);
   current = audio;
   audio.addEventListener("ended", () => { if (current === audio) stopSpeaking(); }, { once: true });
-  // Autoplay can be refused before the user has interacted with the window; that is not worth
-  // surfacing to anyone, the bubble is already on screen either way.
-  const played = await audio.play().then(() => true, () => false);
-  if (!played) return;
-  // Resolve once it's finished (or was stopped), so the bubble can stay up for exactly as long as it's heard.
-  await new Promise<void>((done) => {
-    for (const ev of ["ended", "pause", "error"]) audio.addEventListener(ev, () => done(), { once: true });
-  });
+  // Autoplay can be refused before the user has interacted with the window; not worth surfacing,
+  // the bubble is already on screen either way.
+  await audio.play().catch(() => {});
 }
 
 /**
@@ -143,8 +125,7 @@ export async function synthesize(text: string, key: string, voiceId: string, mod
 export async function speak(text: string, petId?: PetId): Promise<void> {
   try {
     if ((await kvGet("voice_on")) === "off") return;
-    const key = await elevenKey();
-    if (!key) return;
+    if (!(await hasElevenKey())) return;
     const line = forSpeech(text);
     if (!line) return;
     // Checked before the request, not after: generating audio for a muted Mac would spend
@@ -153,7 +134,7 @@ export async function speak(text: string, petId?: PetId): Promise<void> {
     const model = (await kvGet("eleven_model")) || undefined;
     const own = petId ? await voiceFor(petId) : null;
     try {
-      if (own) { await synthesize(line, key, own, model); return; }
+      if (own) { await synthesize(line, own, model); return; }
     } catch (e) {
       // A voice from the Voice Library has to be added to "My voices" before an account can use it; until then,
       // fall back to another voice instead of going silent.
@@ -161,8 +142,8 @@ export async function speak(text: string, petId?: PetId): Promise<void> {
       if (status !== 404 && status !== 400 && status !== 422) throw e;
       console.warn(`[tts] ${petId}'s voice isn't on this account, using a fallback`);
     }
-    const voiceId = await fallbackVoice(key);
-    if (voiceId && voiceId !== own) await synthesize(line, key, voiceId, model);
+    const voiceId = await fallbackVoice();
+    if (voiceId && voiceId !== own) await synthesize(line, voiceId, model);
   } catch (e) {
     console.warn("[tts]", e);
   }

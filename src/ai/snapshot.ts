@@ -6,19 +6,20 @@ import { DAY_NAMES, fmtMinutes, journal, weekRecap, weekStart } from "../wellbei
 import { getFocusUntil, minutesLeft } from "../wellbeing/focus";
 import { cleanTitle, courseOf } from "../study/titles";
 import { deadlineKey, deadlinesDone, studyPlans } from "../study/plans";
+import { UNTRUSTED_NOTE, untrusted } from "./untrusted";
 
 const DAY = 86400;
 
 export { cleanTitle };
 
 const when = (e: CalEvent) => (e.all_day ? `${fmtDay(e.start)} (all day)` : `${fmtDay(e.start)} ${fmtTime(e.start)}`);
-const courseTag = (e: CalEvent) => (courseOf(e.location) ? ` (${courseOf(e.location)})` : "");
+const courseTag = (e: CalEvent) => (courseOf(e.location) ? ` (${untrusted(courseOf(e.location))})` : "");
 const eventLine = (e: CalEvent) =>
   e.kind === "deadline"
-    ? `- [DEADLINE] ${cleanTitle(e.title)}${courseTag(e)} — due ${when(e)}`
-    : `- ${e.title} — ${e.all_day ? when(e) : `${fmtDay(e.start)} ${fmtTime(e.start)}–${fmtTime(e.end)}`}${e.location ? ` @ ${e.location}` : ""}`;
+    ? `- [DEADLINE] ${untrusted(cleanTitle(e.title))}${courseTag(e)} — due ${when(e)}`
+    : `- ${untrusted(e.title)} — ${e.all_day ? when(e) : `${fmtDay(e.start)} ${fmtTime(e.start)}–${fmtTime(e.end)}`}${e.location ? ` @ ${untrusted(e.location)}` : ""}`;
 const deadlineLine = (e: CalEvent, now: number, done: Record<string, number>) =>
-  `- ${cleanTitle(e.title)}${courseTag(e)} — due ${when(e)}${e.start > now ? ` (in ${untilLabel(e.start, now)})` : ""}${done[deadlineKey(e)] ? " — DONE (ticked off)" : ""}`;
+  `- ${untrusted(cleanTitle(e.title))}${courseTag(e)} — due ${when(e)}${e.start > now ? ` (in ${untilLabel(e.start, now)})` : ""}${done[deadlineKey(e)] ? " — DONE (ticked off)" : ""}`;
 
 /** "08:30" → "8:30 AM"; anything else ("off") → "off". */
 const clock = (v: string | null, fallback: string) => {
@@ -77,6 +78,9 @@ export async function appSnapshot(petId: PetId): Promise<string> {
 
   return `Now: ${new Date().toLocaleString([], { dateStyle: "full", timeStyle: "short" })} (${Intl.DateTimeFormat().resolvedOptions().timeZone}).
 
+## About the data below
+${UNTRUSTED_NOTE}
+
 ## Calendar, next 3 days (complete)
 ${cal.length ? cal.slice(0, 40).map(eventLine).join("\n") : "(nothing on the calendar)"}
 
@@ -84,7 +88,7 @@ ${cal.length ? cal.slice(0, 40).map(eventLine).join("\n") : "(nothing on the cal
 ${ahead.length ? ahead.slice(0, 50).map((e) => deadlineLine(e, now, done)).join("\n") : "(no upcoming deadlines)"}
 
 ## Study blocks booked
-${plans.filter((p) => p.end > now && p.status !== "skipped").map((p) => `- ${fmtDay(p.start)} ${fmtTime(p.start)}–${fmtTime(p.end)} for ${cleanTitle(p.title)}`).join("\n") || "(none)"}
+${plans.filter((p) => p.end > now && p.status !== "skipped").map((p) => `- ${fmtDay(p.start)} ${fmtTime(p.start)}–${fmtTime(p.end)} for ${untrusted(cleanTitle(p.title))}`).join("\n") || "(none)"}
 
 ## Deadlines already passed this week
 ${gotThrough.length ? gotThrough.map((e) => deadlineLine(e, now, done)).join("\n") : "(none)"}
@@ -111,7 +115,7 @@ Wearing: ${wearing.length ? wearing.join(", ") : "nothing"}.
 
 ## Connected calendars
 - Google Calendar: ${google?.connected ? `signed in${google.email ? ` as ${google.email}` : ""}` : "not connected"}.
-${feeds.length ? feeds.map((f) => `- ${f.name} (${f.kind === "brightspace" ? "Brightspace deadlines" : "calendar feed"})`).join("\n") : "- No calendar links added."}
+${feeds.length ? feeds.map((f) => `- ${untrusted(f.name)} (${f.kind === "brightspace" ? "Brightspace deadlines" : "calendar feed"})`).join("\n") : "- No calendar links added."}
 
 ## Settings
 - Morning briefing: ${clock(kv.briefing_morning, "08:30")}. Evening briefing: ${clock(kv.briefing_evening, "20:00")}.

@@ -5,7 +5,8 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import { PETS, PetId } from "../pets";
 import { Feed, kvGet, kvSet } from "../api";
 import { DEFAULT_MODEL, ENV_GEMINI_KEY } from "../ai/gemini";
-import { ENV_ELEVEN_KEY, Quiet, Voice, listVoices, petVoiceKey, quietState, resetVoiceCache, synthesize, voiceFor } from "../voice/tts";
+import { hasConsent, revokeConsent } from "../ai/consent";
+import { Quiet, Voice, listVoices, petVoiceKey, quietState, resetVoiceCache, synthesize, voiceFor } from "../voice/tts";
 import Rhythm from "./Rhythm";
 import Select from "./Select";
 
@@ -28,6 +29,9 @@ export default function Settings({ petId }: { petId: PetId }) {
   const [icalUrl, setIcalUrl] = useState("");
   const [busy, setBusy] = useState("");
   const [note, setNote] = useState<Note | null>(null);
+  const [hasKey, setHasKey] = useState(false);
+  const [hasVKey, setHasVKey] = useState(false);
+  const [consent, setConsent] = useState(false);
   const [vKey, setVKey] = useState("");
   const [voices, setVoices] = useState<Voice[]>([]);
   const [voice, setVoice] = useState("");
@@ -43,15 +47,15 @@ export default function Settings({ petId }: { petId: PetId }) {
 
   useEffect(() => {
     load();
-    kvGet("gemini_key").then((v) => setKey(v ?? ""));
+    invoke<boolean>("secret_is_set", { name: "gemini_key" }).then(setHasKey).catch(() => setHasKey(false));
+    hasConsent().then(setConsent);
     kvGet("gemini_model").then((v) => setModel(v ?? ""));
     // Load the account's voices straight away when a key is already saved, so the picker is there without
     // pressing "Save key" again.
     (async () => {
-      const k = await kvGet("eleven_key");
-      setVKey(k ?? "");
-      const useKey = k || ENV_ELEVEN_KEY;
-      if (useKey) setVoices(await listVoices(useKey).catch(() => [] as Voice[]));
+      const saved = await invoke<boolean>("secret_is_set", { name: "eleven_key" }).catch(() => false);
+      setHasVKey(saved);
+      if (saved) setVoices(await listVoices().catch(() => [] as Voice[]));
     })();
     kvGet("voice_on").then((v) => setVoiceOn(v !== "off"));
     quietState().then(setQuiet).catch(() => setQuiet(null));
@@ -67,7 +71,8 @@ export default function Settings({ petId }: { petId: PetId }) {
   const saveGemini = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!key.trim()) { say("gemini", "Paste your Gemini API key first.", true); return; }
-    await kvSet("gemini_key", key.trim());
+    await invoke("secret_set", { name: "gemini_key", value: key.trim() });
+    setKey(""); setHasKey(true);
     await kvSet("gemini_model", model.trim() || null);
     setSaved(true);
     say("gemini", "Saved. Your pet can think now.");
@@ -77,13 +82,14 @@ export default function Settings({ petId }: { petId: PetId }) {
   /** Saving the key also loads the account's voices, so the picker has something in it. */
   const saveVoice = async (e: React.FormEvent) => {
     e.preventDefault();
-    const k = vKey.trim() || ENV_ELEVEN_KEY;
-    if (!k) { say("voice", "Paste your ElevenLabs API key first.", true); return; }
+    if (!vKey.trim()) { say("voice", "Paste your ElevenLabs API key first.", true); return; }
     setBusy("voice"); setNote(null);
     try {
-      const list = await listVoices(k);
+      // Straight into the Keychain; the field is cleared so the key is not left sitting in the DOM.
+      await invoke("secret_set", { name: "eleven_key", value: vKey.trim() });
+      setVKey(""); setHasVKey(true);
+      const list = await listVoices();
       setVoices(list);
-      await kvSet("eleven_key", vKey.trim() || null);
       say("voice", list.length ? `Connected. ${list.length} voices available.` : "Connected, but this account has no voices.");
     } catch (err) {
       say("voice", err instanceof Error ? err.message : String(err), true);
@@ -98,11 +104,10 @@ export default function Settings({ petId }: { petId: PetId }) {
   };
 
   const testVoice = async () => {
-    const k = vKey.trim() || ENV_ELEVEN_KEY;
-    if (!k || !voice) { say("voice", "Save your key and pick a voice first.", true); return; }
+    if (!hasVKey || !voice) { say("voice", "Save your key and pick a voice first.", true); return; }
     setBusy("test"); setNote(null);
     try {
-      await synthesize("Essay 2 is due in 2 hours.", k, voice);
+      await synthesize("Essay 2 is due in 2 hours.", voice);
       say("voice", "Played a test line.");
     } catch (err) {
       say("voice", err instanceof Error ? err.message : String(err), true);
@@ -238,7 +243,7 @@ export default function Settings({ petId }: { petId: PetId }) {
 
       <section aria-labelledby="h-gem">
         <h2 id="h-gem">Gemini</h2>
-        {ENV_GEMINI_KEY ? (
+        {hasKey || ENV_GEMINI_KEY ? (
           <p className="hint">Your pet thinks with Gemini, using the key from <code>.env.local</code>.</p>
         ) : (
           <>
@@ -251,13 +256,24 @@ export default function Settings({ petId }: { petId: PetId }) {
             <Status where="gemini" />
           </>
         )}
+        {consent && (
+          <div className="rrow">
+            <span className="check-label">Chat may send your calendar, tasks and focus history to Google</span>
+            <button
+              className="btn sm soft"
+              onClick={async () => { await revokeConsent(); setConsent(false); say("gemini", "Chat is off. Curet will ask again before sending anything."); }}
+            >
+              Turn off
+            </button>
+          </div>
+        )}
       </section>
 
       <section aria-labelledby="h-voice">
         <h2 id="h-voice">Voice</h2>
         <p className="hint">
           Your pet reads its reminders, briefings and nudges out loud with ElevenLabs. Everything
-          else it says stays quiet. {ENV_ELEVEN_KEY ? <>Using the key from <code>.env.local</code>.</> : <>Get a key at {link("https://elevenlabs.io/app/settings/api-keys", "elevenlabs.io")}.</>}
+          else it says stays quiet. {hasVKey ? <>A key is saved in your Mac Keychain.</> : <>Get a key at {link("https://elevenlabs.io/app/settings/api-keys", "elevenlabs.io")}.</>}
         </p>
         <label className="check">
           <input
@@ -284,7 +300,7 @@ export default function Settings({ petId }: { petId: PetId }) {
             <button className="btn soft" onClick={testVoice} disabled={busy === "test"}>{busy === "test" ? "Playing…" : "Test"}</button>
           </div>
         )}
-        <details open={!ENV_ELEVEN_KEY && !voices.length}>
+        <details open={!hasVKey && !voices.length}>
           <summary>{voices.length ? "Change key" : "Key and voice"}</summary>
           <form className="stack" onSubmit={saveVoice} noValidate>
             <input type="password" value={vKey} onChange={(e) => setVKey(e.target.value)} placeholder="sk_…" aria-label="ElevenLabs API key" autoComplete="off" spellCheck={false} />

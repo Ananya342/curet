@@ -3,6 +3,8 @@
 const handlers = new Map<string, { cb: number; id: number }[]>();
 let nextId = 1;
 const kv = new Map<string, string>(Object.entries({ pet_id: "ghost" }));
+const secrets = new Map<string, string>();
+const SECRET_NAMES = ["google_refresh", "google_access", "google_expiry", "gemini_key", "eleven_key"];
 kv.set("gemini_key", "mock-key");
 const startX = new URLSearchParams(location.search).get("x");
 if (startX) kv.set("pet_x", startX); // e.g. ?mock&x=-80 pins the pet to the left screen edge
@@ -66,8 +68,11 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
       }
       case "plugin:event|unlisten": return;
       case "plugin:event|emit": case "plugin:event|emit_to": emit(args.event, args.payload); return;
-      case "kv_get": return kv.get(args.key) ?? null;
-      case "kv_set": args.value == null ? kv.delete(args.key) : kv.set(args.key, args.value); return;
+      case "kv_get": return SECRET_NAMES.includes(args.key) ? null : (kv.get(args.key) ?? null);
+      case "kv_set":
+        if (SECRET_NAMES.includes(args.key)) return;
+        args.value == null ? kv.delete(args.key) : kv.set(args.key, args.value);
+        return;
       case "screen_info": return { work: { x: 0, y: 0, w: window.innerWidth, h: window.innerHeight }, tray: { x: window.innerWidth - 160, y: 12 } };
       case "events_range": return events.filter((e) => e.end >= args.from && e.start <= args.to);
       case "task_list": return args.includeDone ? tasks : tasks.filter((t) => !t.done);
@@ -84,6 +89,13 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
         return ev;
       }
       case "frontmost_app": return new URLSearchParams(location.search).get("app"); // e.g. ?mock&app=YouTube
+      // Secrets live in the Keychain in the real app; mock mode keeps them in this map so the
+      // renderer still cannot read them back by name (kv_get refuses, same as Rust).
+      case "secret_is_set": return secrets.has(args.name);
+      case "secret_set": args.value == null ? secrets.delete(args.name) : secrets.set(args.name, args.value); return true;
+      case "secret_state": return [...secrets.keys()].map((k) => [k, true]);
+      case "gemini_key": return secrets.get("gemini_key") ?? null;
+      case "tts_voices": return [];
       case "quiet_state": return {
         dnd: quietAs === "dnd",
         muted: quietAs === "muted",

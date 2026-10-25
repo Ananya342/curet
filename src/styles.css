@@ -565,3 +565,18 @@ kbd { background: var(--wash); border-radius: 7px; padding: 1px 7px; font-family
 .pick-sprite { height: 44px; display: flex; align-items: flex-end; justify-content: center; }
 /* Fit the whole animal inside the card, however tall it is. */
 .pick-sprite img { width: 44px; height: 44px; object-fit: contain; object-position: bottom; }
+
+/* Approval gate for tool calls that write or read something private (src/ai/confirm.ts). */
+.confirm { margin: 0 14px 6px; padding: 12px 14px; border-radius: 16px; background: var(--raised); border: 2px solid var(--coral); animation: pop-in 0.2s ease-out; }
+.confirm-what { margin: 0 0 10px; font-size: 13px; font-weight: 700; line-height: 1.45; color: var(--ink); }
+.confirm-btns { display: flex; gap: 8px; }
+
+/* First-run consent for sending personal data to Gemini (src/ai/consent.ts). */
+.consent-screen { padding: 16px 16px 20px; overflow-y: auto; }
+.consent-screen img { width: 54px; height: 54px; object-fit: contain; object-position: bottom; }
+.consent-screen h2 { margin: 8px 0 6px; font-size: 16px; }
+.consent-screen h3 { margin: 14px 0 4px; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-soft); }
+.consent-screen p { margin: 0 0 4px; font-size: 13px; line-height: 1.5; }
+.consent-screen ul { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.5; }
+.consent-screen li { margin-bottom: 3px; }
+.consent-screen .confirm-btns { margin-top: 16px; }

@@ -2,6 +2,7 @@ import { Type } from "@google/genai";
 import { emitTo } from "@tauri-apps/api/event";
 import { addCalendarEvent, eventsRange, memories, nowSec, startOfDay, tasks } from "../api";
 import { freeGaps } from "../wellbeing/gaps";
+import { confirmAction, needsConfirm } from "./confirm";
 import { getFocusUntil } from "../wellbeing/focus";
 import { cleanTitle, journalEntries } from "./snapshot";
 import { courseOf } from "../study/titles";
@@ -112,7 +113,27 @@ const parseDay = (s: string) => {
 };
 const local = (s: number) => new Date(s * 1000).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 
+/** One line the user can actually judge before approving. */
+function describe(name: string, args: Record<string, any>): { summary: string; verb: string } {
+  const t = (v: unknown) => String(v ?? "").slice(0, 80);
+  switch (name) {
+    case "add_calendar_event": return { summary: `Add to your calendar: “${t(args.title)}”${args.start ? ` on ${t(args.start)}` : ""}`, verb: "Add event" };
+    case "add_task": return { summary: `Add a to-do: “${t(args.title)}”${args.due_date ? ` (due ${t(args.due_date)})` : ""}`, verb: "Add to-do" };
+    case "complete_task": return { summary: `Tick off: “${t(args.title ?? `task #${args.id}`)}”`, verb: "Tick off" };
+    case "remember": return { summary: `Remember this, permanently: “${t(args.fact)}”`, verb: "Remember" };
+    case "read_journal": return { summary: "Read your private journal entries", verb: "Allow" };
+    default: return { summary: `Run ${name}`, verb: "Allow" };
+  }
+}
+
 export async function runTool(name: string, args: Record<string, any>): Promise<unknown> {
+  if (needsConfirm(name)) {
+    const { summary, verb } = describe(name, args);
+    if (!(await confirmAction({ tool: name, summary, verb }))) {
+      // Reported back to the model so it tells the user, instead of silently retrying.
+      return { error: "The user did not approve this action. Do not try it again unless they ask." };
+    }
+  }
   switch (name) {
     case "get_events": {
       const from = startOfDay(parseDay(args.start_date));

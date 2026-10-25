@@ -1,4 +1,5 @@
 use crate::db::{self, Db, Event};
+use crate::secret;
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
 use chrono::{Local, NaiveDate, NaiveDateTime, TimeZone, Utc};
 use serde::{Deserialize, Serialize};
@@ -348,7 +349,7 @@ fn can_write(db: &Db) -> bool {
 #[tauri::command]
 pub fn google_status(db: State<Db>) -> GoogleStatus {
     GoogleStatus {
-        connected: db::get(&db, "google_refresh").is_some(),
+        connected: secret::read(&db, "google_refresh").is_some(),
         configured: google_client().is_ok(),
         email: db::get(&db, "google_email"),
         can_write: can_write(&db),
@@ -357,12 +358,15 @@ pub fn google_status(db: State<Db>) -> GoogleStatus {
 
 #[tauri::command]
 pub async fn google_disconnect(app: AppHandle) {
-    let token = db::get(&app.state::<Db>(), "google_refresh");
+    let token = secret::read(&app.state::<Db>(), "google_refresh");
     // Revoke on Google's side too, so signing out really removes Curet's access.
     if let Some(t) = token {
         let _ = http().post("https://oauth2.googleapis.com/revoke").form(&[("token", t.as_str())]).send().await;
     }
     let db = app.state::<Db>();
+    for k in ["google_refresh", "google_access", "google_expiry"] {
+        secret::set(k, None);
+    }
     for k in ["google_refresh", "google_access", "google_expiry", "google_email", "google_scope", "err:google"] {
         db::set(&db, k, None);
     }
@@ -454,7 +458,7 @@ pub async fn google_connect(app: AppHandle) -> Result<(), String> {
         .ok_or_else(|| format!("Google didn't return a token: {}", res["error_description"].as_str().unwrap_or("unknown error")))?;
     {
         let db = app.state::<Db>();
-        db::set(&db, "google_refresh", Some(refresh_token));
+        secret::write(&db, "google_refresh", Some(refresh_token));
         db::set(&db, "google_scope", res["scope"].as_str());
         store_access(&db, &res);
     }
@@ -474,9 +478,9 @@ pub async fn google_connect(app: AppHandle) -> Result<(), String> {
 
 fn store_access(db: &Db, res: &Value) {
     if let Some(t) = res["access_token"].as_str() {
-        db::set(db, "google_access", Some(t));
+        secret::write(db, "google_access", Some(t));
         let exp = Utc::now().timestamp() + res["expires_in"].as_i64().unwrap_or(3000) - 60;
-        db::set(db, "google_expiry", Some(&exp.to_string()));
+        secret::write(db, "google_expiry", Some(&exp.to_string()));
     }
 }
 
@@ -484,13 +488,13 @@ async fn google_access_token(app: &AppHandle) -> Result<String, String> {
     let (id, secret) = google_client()?;
     let refresh = {
         let db = app.state::<Db>();
-        let valid = db::get(&db, "google_expiry").and_then(|s| s.parse::<i64>().ok()).unwrap_or(0) > Utc::now().timestamp();
+        let valid = secret::read(&db, "google_expiry").and_then(|s| s.parse::<i64>().ok()).unwrap_or(0) > Utc::now().timestamp();
         if valid {
-            if let Some(t) = db::get(&db, "google_access") {
+            if let Some(t) = secret::read(&db, "google_access") {
                 return Ok(t);
             }
         }
-        db::get(&db, "google_refresh").ok_or("not connected")?
+        secret::read(&db, "google_refresh").ok_or("not connected")?
     };
     let res: Value = http()
         .post("https://oauth2.googleapis.com/token")
@@ -612,7 +616,7 @@ pub struct NewEvent {
 pub async fn google_add_event(app: AppHandle, event: NewEvent) -> Result<Event, String> {
     {
         let db = app.state::<Db>();
-        if db::get(&db, "google_refresh").is_none() {
+        if secret::read(&db, "google_refresh").is_none() {
             return Err("Google Calendar isn't connected. Sign in with Google in Settings first.".into());
         }
         if !can_write(&db) {
@@ -702,7 +706,7 @@ pub async fn refresh(app: &AppHandle) {
             Err(e) => db::set(&db, &format!("err:{}", f.id), Some(&e)),
         }
     }
-    if db::get(&app.state::<Db>(), "google_refresh").is_some() {
+    if secret::read(&app.state::<Db>(), "google_refresh").is_some() {
         let result = fetch_google(app, from, to).await;
         let db = app.state::<Db>();
         match result {

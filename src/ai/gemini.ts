@@ -4,6 +4,7 @@ import { kvGet, nowSec } from "../api";
 import { PETS, PetId } from "../pets";
 import { declarations, runTool } from "./tools";
 import { APP_GUIDE, appSnapshot } from "./snapshot";
+import { hasConsent } from "./consent";
 
 export interface Msg { role: "user" | "model"; text: string }
 // Default model. If Gemini rejects the name, chat falls back to FALLBACK_MODEL so it keeps working.
@@ -69,13 +70,20 @@ const isBusy = (e: unknown) => /\b(500|503)\b|UNAVAILABLE|overloaded|high demand
 
 /** The key saved in Settings, or else the one baked in from .env.local. */
 export const ENV_GEMINI_KEY = import.meta.env.LIFEPET_GEMINI_KEY?.trim() || "";
-export const geminiKey = async () => (await kvGet("gemini_key")) || ENV_GEMINI_KEY || null;
+export const geminiKey = async () =>
+  (await invoke<string | null>("gemini_key").catch(() => null)) || ENV_GEMINI_KEY || null;
+
+export class NoConsentError extends Error {
+  constructor() { super("NO_CONSENT"); }
+}
 
 export async function ask(
   history: Msg[], text: string, petId: PetId,
   onStatus?: (s: string) => void, onText?: (soFar: string) => void,
 ): Promise<string> {
   onStatus?.("Thinking…");
+  // Checked before the snapshot is even built, so nothing personal is assembled, let alone sent.
+  if (!(await hasConsent())) throw new NoConsentError();
   const key = await geminiKey();
   if (!key) throw new Error("NO_KEY");
   const chosen = await kvGet("gemini_model");

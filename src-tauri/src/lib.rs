@@ -8,7 +8,9 @@ mod mac;
 mod mac;
 mod quiet;
 mod scheduler;
+mod secret;
 mod tray;
+mod tts;
 mod wellbeing;
 
 use serde::Serialize;
@@ -329,6 +331,13 @@ pub fn run() {
             log,
             chime,
             quiet::quiet_state,
+            secret::secret_is_set,
+            secret::secret_set,
+            secret::secret_state,
+            tts::tts_speak,
+            tts::tts_voices,
+            tts::tts_add_shared,
+            tts::gemini_key,
             db::kv_get,
             db::kv_set,
             db::events_range,
@@ -410,6 +419,8 @@ pub fn run() {
             }
 
             let _ = app.global_shortcut().register(toggle);
+            // Lift any secret still in the database into the Keychain before anything reads it.
+            secret::migrate(&handle);
             hit::spawn(handle.clone());
             scheduler::spawn(handle);
             Ok(())

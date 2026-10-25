@@ -3,6 +3,8 @@ import { PETS, PetId } from "../pets";
 import { kvGet, kvSet } from "../api";
 import { Markdown } from "./Markdown";
 import { Msg, ask, friendlyError, replyWithoutLead } from "../ai/gemini";
+import { PendingAction, setConfirmHandler } from "../ai/confirm";
+import { NOT_SENT, SENT_ON_REQUEST, SENT_TO_ELEVENLABS, SENT_TO_GEMINI, grantConsent, hasConsent } from "../ai/consent";
 
 /**
  * Reveals `target` a few characters per frame, like ChatGPT, however chunky the stream underneath is. It keeps a
@@ -53,6 +55,25 @@ export default function Chat({ petId }: { petId: PetId }) {
   const typed = useTypewriter(draft ? replyWithoutLead(draft, final != null) ?? "" : "");
   const [undo, setUndo] = useState<Msg[] | null>(null);
   const end = useRef<HTMLDivElement>(null);
+  const [pending, setPending] = useState<(PendingAction & { resolve: (ok: boolean) => void }) | null>(null);
+  const [consent, setConsent] = useState<boolean | null>(null);
+
+  // The gate in ai/confirm.ts asks through here. On unmount the handler is removed, so a tool
+  // call with no chat window open is refused rather than waiting on a promise forever.
+  useEffect(() => { hasConsent().then(setConsent); }, []);
+
+  useEffect(() => {
+    setConfirmHandler((action) => new Promise<boolean>((resolve) => setPending({ ...action, resolve })));
+    return () => {
+      setConfirmHandler(null);
+      setPending((p) => { p?.resolve(false); return null; });
+    };
+  }, []);
+
+  const answer = (ok: boolean) => {
+    pending?.resolve(ok);
+    setPending(null);
+  };
   const field = useRef<HTMLTextAreaElement>(null);
   const undoTimer = useRef<number>(0);
 
@@ -125,6 +146,43 @@ export default function Chat({ petId }: { petId: PetId }) {
     }
   };
 
+  // Nothing personal is assembled, let alone sent, until this is answered.
+  if (consent === false) {
+    return (
+      <div className="chat">
+        <div className="log consent-screen">
+          <img src={pet.src} alt="" draggable={false} />
+          <h2>Before <span translate="no">{pet.name}</span> can chat</h2>
+          <p>Chat runs on Google's Gemini, which means some of what Curet knows about you leaves this Mac.</p>
+
+          <h3>Sent to Google every time you chat</h3>
+          <ul>{SENT_TO_GEMINI.map((l) => <li key={l}>{l}</li>)}</ul>
+
+          <h3>Sent only if you ask, and only after you approve it</h3>
+          <ul>{SENT_ON_REQUEST.map((l) => <li key={l}>{l}</li>)}</ul>
+
+          <h3>Never sent</h3>
+          <ul>{NOT_SENT.map((l) => <li key={l}>{l}</li>)}</ul>
+
+          <h3>Spoken notifications</h3>
+          <p>{SENT_TO_ELEVENLABS}</p>
+
+          <p className="hint">
+            Google and ElevenLabs handle this data under their own terms, not ours. Everything else
+            stays in a file on this Mac. You can turn chat off again in Settings at any time, and the
+            rest of Curet — reminders, focus, the journal — works without it.
+          </p>
+
+          <div className="confirm-btns">
+            <button className="btn" onClick={async () => { await grantConsent(); setConsent(true); }}>
+              I understand, turn on chat
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="chat">
       <div className="log" role="log" aria-live="polite" aria-label="Conversation">
@@ -164,6 +222,16 @@ export default function Chat({ petId }: { petId: PetId }) {
         )}
         <div ref={end} />
       </div>
+
+      {pending && (
+        <div className="confirm" role="alertdialog" aria-label="Confirm action">
+          <p className="confirm-what">{pending.summary}</p>
+          <div className="confirm-btns">
+            <button className="btn sm" onClick={() => answer(true)}>{pending.verb ?? "Allow"}</button>
+            <button className="btn sm quiet" onClick={() => answer(false)}>No</button>
+          </div>
+        </div>
+      )}
 
       {undo && (
         <div className="toast" role="status">

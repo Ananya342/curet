@@ -121,13 +121,38 @@ pub fn events_between(db: &Db, from: i64, to: i64) -> Vec<Event> {
     .collect()
 }
 
+/// Keys the webview may never read or write by name.
+///
+/// `kv_get` takes an arbitrary string, so without this any script running in a window can ask for
+/// the Google refresh token and walk off with the account. Nothing in the frontend needs these:
+/// `calendar.rs` reads the Google tokens itself, and `secret.rs` owns the API keys.
+const SECRETS: &[&str] = &[
+    "google_refresh",
+    "google_access",
+    "google_expiry",
+    "gemini_key",
+    "eleven_key",
+];
+
+fn is_secret(key: &str) -> bool {
+    SECRETS.contains(&key)
+}
+
 #[tauri::command]
 pub fn kv_get(db: State<Db>, key: String) -> Option<String> {
+    if is_secret(&key) {
+        return None;
+    }
     get(&db, &key)
 }
 
 #[tauri::command]
 pub fn kv_set(db: State<Db>, key: String, value: Option<String>) {
+    // Silently ignored rather than errored: a caller that shouldn't be touching these has no
+    // business learning whether they exist.
+    if is_secret(&key) {
+        return;
+    }
     set(&db, &key, value.as_deref());
 }
 
