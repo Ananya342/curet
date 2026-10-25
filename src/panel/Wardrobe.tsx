@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { PETS, PetId, PetView } from "../pets";
 import { DEFAULT_OUTFIT, GlassesStyle, HatStyle, Outfit, SWATCHES, TagStyle, getOutfit, setOutfit } from "../accessories";
-import Accessories from "../pet/Accessories";
+import Accessories, { headroom } from "../pet/Accessories";
 
 const HATS: { id: HatStyle; label: string }[] = [
   { id: "top", label: "Top hat" }, { id: "party", label: "Party" }, { id: "beanie", label: "Beanie" }, { id: "crown", label: "Crown" },
@@ -45,6 +45,7 @@ export default function Wardrobe({ petId, onOutfit }: { petId: PetId; onOutfit?:
   const [outfit, setLocal] = useState<Outfit>(DEFAULT_OUTFIT);
   const saveTimer = useRef<number>(0);
   const def = PETS[petId];
+  const frontW = def.side ? 92 : 110;
 
   useEffect(() => { getOutfit().then(setLocal); }, []);
   useEffect(() => { onOutfit?.(outfit); }, [outfit, onOutfit]);
@@ -74,8 +75,12 @@ export default function Wardrobe({ petId, onOutfit }: { petId: PetId; onOutfit?:
   return (
     <section aria-labelledby="h-wardrobe" className="wardrobe">
       <h2 id="h-wardrobe">Dress up {def.name}</h2>
-      <div className="dressed" aria-hidden="true">
-        <Dressed view={def} w={def.side ? 92 : 110} outfit={outfit} />
+      {/* Room above for whatever hat is on, so it stays inside the box. */}
+      <div className="dressed" aria-hidden="true" style={{ paddingTop: 22 + Math.max(
+        headroom(def, frontW, frontW * def.ar, outfit),
+        def.side ? headroom(def.side, 104, 104 * def.side.ar, outfit) : 0,
+      ) }}>
+        <Dressed view={def} w={frontW} outfit={outfit} />
         {def.side && <Dressed view={def.side} w={104} outfit={outfit} side />}
       </div>
       {Row({ k: "hat", label: "Hat", children: <>

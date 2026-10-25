@@ -40,8 +40,8 @@ function Hat({ style, color }: { style: HatStyle; color: string }) {
   switch (style) {
     case "top": return <>
       <Solid d={ell(0, -6, 50, 9)} fill={shade(color, -0.12)} />
-      <Solid d={rr(-28, -82, 56, 76, 6)} fill={color} />
-      <Solid d={ell(0, -82, 28, 6)} fill={shade(color, 0.18)} />
+      <Solid d={rr(-28, -60, 56, 54, 6)} fill={color} />
+      <Solid d={ell(0, -60, 28, 6)} fill={shade(color, 0.18)} />
       <path d={rr(-28, -26, 56, 11, 1)} fill={band} />
     </>;
     case "party": return <>
@@ -150,7 +150,7 @@ function Collar({ view, W, H, color, tag, side }: { view: PetView; W: number; H:
 }
 
 // How far each hat reaches above where it meets the head, in the same 100-unit drawing space.
-const HAT_RISE: Record<HatStyle, number> = { top: 88, party: 124, beanie: 73, crown: 59 };
+const HAT_RISE: Record<HatStyle, number> = { top: 66, party: 124, beanie: 73, crown: 59 };
 const CAP_RISE = 42;
 
 /** How many px the outfit sticks up above the top of a W×H sprite, so speech bubbles can clear it. */

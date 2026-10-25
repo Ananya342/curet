@@ -50,7 +50,7 @@ export const PETS: Record<PetId, PetDef> = {
   blob: {
     id: "blob", name: "Jelly", src: "/pets/blob.png", w: 168, ar: 350 / 420,
     eyes: [{ x: 0.33, y: 0.47 }, { x: 0.66, y: 0.47 }], eye: { rx: 0.056, ry: 0.07 },
-    nose: { x: 0.5, y: 0.56 }, head: { x: 0.5, y: 0.1, w: 0.6 }, neck: { x: 0.5, y: 0.66, w: 0.66 }, lid: "#cda1f4",
+    nose: { x: 0.5, y: 0.56 }, head: { x: 0.5, y: 0.15, w: 0.8 }, neck: { x: 0.5, y: 0.66, w: 0.66 }, lid: "#cda1f4",
     personality: "a blob",
     boops: ["Hi!", "Hello.", "Need something?"],
     greetings: ["Good morning.", "Hi, I'm here.", "Ready when you are."],

@@ -30,7 +30,7 @@ const PETS = {
   },
   blob: {
     name: "Jelly", ar: 638 / 766, tagline: "Bounces you back on track.",
-    eyes: [[0.33, 0.47], [0.66, 0.47]], eye: [0.056, 0.07], head: [0.5, 0.1, 0.6, 0], neck: [0.5, 0.66, 0.66],
+    eyes: [[0.33, 0.47], [0.66, 0.47]], eye: [0.056, 0.07], head: [0.5, 0.15, 0.8, 0], neck: [0.5, 0.66, 0.66],
     outfit: { hat: { style: "crown", color: "#ffd95a" } },
     lines: ["boing!", "blorp!", "squish squish!"],
   },
@@ -95,14 +95,14 @@ const solid = (d, fill) =>
   `<path d="${d}" fill="${fill}" stroke="rgba(40,25,30,0.35)" stroke-width="1.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><path d="${d}" fill="url(#${gloss})"/>`;
 
 const HAT_SCALE = { top: 0.85, party: 0.64, beanie: 0.95, crown: 0.66 };
-const HAT_RISE = { top: 88, party: 124, beanie: 73, crown: 59 };
+const HAT_RISE = { top: 66, party: 124, beanie: 73, crown: 59 };
 const CAP_RISE = 42;
 
 function hat(style, color) {
   const band = isDark(color) ? "#ff4f5e" : shade(color, -0.45);
   const light = isDark(color) ? "#ffd95a" : "#fff";
   switch (style) {
-    case "top": return solid(ell(0, -6, 50, 9), shade(color, -0.12)) + solid(rr(-28, -82, 56, 76, 6), color) + solid(ell(0, -82, 28, 6), shade(color, 0.18)) + `<path d="${rr(-28, -26, 56, 11, 1)}" fill="${band}"/>`;
+    case "top": return solid(ell(0, -6, 50, 9), shade(color, -0.12)) + solid(rr(-28, -60, 56, 54, 6), color) + solid(ell(0, -60, 28, 6), shade(color, 0.18)) + `<path d="${rr(-28, -26, 56, 11, 1)}" fill="${band}"/>`;
     case "party": return solid("M0 -112L36 -6Q0 8 -36 -6Z", color)
       + [[-12, -40], [12, -70], [-18, -18], [17, -26], [2, -92], [-2, -52]].map(([x, y]) => `<path d="${ell(x, y, 5, 5)}" fill="${light}" opacity="0.9"/>`).join("")
       + solid(ell(0, -114, 10, 10), light);

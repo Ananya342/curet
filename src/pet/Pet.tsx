@@ -884,6 +884,10 @@ export default function Pet() {
   // ---- render -----------------------------------------------------------------------------------------------
   const cx = WIN_W / 2;
   const cy = WIN_H - FLOOR_PAD - sh / 2;
+  // A hat pokes up above the sprite; the speech bubble sits over it and the menu fans around it, never on it.
+  const hatRoom = headroom(view, sw, sh, outfit);
+  // The pet with its hat on, as the oval the orbs keep clear of.
+  const bodyCy = cy - hatRoom / 2, bodyH = sh + hatRoom;
   // Fan the orbs around the pet: straight up if it fits, otherwise tilted away from a nearby edge or on a wider
   // ring, picking the gentlest fan that keeps every orb on screen and clear of the others and the pet. Labels
   // only show on hover, so each one just gets nudged sideways to stay on screen.
@@ -897,19 +901,20 @@ export default function Pet() {
       let bad = 0;
       for (const p of pts) {
         bad += Math.max(0, lo.x - (p.x - r)) + Math.max(0, p.x + r - hi.x) + Math.max(0, lo.y - (p.y - r)) + Math.max(0, p.y + r - hi.y);
-        if (((p.x - cx) / (sw / 2 + r * 0.8)) ** 2 + ((p.y - cy) / (sh / 2 + r * 0.8)) ** 2 < 1) bad += 30;
+        if (((p.x - cx) / (sw / 2 + r * 0.8)) ** 2 + ((p.y - bodyCy) / (bodyH / 2 + r * 0.8)) ** 2 < 1) bad += 30;
       }
       for (let a = 0; a < n; a++) for (let b = a + 1; b < n; b++) bad += Math.max(0, gap - Math.hypot(pts[b].x - pts[a].x, pts[b].y - pts[a].y));
       return bad;
     };
     let best: { x: number; y: number }[] = [], bestScore = Infinity;
     for (let ring = 0; ring <= 6; ring++) {
-      const R = sh / 2 + 52 + ring * 14;
-      const step = Math.max(30, (2 * Math.asin(Math.min(1, gap / (2 * R))) * 180) / Math.PI);
+      // An oval rather than a circle, so a tall hat pushes the orbs up without pushing them off the sides.
+      const Rx = sw / 2 + 52 + ring * 14, Ry = bodyH / 2 + 52 + ring * 14;
+      const step = Math.max(30, (2 * Math.asin(Math.min(1, gap / (2 * Math.min(Rx, Ry)))) * 180) / Math.PI);
       for (const tilt of [0, 15, -15, 30, -30, 45, -45, 60, -60, 80, -80]) {
         const pts = Array.from({ length: n }, (_, i) => {
           const a = ((-90 + tilt + (i - (n - 1) / 2) * step) * Math.PI) / 180;
-          return { x: cx + Math.cos(a) * R, y: cy + Math.sin(a) * R };
+          return { x: cx + Math.cos(a) * Rx, y: bodyCy + Math.sin(a) * Ry };
         });
         const score = cost(pts) * 1000 + Math.abs(tilt) + ring * 10;
         if (score < bestScore) { bestScore = score; best = pts; }
@@ -932,9 +937,6 @@ export default function Pet() {
 
   // Props show while locked in, and stay for their pop-out; a drag, toss or hide puts them away at once.
   const showGear = gear !== null && (mode === "focusing" || gear === "out");
-
-  // A hat pokes up above the sprite; the speech bubble sits over it rather than on it.
-  const hatRoom = headroom(view, sw, sh, outfit);
 
   const breathClass = mode === "sleeping" ? "breath slow" : mode === "focusing" ? "breath work" : mode === "idle" || mode === "alert" ? "breath" : "";
 
