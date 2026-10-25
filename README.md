@@ -13,7 +13,6 @@ A desktop pet that tracks your deadlines, books study time, nudges you back on t
 > Students rarely miss deadlines because they don't care. The dates are scattered across syllabi, Brightspace and calendars, and nothing turns them into a plan. Curet does, and it sits right on your desktop so you actually see it.
 
 <p align="center">
-  <a href="https://github.com/Ananya342/curet/releases">Download</a> ·
   <a href="#set-it-up">Set it up</a> ·
   <a href="#features">Features</a> ·
   <a href="#tech-stack">Tech stack</a>
@@ -52,16 +51,7 @@ A desktop pet that tracks your deadlines, books study time, nudges you back on t
 
 ## Download
 
-**macOS:** grab the latest `Curet.app` from [Releases](https://github.com/Ananya342/curet/releases) and drag it into **Applications**.
-
-The build isn't notarised yet, so the first time:
-1. Right-click **Curet** in Applications and choose **Open**, then **Open** again.
-2. If macOS says the app is damaged, run this once in Terminal:
-   ```bash
-   xattr -dr com.apple.quarantine /Applications/Curet.app
-   ```
-
-**Windows:** maintainers can build an installer from the **Actions** tab → **Windows build** → **Run workflow**. Some Mac-only extras (floating over full-screen apps, the drift check) aren't available there yet.
+Downloads are currently unavailable.
 
 ## Set it up
 
