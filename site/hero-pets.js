@@ -66,7 +66,8 @@ const ROWS = [
   [["ghost", "dragon", "redpanda"], ["cat", "perry", "blob", "dog"]],
   [["ghost", "dragon"], ["redpanda", "perry", "dog"], ["cat", "blob"]],
 ];
-const GAP_X = 0.22, GAP_Y = 0.16; // space between pets, in pet sizes
+// Space between pets, in pet sizes. Rows overlap a little, like a group photo: the front row stands over the back row's feet.
+const GAP_X = 0.04, GAP_Y = -0.1;
 
 // ---- outfits, as SVG ---------------------------------------------------------------------------------------
 
@@ -229,7 +230,7 @@ function area() {
   return width < 860
     // on a phone the bubble sits under the button; the pets get the room below it, clear of the peeking cat
     ? { left: side, right: width - side, top: bBottom + 26, bottom: height - (catPeek ? catPeek.offsetHeight : 60) - 8 }
-    : { left: Math.max(width * 0.5, textRight() + 32), right: width - side, top: navBottom + 14, bottom: bTop - 22 };
+    : { left: Math.max(width * 0.5, textRight() + 32), right: width - side, top: navBottom + 4, bottom: bTop - 14 };
 }
 
 // A pet's box is size × size; its picture fits inside, and a hat may rise above it.
@@ -252,7 +253,7 @@ function layout() {
   // Only switch arrangement when the new one is clearly roomier, so a few pixels can't flip it back and forth.
   if (current && best !== current && fit(best) < fit(current) * 1.08) best = current;
   current = best;
-  size = Math.min(fit(best), Math.max(150, hero.clientWidth * 0.1));
+  size = Math.min(fit(best), Math.max(170, hero.clientWidth * 0.14));
   layer.style.setProperty("--s", `${size}px`);
   layer.hidden = size < 34;
   const cx = (a.left + a.right) / 2;
