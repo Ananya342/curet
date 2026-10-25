@@ -12,9 +12,12 @@ export interface PetView {
   /** The boop spot. */
   nose: Pt;
   /** Where accessories sit: `head` is the middle of a hat's brim, `neck` the middle of a collar; `w` is how wide
-   *  each should be, `tilt` turns a hat with a head drawn at an angle. */
+   *  each should be, `tilt` turns a hat with a head drawn at an angle. A collar's `sag` (a fraction of its width)
+   *  sets how much it curves; `wrap` draws it past the body and trims it to the outline, for a pet with no neck. */
   head: Pt & { w: number; tilt?: number };
-  neck: Pt & { w: number };
+  neck: Pt & { w: number; sag?: number; wrap?: boolean };
+  /** Already wears a hat of its own (Perry's fedora), so hats and caps are left off. */
+  hatless?: boolean;
 }
 
 export interface PetDef extends PetView {
@@ -52,7 +55,7 @@ export const PETS: Record<PetId, PetDef> = {
   blob: {
     id: "blob", name: "Jelly", voice: "pUp183J2hYPdgcWbsdFh", src: "/pets/blob.png", w: 168, ar: 350 / 420,
     eyes: [{ x: 0.33, y: 0.47 }, { x: 0.66, y: 0.47 }], eye: { rx: 0.056, ry: 0.07 },
-    nose: { x: 0.5, y: 0.56 }, head: { x: 0.5, y: 0.15, w: 0.8 }, neck: { x: 0.5, y: 0.66, w: 0.66 }, lid: "#cda1f4",
+    nose: { x: 0.5, y: 0.56 }, head: { x: 0.5, y: 0.15, w: 0.8 }, neck: { x: 0.5, y: 0.72, w: 1.06, sag: 0.05, wrap: true }, lid: "#cda1f4",
     personality: "a blob",
     boops: ["Hi!", "Hello.", "Need something?"],
     greetings: ["Good morning.", "Hi, I'm here.", "Ready when you are."],
@@ -77,8 +80,9 @@ export const PETS: Record<PetId, PetDef> = {
     id: "perry", name: "Perry", voice: "0gMAxuCkfi36a6UQMpAe", src: "/pets/perry.png", w: 132, ar: 420 / 308,
     eyes: [{ x: 0.195, y: 0.42 }, { x: 0.645, y: 0.42 }], eye: { rx: 0.075, ry: 0.06 },
     nose: { x: 0.42, y: 0.55 }, head: { x: 0.42, y: 0.22, w: 0.76 }, neck: { x: 0.42, y: 0.64, w: 0.62 }, lid: "#3d93b8",
+    hatless: true,
     side: {
-      src: "/pets/perry-side.png", ar: 402 / 420,
+      src: "/pets/perry-side.png", ar: 402 / 420, hatless: true,
       eyes: [{ x: 0.69, y: 0.34 }], eye: { rx: 0.045, ry: 0.05 },
       nose: { x: 0.88, y: 0.43 }, head: { x: 0.58, y: 0.29, w: 0.6, tilt: -4 }, neck: { x: 0.64, y: 0.55, w: 0.34 },
     },

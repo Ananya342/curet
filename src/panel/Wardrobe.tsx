@@ -83,12 +83,14 @@ export default function Wardrobe({ petId, onOutfit }: { petId: PetId; onOutfit?:
         <Dressed view={def} w={frontW} outfit={outfit} />
         {def.side && <Dressed view={def.side} w={104} outfit={outfit} side />}
       </div>
-      {Row({ k: "hat", label: "Hat", children: <>
-        <Seg label="Hat style" value={outfit.hat.style} options={HATS} onPick={(style) => change("hat", { style })} />
-        <Colors label="Hat colour" value={outfit.hat.color} onPick={(color) => change("hat", { color })} />
-      </> })}
-      {Row({ k: "cap", label: "Cap", children:
-        <Colors label="Cap colour" value={outfit.cap.color} onPick={(color) => change("cap", { color })} /> })}
+      {def.hatless ? <p className="hint">{def.name} keeps his own hat on, so hats and caps are off for him.</p> : <>
+        {Row({ k: "hat", label: "Hat", children: <>
+          <Seg label="Hat style" value={outfit.hat.style} options={HATS} onPick={(style) => change("hat", { style })} />
+          <Colors label="Hat colour" value={outfit.hat.color} onPick={(color) => change("hat", { color })} />
+        </> })}
+        {Row({ k: "cap", label: "Cap", children:
+          <Colors label="Cap colour" value={outfit.cap.color} onPick={(color) => change("cap", { color })} /> })}
+      </>}
       {Row({ k: "glasses", label: "Sunglasses", children: <>
         <Seg label="Glasses style" value={outfit.glasses.style} options={GLASSES} onPick={(style) => change("glasses", { style })} />
         <Colors label="Frame colour" value={outfit.glasses.color} onPick={(color) => change("glasses", { color })} />

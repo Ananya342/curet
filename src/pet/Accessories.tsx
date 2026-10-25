@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useId, type CSSProperties } from "react";
 import type { PetView } from "../pets";
 import type { GlassesStyle, HatStyle, Outfit, TagStyle } from "../accessories";
 
@@ -127,16 +127,24 @@ function Glasses({ view, W, H, style, color, side }: { view: PetView; W: number;
 
 function Collar({ view, W, H, color, tag, side }: { view: PetView; W: number; H: number; color: string; tag: TagStyle; side: boolean }) {
   const cx = view.neck.x * W, cy = view.neck.y * H, cw = view.neck.w * W;
-  const t = Math.max(4, cw * (side ? 0.17 : 0.09)), sag = cw * (side ? 0.11 : 0.18);
+  const t = Math.max(4, cw * (side ? 0.17 : 0.09)), sag = cw * (view.neck.sag ?? (side ? 0.11 : 0.18));
+  const clip = `collar${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   const d = `M${cx - cw / 2} ${cy - t / 2}Q${cx} ${cy + sag} ${cx + cw / 2} ${cy - t / 2}L${cx + cw / 2} ${cy + t / 2}Q${cx} ${cy + sag + t} ${cx - cw / 2} ${cy + t / 2}Z`;
   // The tag hangs off the bottom edge: in the middle from the front, toward the chest from the side.
   const u = side ? 0.78 : 0.5;
   const bx = (1 - u) ** 2 * (cx - cw / 2) + 2 * u * (1 - u) * cx + u * u * (cx + cw / 2);
   const by = (1 - u) ** 2 * (cy + t / 2) + 2 * u * (1 - u) * (cy + sag + t) + u * u * (cy + t / 2);
   const ts = Math.max(4, t * 0.9);
-  return <g>
+  const band = <>
     <Solid d={d} fill={color} />
     <path d={`M${cx - cw / 2 + 2} ${cy}Q${cx} ${cy + sag + t / 2} ${cx + cw / 2 - 2} ${cy}`} stroke="rgba(255,255,255,0.35)" strokeWidth={Math.max(1, t * 0.15)} strokeDasharray={`${t * 0.5} ${t * 0.5}`} fill="none" />
+  </>;
+  return <g>
+    {view.neck.wrap ? <>
+      {/* Wider than the body and trimmed to its outline, so it reads as wrapping all the way round. */}
+      <mask id={clip} style={{ maskType: "alpha" }}><image href={view.src} width={W} height={H} preserveAspectRatio="none" /></mask>
+      <g mask={`url(#${clip})`}>{band}</g>
+    </> : band}
     {tag !== "none" && <>
       <path d={ell(bx, by + ts * 0.15, ts * 0.32, ts * 0.32)} fill="none" stroke="#d9b45a" strokeWidth={Math.max(1, ts * 0.16)} />
       {tag === "heart" && <Solid d={heart(bx, by + ts * 1.15, ts)} fill="#ff6f9f" />}
@@ -156,7 +164,7 @@ const CAP_RISE = 42;
 /** How many px the outfit sticks up above the top of a W×H sprite, so speech bubbles can clear it. */
 export function headroom(view: PetView, W: number, H: number, outfit: Outfit) {
   const { hat, cap } = outfit;
-  if (!hat.on && !cap.on) return 0;
+  if (view.hatless || (!hat.on && !cap.on)) return 0;
   const scale = (hat.on ? HAT_SCALE[hat.style] : 0.8) * view.head.w * W / 100;
   return Math.max(0, (hat.on ? HAT_RISE[hat.style] : CAP_RISE) * scale - view.head.y * H);
 }
@@ -171,7 +179,7 @@ const SPARKLES = [[0.18, 0.2], [0.82, 0.32], [0.3, 0.72], [0.72, 0.62], [0.52, 0
 export default function Accessories({ view, W, H, outfit, side = false }: { view: PetView; W: number; H: number; outfit: Outfit; side?: boolean }) {
   const { collar, hat, cap, glasses, shine } = outfit;
   const head = view.head;
-  const hatOn = hat.on || cap.on;
+  const hatOn = !view.hatless && (hat.on || cap.on);
   const scale = (hat.on ? HAT_SCALE[hat.style] : 0.8) * head.w * W / 100;
   const amount = Math.max(0, Math.min(100, shine.amount)) / 100;
   return <>
