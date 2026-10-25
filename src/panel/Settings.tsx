@@ -2,10 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { PetId } from "../pets";
+import { PETS, PetId } from "../pets";
 import { Feed, kvGet, kvSet } from "../api";
 import { DEFAULT_MODEL, ENV_GEMINI_KEY } from "../ai/gemini";
-import { ENV_ELEVEN_KEY, Quiet, Voice, listVoices, quietState, resetVoiceCache, synthesize } from "../voice/tts";
+import { ENV_ELEVEN_KEY, Quiet, Voice, listVoices, petVoiceKey, quietState, resetVoiceCache, synthesize, voiceFor } from "../voice/tts";
 import Rhythm from "./Rhythm";
 import Select from "./Select";
 
@@ -17,7 +17,7 @@ const link = (url: string, text: string) => (
 );
 const Spinner = () => <span className="spin" aria-hidden="true" />;
 
-export default function Settings(_: { petId: PetId }) {
+export default function Settings({ petId }: { petId: PetId }) {
   const [key, setKey] = useState("");
   const [model, setModel] = useState("");
   const [saved, setSaved] = useState(false);
@@ -45,28 +45,22 @@ export default function Settings(_: { petId: PetId }) {
     load();
     kvGet("gemini_key").then((v) => setKey(v ?? ""));
     kvGet("gemini_model").then((v) => setModel(v ?? ""));
-    // Load the account's voices straight away when a key is already saved, so the picker shows the current voice
-    // instead of staying hidden until "Save key" is pressed again.
+    // Load the account's voices straight away when a key is already saved, so the picker is there without
+    // pressing "Save key" again.
     (async () => {
-      const [k, v] = await Promise.all([kvGet("eleven_key"), kvGet("eleven_voice")]);
+      const k = await kvGet("eleven_key");
       setVKey(k ?? "");
-      setVoice(v ?? "");
       const useKey = k || ENV_ELEVEN_KEY;
-      if (!useKey) return;
-      const list = await listVoices(useKey).catch(() => [] as Voice[]);
-      setVoices(list);
-      // Nothing picked yet (or it no longer exists): show and keep the one speech falls back to, the first voice.
-      if (list.length && !list.some((x) => x.voice_id === v)) {
-        setVoice(list[0].voice_id);
-        await kvSet("eleven_voice", list[0].voice_id);
-        resetVoiceCache();
-      }
+      if (useKey) setVoices(await listVoices(useKey).catch(() => [] as Voice[]));
     })();
     kvGet("voice_on").then((v) => setVoiceOn(v !== "off"));
     quietState().then(setQuiet).catch(() => setQuiet(null));
     const un = listen("events-updated", load);
     return () => { un.then((f) => f()); };
   }, [load]);
+
+  // Each pet has its own voice: the one picked here, or else the default it came with.
+  useEffect(() => { voiceFor(petId).then(setVoice); }, [petId]);
 
   const say = (where: string, text: string, bad = false) => setNote({ where, text, bad });
 
@@ -90,10 +84,6 @@ export default function Settings(_: { petId: PetId }) {
       const list = await listVoices(k);
       setVoices(list);
       await kvSet("eleven_key", vKey.trim() || null);
-      const picked = voice || list[0]?.voice_id || "";
-      setVoice(picked);
-      await kvSet("eleven_voice", picked || null);
-      resetVoiceCache();
       say("voice", list.length ? `Connected. ${list.length} voices available.` : "Connected, but this account has no voices.");
     } catch (err) {
       say("voice", err instanceof Error ? err.message : String(err), true);
@@ -103,7 +93,7 @@ export default function Settings(_: { petId: PetId }) {
 
   const pickVoice = async (id: string) => {
     setVoice(id);
-    await kvSet("eleven_voice", id || null);
+    await kvSet(petVoiceKey(petId), id || null);
     resetVoiceCache();
   };
 
@@ -285,7 +275,12 @@ export default function Settings(_: { petId: PetId }) {
         )}
         {voices.length > 0 && (
           <div className="inline-form">
-            <div className="grow"><Select label="Voice" value={voice} onChange={pickVoice} options={voices.map((v) => [v.voice_id, v.name] as [string, string])} /></div>
+            <div className="grow"><Select label={`Voice for ${PETS[petId].name}`} value={voice} onChange={pickVoice}
+              options={[
+                // The pet's own voice may not be in "My voices" yet (Voice Library voices must be added first): still show it.
+                ...(voices.some((v) => v.voice_id === PETS[petId].voice) ? [] : [[PETS[petId].voice, `${PETS[petId].name}'s own voice`] as [string, string]]),
+                ...voices.map((v) => [v.voice_id, v.name] as [string, string]),
+              ]} /></div>
             <button className="btn soft" onClick={testVoice} disabled={busy === "test"}>{busy === "test" ? "Playing…" : "Test"}</button>
           </div>
         )}

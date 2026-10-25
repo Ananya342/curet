@@ -182,7 +182,7 @@ export default function Pet() {
     // Wait for the voice to finish (with a generous cap in case it never reports back), then keep it up a little longer.
     const t0 = Date.now();
     armBubble(b.id, ms + 30000);
-    speak(text).then(() => {
+    speak(text, petRef.current.id).then(() => {
       if (bubbleIdRef.current === b.id) armBubble(b.id, Math.max(2500, ms - (Date.now() - t0)));
     });
   }, [armBubble]);

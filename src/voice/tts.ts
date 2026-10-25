@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { kvGet } from "../api";
+import { PETS, PetId } from "../pets";
 
 /** Default key from .env.local, used when none is saved in Settings (same deal as Gemini). */
 export const ENV_ELEVEN_KEY = import.meta.env.LIFEPET_ELEVEN_KEY?.trim() || "";
@@ -74,7 +75,15 @@ export function stopSpeaking() {
   current = null;
 }
 
-async function resolveVoice(key: string): Promise<string | null> {
+/** The voice the user picked for this pet in Settings, if any. */
+export const petVoiceKey = (petId: PetId) => `eleven_voice_${petId}`;
+/** The voice this pet speaks with: the one picked in Settings, else its own default. */
+export async function voiceFor(petId: PetId): Promise<string> {
+  return (await kvGet(petVoiceKey(petId))) || PETS[petId].voice;
+}
+
+/** A voice for when a pet's own isn't available on this account: the old single-voice setting, else the first voice. */
+async function fallbackVoice(key: string): Promise<string | null> {
   const saved = await kvGet("eleven_voice");
   if (saved) return saved;
   if (cachedVoice) return cachedVoice;
@@ -110,7 +119,7 @@ export async function synthesize(text: string, key: string, voiceId: string, mod
     headers: { "xi-api-key": key, "Content-Type": "application/json" },
     body: JSON.stringify({ text, model_id: model || DEFAULT_TTS_MODEL }),
   });
-  if (!res.ok) throw new Error(await errorText(res));
+  if (!res.ok) throw Object.assign(new Error(await errorText(res)), { status: res.status });
 
   stopSpeaking();
   const url = URL.createObjectURL(await res.blob());
@@ -131,7 +140,7 @@ export async function synthesize(text: string, key: string, voiceId: string, mod
  * Speak a pet bubble out loud, if voice is switched on and a key is saved.
  * Deliberately swallows every failure: the pet must never break because speech didn't work.
  */
-export async function speak(text: string): Promise<void> {
+export async function speak(text: string, petId?: PetId): Promise<void> {
   try {
     if ((await kvGet("voice_on")) === "off") return;
     const key = await elevenKey();
@@ -141,9 +150,19 @@ export async function speak(text: string): Promise<void> {
     // Checked before the request, not after: generating audio for a muted Mac would spend
     // ElevenLabs credits on something nobody can hear.
     if (await askingForQuiet()) return;
-    const voiceId = await resolveVoice(key);
-    if (!voiceId) return;
-    await synthesize(line, key, voiceId, (await kvGet("eleven_model")) || undefined);
+    const model = (await kvGet("eleven_model")) || undefined;
+    const own = petId ? await voiceFor(petId) : null;
+    try {
+      if (own) { await synthesize(line, key, own, model); return; }
+    } catch (e) {
+      // A voice from the Voice Library has to be added to "My voices" before an account can use it; until then,
+      // fall back to another voice instead of going silent.
+      const status = (e as { status?: number }).status;
+      if (status !== 404 && status !== 400 && status !== 422) throw e;
+      console.warn(`[tts] ${petId}'s voice isn't on this account, using a fallback`);
+    }
+    const voiceId = await fallbackVoice(key);
+    if (voiceId && voiceId !== own) await synthesize(line, key, voiceId, model);
   } catch (e) {
     console.warn("[tts]", e);
   }
