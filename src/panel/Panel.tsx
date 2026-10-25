@@ -34,7 +34,6 @@ export default function Panel() {
   const [hidden, setHidden] = useState(false);
   const [reminder, setReminder] = useState<Reminder | null>(null);
   const [opened, setOpened] = useState(0);
-  const [petsOpen, setPetsOpen] = useState(false);
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const modeRef = useRef(mode);
   modeRef.current = mode;
@@ -108,14 +107,14 @@ export default function Panel() {
       <div className="panel compact" data-pet={petId}>
         <header>
           <img src={PETS[petId].src} alt="" draggable={false} />
-          <h1 className="grow">{reminder ? (reminder.kind === "deadline" ? "Due soon" : "Starting soon") : petsOpen ? "Your pets" : "Up next"}</h1>
+          <h1 className="grow">{reminder ? (reminder.kind === "deadline" ? "Due soon" : "Starting soon") : "Up next"}</h1>
           <button className="icon-btn" onClick={() => expand("settings")} aria-label="Settings" title="Settings">
             {GEAR}
           </button>
           {closeBtn}
         </header>
         <Glance petId={petId} hidden={hidden} reminder={reminder} opened={opened} onExpand={expand} onClose={close}
-          onDismiss={() => { setReminder(null); close(); }} onPets={setPetsOpen} />
+          onDismiss={() => { setReminder(null); close(); }} />
       </div>
     );
   }
