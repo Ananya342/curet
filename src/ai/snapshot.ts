@@ -4,19 +4,22 @@ import { getOutfit } from "../accessories";
 import { PETS, PetId } from "../pets";
 import { DAY_NAMES, fmtMinutes, journal, weekRecap, weekStart } from "../wellbeing/recap";
 import { getFocusUntil, minutesLeft } from "../wellbeing/focus";
+import { GradeWeight, cleanTitle, fmtPct, gradeWeights, rank, weightOf } from "../study/grades";
+import { deadlineKey, deadlinesDone, studyPlans } from "../study/plans";
 
 const DAY = 86400;
 
-/** Brightspace titles end in " - Due" or " - Availability Ends"; the kind already says it's a deadline. */
-export const cleanTitle = (t: string) => t.replace(/\s*[-–]\s*(due|closes?|availability ends)\s*$/i, "");
+export { cleanTitle };
 
 const when = (e: CalEvent) => (e.all_day ? `${fmtDay(e.start)} (all day)` : `${fmtDay(e.start)} ${fmtTime(e.start)}`);
 const eventLine = (e: CalEvent) =>
   e.kind === "deadline"
     ? `- [DEADLINE] ${cleanTitle(e.title)} — due ${when(e)}`
     : `- ${e.title} — ${e.all_day ? when(e) : `${fmtDay(e.start)} ${fmtTime(e.start)}–${fmtTime(e.end)}`}${e.location ? ` @ ${e.location}` : ""}`;
-const deadlineLine = (e: CalEvent, now: number) =>
-  `- ${cleanTitle(e.title)} — due ${when(e)}${e.start > now ? ` (in ${untilLabel(e.start, now)})` : ""}`;
+const deadlineLine = (e: CalEvent, now: number, weights: GradeWeight[], done: Record<string, number>) => {
+  const w = weightOf(e, weights);
+  return `- ${cleanTitle(e.title)} — due ${when(e)}${e.start > now ? ` (in ${untilLabel(e.start, now)})` : ""}${w.known ? ` — ${fmtPct(w.weight)} of the grade${w.course ? ` in ${w.course}` : ""}` : ""}${done[deadlineKey(e)] ? " — DONE (ticked off)" : ""}`;
+};
 
 /** "08:30" → "8:30 AM"; anything else ("off") → "off". */
 const clock = (v: string | null, fallback: string) => {
@@ -40,7 +43,7 @@ export async function appSnapshot(petId: PetId): Promise<string> {
   const now = nowSec();
   const today = startOfDay();
   const monday = weekStart();
-  const [cal, all, open, mem, recap, focusUntil, outfit, feeds, google, entries, kv] = await Promise.all([
+  const [cal, all, open, mem, recap, focusUntil, outfit, feeds, google, entries, kv, weights, done, plans] = await Promise.all([
     eventsRange(today, today + 3 * DAY),
     eventsRange(Math.min(monday, today), now + 45 * DAY),
     tasks.list(true),
@@ -55,6 +58,9 @@ export async function appSnapshot(petId: PetId): Promise<string> {
       ["briefing_morning", "briefing_evening", "break_every", "eye_every", "late_nudge", "recap_on", "week_ahead_on", "nudges_on", "wander_on", "voice_on"]
         .map(async (k) => [k, await kvGet(k)] as const),
     ).then(Object.fromEntries) as Promise<Record<string, string | null>>,
+    gradeWeights(),
+    deadlinesDone(),
+    studyPlans(),
   ]);
 
   const deadlines = all.filter((e) => e.kind === "deadline");
@@ -77,10 +83,16 @@ export async function appSnapshot(petId: PetId): Promise<string> {
 ${cal.length ? cal.slice(0, 40).map(eventLine).join("\n") : "(nothing on the calendar)"}
 
 ## Deadlines coming up, next 45 days (complete, soonest first)
-${ahead.length ? ahead.slice(0, 50).map((e) => deadlineLine(e, now)).join("\n") : "(no upcoming deadlines)"}
+${ahead.length ? ahead.slice(0, 50).map((e) => deadlineLine(e, now, weights, done)).join("\n") : "(no upcoming deadlines)"}
+
+## What to work on first (Curet's priority = grade weight ÷ days left)
+${priorities(ahead, weights, done, now)}
+
+## Study blocks booked
+${plans.filter((p) => p.end > now && p.status !== "skipped").map((p) => `- ${fmtDay(p.start)} ${fmtTime(p.start)}–${fmtTime(p.end)} for ${cleanTitle(p.title)}`).join("\n") || "(none)"}
 
 ## Deadlines already passed this week
-${gotThrough.length ? gotThrough.map((e) => deadlineLine(e, now)).join("\n") : "(none)"}
+${gotThrough.length ? gotThrough.map((e) => deadlineLine(e, now, weights, done)).join("\n") : "(none)"}
 
 ## To-do list (open)
 ${openTasks.length ? openTasks.map(taskLine).join("\n") : "(no open tasks)"}
@@ -119,11 +131,21 @@ ${entries.filter((e) => e.text).length} saved entr${entries.filter((e) => e.text
 ${mem.length ? mem.map((m) => `- ${m.fact}`).join("\n") : "(nothing yet)"}`;
 }
 
+/** Unfinished deadlines in the order the planner would tackle them, with the numbers behind it. */
+function priorities(ahead: CalEvent[], weights: GradeWeight[], done: Record<string, number>, now: number) {
+  const ranked = rank(ahead.filter((e) => !done[deadlineKey(e)]), weights, now).slice(0, 8);
+  if (!ranked.length) return "(nothing unfinished)";
+  const lines = ranked.map((r, i) =>
+    `${i + 1}. ${cleanTitle(r.event.title)} — ${r.weight.known ? fmtPct(r.weight.weight) : `~${fmtPct(r.weight.weight)} (guessed from the kind of work; no syllabus weight)`}, due in ${untilLabel(r.event.start, now)}, score ${r.score.toFixed(1)}`);
+  return `${lines.join("\n")}
+When asked what to do first, follow this order and give the reason in grade terms (e.g. "Essay 2 is 20% of your grade and Quiz 4 is 2%, start the essay"). Only state a percentage as fact when it isn't marked as guessed; if weights are guessed, suggest uploading the syllabus in Today.`;
+}
+
 /** The app itself, so questions like "how do I focus?" get a real answer. */
 export const APP_GUIDE = `How Curet works (use this to answer questions about the app):
 - The pet lives on the desktop. Double-click it for its menu: Chat, Today, Focus, Pets, Tuck in, Sleep, Settings. Drag it anywhere; it sleeps when left alone.
 - The menu bar icon opens a quick glance at what's next, with Wake/Tuck in, Chat and Pets.
-- Tabs in this pop-up: Chat (you), Today (calendar, coming deadlines for 7 days, add an event, to-do list), Week (focus time per day, deadlines got through, due in the next 7 days, tasks ticked off, weekly journal), Pets (pick a pet, dress it up), Settings (Brightspace link, Google Calendar, daily rhythm, Gemini key, voice).
+- Tabs in this pop-up: Chat (you), Today (calendar, coming deadlines for 7 days with how much each counts and which to start first, upload a syllabus, add an event, to-do list), Week (focus time per day, deadlines got through, due in the next 7 days, tasks ticked off, weekly journal), Pets (pick a pet, dress it up), Settings (Brightspace link, Google Calendar, daily rhythm, Gemini key, voice).
 - Focus mode: from the pet's menu choose Focus, then 25, 50 or 90 min. The pet works on a tiny laptop and holds reminders until the block ends.
 - Briefings arrive morning and evening; Sunday evening adds a week preview and recap; Monday morning warns about bunched-up deadlines.
 - Option-Command-L tucks the pet into the menu bar and brings it back.`;

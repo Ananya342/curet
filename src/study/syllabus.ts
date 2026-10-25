@@ -16,6 +16,8 @@ export interface SyllabusItem {
   time?: string;
   duration_minutes?: number;
   location?: string;
+  /** Percent of the final grade this one item is worth, when the syllabus says. */
+  weight?: number;
 }
 export interface Syllabus { course: string; items: SyllabusItem[] }
 
@@ -34,6 +36,7 @@ const schema = {
           time: { type: Type.STRING, description: "Start (or due) time as HH:MM, 24-hour. Omit if not stated." },
           duration_minutes: { type: Type.NUMBER, description: "Only if stated or obvious from a time range" },
           location: { type: Type.STRING },
+          weight: { type: Type.NUMBER, description: "Percent of the final course grade this single item is worth, e.g. 20 for 20%. Omit if the syllabus doesn't say." },
         },
         required: ["title", "kind", "date"],
       },
@@ -47,7 +50,8 @@ Rules:
 - Only include items with a specific date. Skip weekly patterns without dates ("quizzes every Friday") and anything marked TBA.
 - Today is ${new Date().toDateString()}. When the syllabus leaves out the year, pick the year that puts the date in the current or next term.
 - Give times in 24-hour HH:MM, only when the syllabus states them. If it gives a range (e.g. 7–9pm), set time to the start and duration_minutes to the length.
-- Keep titles short and clear, as they'd appear on a calendar. Don't repeat the course name in each title.`;
+- Keep titles short and clear, as they'd appear on a calendar. Don't repeat the course name in each title.
+- weight is the percent of the final grade that one item is worth, read from the grading breakdown. When a category is split across several items (e.g. "Quizzes 20%" with 5 dated quizzes), divide it evenly (4 each) unless the syllabus says otherwise (e.g. lowest dropped: still divide by the number listed). When a category's weight isn't stated, omit weight. Never guess.`;
 
 const toBase64 = (buf: ArrayBuffer) => {
   let s = "";
@@ -85,7 +89,11 @@ export async function readSyllabus(input: File | string, onStatus?: (s: string) 
       const out = JSON.parse(res.text ?? "{}") as Syllabus;
       const items = (out.items ?? [])
         .filter((i) => i.title && validDate(i.date))
-        .map((i) => ({ ...i, time: i.time && /^\d{1,2}:\d{2}$/.test(i.time) ? i.time.padStart(5, "0") : undefined }))
+        .map((i) => ({
+          ...i,
+          time: i.time && /^\d{1,2}:\d{2}$/.test(i.time) ? i.time.padStart(5, "0") : undefined,
+          weight: typeof i.weight === "number" && i.weight > 0 && i.weight <= 100 ? i.weight : undefined,
+        }))
         .sort((a, b) => (a.date + (a.time ?? "")).localeCompare(b.date + (b.time ?? "")));
       return { course: (out.course ?? "").trim(), items };
     } catch (e) {

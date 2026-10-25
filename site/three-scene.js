@@ -1,6 +1,6 @@
 // Curet, live: a Three.js layer over the page.
-//   hero      the seven pets bounce around the pink disc; they flee your cursor and pop when booped
 //   showcase  the chosen pet tilts toward you, hops when poked, and spins when you swap
+// (The hero's seven pets are plain page elements, in hero-pets.js, so they can wear outfits and show taglines.)
 // One fixed, click-through canvas does all of it. People who ask for reduced motion get the plain page.
 import * as THREE from "./assets/vendor/three.module.min.js";
 
@@ -9,8 +9,6 @@ if (matchMedia("(prefers-reduced-motion: reduce)").matches) throw new Error("red
 const $ = (s) => document.querySelector(s);
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const lerp = (a, b, t) => a + (b - a) * t;
-const rand = (a, b) => a + Math.random() * (b - a);
-const pick = (a) => a[Math.floor(Math.random() * a.length)];
 
 // ------------------------------------------------------------------ renderer
 const canvas = document.createElement("canvas");
@@ -48,16 +46,6 @@ fit();
 addEventListener("resize", fit);
 
 // ------------------------------------------------------------------ pets as textured planes
-const IDS = ["ghost", "cat", "blob", "dragon", "redpanda", "perry", "dog"];
-const LINES = {
-  ghost: ["eep! hehe", "boo… that tickles!", "you found me!"],
-  cat: ["mew!", "nyaa… again?", "hey, that’s my nose!"],
-  blob: ["boing!", "blorp!", "squish squish!"],
-  dragon: ["rawr! (a tiny one)", "*sneezes a smoke puff*", "grr… hehe"],
-  redpanda: ["squeak!", "snack time?", "*wiggles tail*"],
-  perry: ["krrrr!", "*tips fedora*", "agent P, reporting!"],
-  dog: ["arf!", "*wags tail*", "woof! again again!"],
-};
 const loader = new THREE.TextureLoader();
 const tex = {};
 const planeGeo = new THREE.PlaneGeometry(1, 1);
@@ -77,116 +65,7 @@ function makePlane(id) {
   return m;
 }
 
-// ---- hero pets
-const hero = $("#top");
-const heroBubble = $(".hero-bubble");
-const heroText = heroBubble?.querySelector(".bubble-text");
-const heroCopy = $(".hero-copy");
-const pets = IDS.map((id, i) => ({
-  id, mesh: makePlane(id), x: 0, y: 0, vx: 0, vy: 0, r: 60, w: 100, h: 100, land: 0, boop: 0, hop: rand(0.4, 2.2),
-  seeded: false, order: i,
-}));
-let area = { left: 0, right: 0, top: 0, bottom: 0, ok: false, scale: 100 };
-let heroRect = { top: 0, left: 0, width: 1, height: 1 };
-
-function measureHero() {
-  heroRect = hero.getBoundingClientRect();
-  const narrow = heroRect.width < 860;
-  const bubbleRect = heroBubble ? heroBubble.getBoundingClientRect() : null;
-  if (narrow) {
-    // on a phone the bubble sits under the button; the creatures get the room below it
-    area = { left: 12, right: heroRect.width - 12, top: bubbleRect ? bubbleRect.bottom - heroRect.top + 14 : 440, bottom: heroRect.height - 28 };
-  } else {
-    const bubbleTop = bubbleRect ? bubbleRect.top - heroRect.top - 16 : heroRect.height - 300;
-    area = { left: heroRect.width * 0.5, right: heroRect.width - 24, top: 92, bottom: bubbleTop };
-  }
-  if (!narrow && area.bottom - area.top < 150) area.bottom = area.top + 150;
-  area.ok = narrow ? area.bottom - area.top >= 110 : true;
-  area.scale = clamp((area.bottom - area.top) * (narrow ? 0.62 : 0.5), 56, 170);
-}
-
-function layoutPets() {
-  for (const p of pets) {
-    const t = texture(p.id);
-    p.w = area.scale; p.h = area.scale * (t.ready ? t.ar : 1);
-    p.r = Math.max(p.w, p.h) * 0.42;
-    if (!p.seeded) {
-      p.x = rand(area.left + p.r, area.right - p.r);
-      p.y = rand(area.top + p.r, area.bottom - p.r);
-      p.vx = rand(-200, 200); p.vy = rand(-200, 100);
-      p.seeded = true;
-    }
-  }
-}
-
 const pointer = { x: -999, y: -999 };
-let scrollVel = 0;
-
-function stepPets(dt, t) {
-  const spinny = 1 + Math.min(Math.abs(scrollVel) / 1400, 2.5);
-  const lx = pointer.x - heroRect.left, ly = pointer.y - heroRect.top;
-  for (const p of pets) {
-    p.vy += 1700 * dt;
-    // flee the cursor
-    const dx = p.x - lx, dy = p.y - ly, d = Math.hypot(dx, dy);
-    if (d < 170 && d > 1) {
-      const k = (1 - d / 170) * 2600 * dt;
-      p.vx += (dx / d) * k; p.vy += (dy / d) * k * 0.6;
-    }
-    // restless hopping
-    p.hop -= dt * spinny;
-    const floor = area.bottom - p.h / 2;
-    if (p.hop <= 0 && p.y >= floor - 4) {
-      p.vy = -rand(620, 900);
-      p.vx += rand(-380, 380);
-      p.hop = rand(0.5, 1.9);
-    }
-    p.x += p.vx * dt; p.y += p.vy * dt;
-    // walls and floor
-    if (p.x < area.left + p.r) { p.x = area.left + p.r; p.vx = Math.abs(p.vx) * 0.85; }
-    if (p.x > area.right - p.r) { p.x = area.right - p.r; p.vx = -Math.abs(p.vx) * 0.85; }
-    if (p.y < area.top + p.h / 2) { p.y = area.top + p.h / 2; p.vy = Math.abs(p.vy) * 0.5; }
-    if (p.y > floor) {
-      if (p.vy > 260) p.land = 1;
-      p.y = floor; p.vy = -p.vy * 0.5; p.vx *= 0.9;
-      if (Math.abs(p.vy) < 90) p.vy = 0;
-    }
-    p.vx = clamp(p.vx, -900, 900);
-    p.land = Math.max(0, p.land - dt * 5);
-    p.boop = Math.max(0, p.boop - dt * 2.2);
-  }
-  // pets bump into each other
-  for (let i = 0; i < pets.length; i++) for (let j = i + 1; j < pets.length; j++) {
-    const a = pets[i], b = pets[j];
-    const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy), min = a.r + b.r;
-    if (d < min && d > 0.01) {
-      const nx = dx / d, ny = dy / d, push = (min - d) / 2;
-      a.x -= nx * push; a.y -= ny * push; b.x += nx * push; b.y += ny * push;
-      const rv = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
-      if (rv < 0) { a.vx += nx * rv; a.vy += ny * rv; b.vx -= nx * rv; b.vy -= ny * rv; }
-    }
-  }
-  const visible = heroRect.bottom > 0 && heroRect.top < H;
-  for (const p of pets) {
-    p.mesh.visible = visible && area.ok;
-    if (!p.mesh.visible) continue;
-    const stretch = clamp(Math.abs(p.vy) / 2400, 0, 0.2);
-    const squish = p.land * 0.26 + p.boop * Math.sin(p.boop * 14) * 0.18;
-    const sx = p.w * (1 - stretch * 0.6 + squish * 0.8), sy = p.h * (1 + stretch - squish);
-    p.mesh.scale.set(sx, sy, 1);
-    p.mesh.position.set(heroRect.left + p.x, -(heroRect.top + p.y) - (p.h - sy) / 2, 0);
-    p.mesh.rotation.z = clamp(-p.vx / 1800, -0.4, 0.4) + Math.sin(t * 9 + p.order) * 0.03 * (p.vy === 0 ? 0 : 1);
-  }
-}
-
-const boopLine = { until: 0, base: heroText?.textContent ?? "" };
-function boopPet(p) {
-  p.vy = -980; p.vx += rand(-300, 300); p.boop = 1; p.hop = rand(1, 2);
-  if (heroText) {
-    heroText.textContent = pick(LINES[p.id]);
-    boopLine.until = performance.now() + 2200;
-  }
-}
 
 // ------------------------------------------------------------------ showcase pet
 const stageImg = $("#stage-pet");
@@ -198,7 +77,7 @@ disc.renderOrder = 1;
 scene.add(disc);
 const discTarget = new THREE.Color(0x9ed7ff);
 const petsRoot = $('.scene[data-scene="pets"]');
-const stage = { id: "ghost", lean: 0, mesh: makePlane("ghost"), spin: 0, spinTo: null, hop: 0, tx: 0, ty: 0, rx: 0, ry: 0, rect: null, visible: false };
+const stage = { id: "ghost", next: null, lean: 0, mesh: makePlane("ghost"), spin: 0, spinTo: null, hop: 0, tx: 0, ty: 0, rx: 0, ry: 0, rect: null, visible: false };
 stage.mesh.renderOrder = 3;
 
 function setStageTexture(id) {
@@ -206,10 +85,13 @@ function setStageTexture(id) {
   stage.mesh.material.map = texture(id).map;
   stage.mesh.material.needsUpdate = true;
 }
+// Changing pet turns the showcase pet edge-on, swaps the picture, and turns it back. A change that arrives
+// mid-turn waits for the turn to finish, so scrolling quickly never restarts or stacks turns.
+const TURN = 1.1; // seconds for the whole turn
 addEventListener("curet:pet", (e) => {
-  const id = e.detail.id;
   if (e.detail.color) discTarget.set(e.detail.color);
-  stage.spin = 0.001; stage.spinTo = id;
+  stage.next = e.detail.id;
+  if (stage.spin === 0 && stage.next !== stage.id) { stage.spin = 0.001; stage.spinTo = stage.next; }
 });
 
 function stepStage(dt, t) {
@@ -237,13 +119,17 @@ function stepStage(dt, t) {
   stage.tx = lerp(stage.tx, ny * 0.38, 1 - Math.pow(0.001, dt));
   let spin = 0, squash = 0;
   if (stage.spin > 0) {
-    stage.spin += dt / 0.95;
+    stage.spin += dt / TURN;
     const k = clamp(stage.spin, 0, 1);
-    const ease = 1 - Math.pow(1 - k, 3);
-    spin = ease * Math.PI * 2;
-    squash = Math.sin(k * Math.PI) * 0.1;
-    if (k > 0.5 && stage.spinTo) { setStageTexture(stage.spinTo); stage.spinTo = null; }
-    if (stage.spin >= 1) stage.spin = 0;
+    // ease in to edge-on, swap while the picture is a sliver, ease out facing you again. The two halves meet at
+    // the same speed, so the turn flows straight through the swap.
+    spin = k < 0.5 ? (k * 2) ** 3 * (Math.PI / 2) : -((1 - (k - 0.5) * 2) ** 3) * (Math.PI / 2);
+    squash = Math.sin(k * Math.PI) * 0.04;
+    if (k >= 0.5 && stage.spinTo) { setStageTexture(stage.spinTo); stage.spinTo = null; }
+    if (stage.spin >= 1) {
+      stage.spin = 0;
+      if (stage.next && stage.next !== stage.id) { stage.spin = 0.001; stage.spinTo = stage.next; }
+    }
   }
   stage.hop = Math.max(0, stage.hop - dt * 1.6);
   const hopY = Math.sin((1 - stage.hop) * Math.PI) * (stage.hop > 0 ? 70 : 0);
@@ -270,12 +156,7 @@ addEventListener("pointermove", (e) => {
 }, { passive: true });
 
 addEventListener("pointerdown", (e) => {
-  // booping: hit-test the creatures (the canvas itself lets every click through)
-  const lx = e.clientX - heroRect.left, ly = e.clientY - heroRect.top;
-  if (area.ok && heroRect.bottom > 0) {
-    const hit = [...pets].reverse().find((p) => Math.hypot(p.x - lx, p.y - ly) < p.r * 1.05);
-    if (hit) { boopPet(hit); return; }
-  }
+  // poking the showcase pet (the canvas itself lets every click through)
   if (stage.visible && stage.rect) {
     const r = stage.rect;
     if (Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2)) < r.height * 0.42) {
@@ -284,12 +165,9 @@ addEventListener("pointerdown", (e) => {
   }
 });
 
-let lastScroll = scrollY;
 let handShown = false;
 function overPet() {
-  if (!area.ok || heroRect.bottom <= 0) return stage.visible && stage.rect && Math.hypot(pointer.x - (stage.rect.left + stage.rect.width / 2), pointer.y - (stage.rect.top + stage.rect.height / 2)) < stage.rect.height * 0.42;
-  const lx = pointer.x - heroRect.left, ly = pointer.y - heroRect.top;
-  return pets.some((p) => Math.hypot(p.x - lx, p.y - ly) < p.r * 1.05);
+  return stage.visible && stage.rect && Math.hypot(pointer.x - (stage.rect.left + stage.rect.width / 2), pointer.y - (stage.rect.top + stage.rect.height / 2)) < stage.rect.height * 0.42;
 }
 
 // ------------------------------------------------------------------ loop
@@ -299,21 +177,12 @@ function frame() {
   const dt = Math.min((now - last) / 1000, 0.05);
   last = now; t += dt;
 
-  scrollVel = lerp(scrollVel, (scrollY - lastScroll) / Math.max(dt, 0.001), 0.2);
-  lastScroll = scrollY;
-  measureHero();
-  layoutPets();
-  stepPets(dt, t);
   stepStage(dt, t);
-
-  // restore the hero bubble's text after a boop
-  if (boopLine.until && now > boopLine.until && heroText) { heroText.textContent = boopLine.base; boopLine.until = 0; }
   const hand = overPet();
   if (hand !== handShown) { handShown = hand; document.body.style.cursor = hand ? "pointer" : ""; }
 
-  // nothing to draw (the day scene, the board, the setup steps): leave the GPU alone
-  const heroOn = heroRect.bottom > 0 && heroRect.top < H;
-  if (!heroOn && !stage.visible) {
+  // nothing to draw (the hero, the day scene, the board, the setup steps): leave the GPU alone
+  if (!stage.visible) {
     if (!blank) { renderer.clear(); blank = true; }
     return;
   }

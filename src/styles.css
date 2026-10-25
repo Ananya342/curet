@@ -136,6 +136,7 @@ img { -webkit-user-drag: none; }
 .bubble { cursor: default; }
 .bubble-close { position: absolute; top: -9px; right: -9px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; padding: 0; border: 2px solid #3a2a2a; background: #fffdf7; color: #3a2a2a; cursor: pointer; box-shadow: 0 2px 0 #3a2a2a; opacity: 0; transition: opacity 0.15s; }
 .bubble:hover .bubble-close, .bubble-close:focus-visible { opacity: 1; }
+.bubble-actions button { white-space: nowrap; }
 .bubble-actions button {
   border-radius: 999px; padding: 5px 12px; font: inherit; font-size: 12.5px; cursor: pointer;
 }
@@ -435,6 +436,11 @@ svg.spinning { animation: spin 0.8s linear infinite; }
 .items .s { color: var(--ink-soft); font-size: 12.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; background: var(--sky); border: 2px solid var(--edge); }
 .dot.deadline { background: var(--coral); }
+/* grade weight on a deadline, and the planner's pick */
+.items .weight { display: inline-block; margin-left: 7px; padding: 0 7px; border-radius: 999px; border: 2px solid var(--edge); background: var(--butter); color: var(--on-candy); font-size: 11px; font-weight: 900; line-height: 16px; vertical-align: 1px; }
+.items li.first { border-color: var(--edge); box-shadow: 0 2px 0 var(--pop); }
+.start-here { margin: 0; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); text-wrap: pretty; }
+.start-here b { color: var(--ink); font-weight: 900; }
 .tasks { display: flex; flex-direction: column; gap: 2px; }
 .tasks li { display: flex; align-items: center; border-radius: 12px; }
 .tasks li:hover { background: var(--wash); }

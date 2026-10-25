@@ -4,6 +4,7 @@ import { addCalendarEvent, eventsRange, memories, nowSec, startOfDay, tasks } fr
 import { freeGaps } from "../wellbeing/gaps";
 import { getFocusUntil } from "../wellbeing/focus";
 import { cleanTitle, journalEntries } from "./snapshot";
+import { setWeight } from "../study/grades";
 
 export const declarations = [
   {
@@ -88,6 +89,18 @@ export const declarations = [
     parameters: { type: Type.OBJECT, properties: { fact: { type: Type.STRING } }, required: ["fact"] },
   },
   {
+    name: "set_grade_weight",
+    description: "Record how much a deadline or exam counts toward the user's final grade, when they tell you (e.g. 'Essay 2 is worth 20%'). Planning uses it to decide what to study first.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        title: { type: Type.STRING, description: "The deadline or exam, as it appears in the deadline list" },
+        percent: { type: Type.NUMBER, description: "Percent of the final grade, e.g. 20" },
+      },
+      required: ["title", "percent"],
+    },
+  },
+  {
     name: "read_journal",
     description: "Read the user's private weekly journal entries, newest first. Only when the user asks about their journal or reflections.",
     parameters: { type: Type.OBJECT, properties: { limit: { type: Type.NUMBER, description: "How many entries. Default 5." } } },
@@ -164,6 +177,18 @@ export async function runTool(name: string, args: Record<string, any>): Promise<
     case "remember":
       await memories.add(args.fact);
       return { saved: true };
+    case "set_grade_weight": {
+      const pct = Number(args.percent);
+      if (!(pct > 0 && pct <= 100)) return { error: "The percent should be between 0 and 100." };
+      const now = nowSec();
+      const want = cleanTitle(String(args.title ?? "")).toLowerCase();
+      const evs = (await eventsRange(now - 7 * 86400, now + 180 * 86400)).filter((e) => e.kind === "deadline" || /\b(exam|midterm|final|quiz|test)\b/i.test(e.title));
+      const e = evs.find((x) => cleanTitle(x.title).toLowerCase() === want) ?? evs.find((x) => cleanTitle(x.title).toLowerCase().includes(want) || want.includes(cleanTitle(x.title).toLowerCase()));
+      if (!e) return { error: "No deadline or exam with that title in the next six months." };
+      await setWeight(e, pct);
+      await emitTo("panel", "plans-updated", null).catch(() => {});
+      return { saved: cleanTitle(e.title), percent: pct };
+    }
     case "read_journal":
       return await journalEntries(Math.max(1, Math.min(20, Number(args.limit) || 5)));
     case "start_focus": {

@@ -3,6 +3,7 @@ import { listen } from "@tauri-apps/api/event";
 import { eventsRange, kvSet, nowSec } from "../api";
 import { weekKey, weekStart } from "./recap";
 import { deadlinesMet } from "../study/plans";
+import { cleanTitle, fmtPct, gradeWeights, rank } from "../study/grades";
 
 type Action = { label: string; run: () => void };
 export interface MindfulCtx {
@@ -78,16 +79,23 @@ export function useMindful(c: MindfulCtx) {
         byDay.set(d, (byDay.get(d) ?? 0) + 1);
       }
       const [busiest, n] = [...byDay].reduce<[string, number]>((a, b) => (b[1] > a[1] ? b : a), ["", 0]);
+      // The week's top pick by the planning formula (grade weight ÷ days left), when a syllabus gave weights.
+      const top = rank(due, await gradeWeights(), now).find((r) => r.weight.known);
+      const big = top && top.weight.weight >= 10
+        ? `${cleanTitle(top.event.title)} is the big one: ${fmtPct(top.weight.weight)} of your grade, due ${new Date(top.event.start * 1000).toLocaleDateString([], { weekday: "long" })}.`
+        : "";
       let text = "";
-      if (n >= 3) text = `${plural(n, "thing")} due ${busiest}. Want to start one today?`;
-      else if (due.length >= 5) text = `${plural(due.length, "deadline")} this week. Want to start one today?`;
+      if (n >= 3) text = `${plural(n, "thing")} due ${busiest}.${big ? `\n${big}` : ""} Want to start ${big ? "it" : "one"} today?`;
+      else if (due.length >= 5) text = `${plural(due.length, "deadline")} this week.${big ? `\n${big}` : ""} Want to start ${big ? "it" : "one"} today?`;
+      else if (big) text = `${big} Want to start it today?`;
       else if (preview) text = due.length ? `A lighter week: ${plural(due.length, "deadline")} coming up. Nice pacing!` : "Nothing due this week. Enjoy the breathing room.";
       if (!text) return;
       await rouse();
       const { say, hush, openPanel, openFocusMenu } = ctx.current;
       say(text, {
         ms: 30000,
-        actions: n >= 3 || due.length >= 5
+        rich: text.includes("\n"),
+        actions: n >= 3 || due.length >= 5 || big
           ? [
               { label: "Start focus", run: () => { hush(); openFocusMenu(); } },
               { label: "Plan in Today", run: () => { hush(); openPanel("today"); } },

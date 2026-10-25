@@ -925,7 +925,9 @@ export default function Pet() {
 
   // Same for the speech bubble: slide it back inside the visible part of the window.
   const visLo = screen.current.x - pos.current.x, visHi = screen.current.x + screen.current.w - pos.current.x;
-  const bubbleCx = clamp(cx, visLo + 156, Math.max(visLo + 156, visHi - 156));
+  // Keep the bubble on screen, but never past the pet window's own edges either, or the window clips it.
+  const bubbleLo = Math.max(visLo, 0) + 156, bubbleHi = Math.min(visHi, WIN_W) - 156;
+  const bubbleCx = clamp(cx, bubbleLo, Math.max(bubbleLo, bubbleHi));
   const tailShift = clamp(cx - bubbleCx, -110, 110);
 
   // Props show while locked in, and stay for their pop-out; a drag, toss or hide puts them away at once.

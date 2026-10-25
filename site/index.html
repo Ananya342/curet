@@ -25,6 +25,7 @@
     <a class="wordmark" href="#top" aria-label="Curet, back to top" translate="no">c<b>u</b>ret</a>
     <nav aria-label="Page">
       <a href="#day">The day</a>
+      <a href="#plan">Syllabus</a>
       <a href="#pets">Pets</a>
       <a href="#setup">Setup</a>
     </nav>
@@ -49,7 +50,7 @@
 <!-- ============================================================ one Tuesday (scroll scene) -->
 <section class="scene day" id="day" data-scene="tuesday" data-options='{"hold":2.4}' aria-labelledby="day-h">
   <!-- The cat peeks over the top edge of this chapter, as it does over the u in the logo. -->
-  <div class="peek peek-cat" style="--w:min(24vw,330px);--r:1.19;--x:84%">
+  <div class="peek peek-cat" style="--w:var(--cat-w);--r:1.19;--x:84%">
     <div class="crop"><img src="assets/pets/cat.png" width="756" height="900" alt="Mochi, an orange cat, peeking over the edge" fetchpriority="high"></div>
     <i class="paw l"></i><i class="paw r"></i>
   </div>
@@ -98,10 +99,6 @@
 
 <!-- ============================================================ what it does -->
 <section class="board-wrap" id="features" aria-labelledby="features-h">
-  <div class="peek" style="--w:min(22vw,300px);--r:1.08;--x:40%">
-    <div class="crop"><img src="assets/pets/redpanda.png" width="646" height="698" alt="Maple, a red panda, peeking over the edge" loading="lazy"></div>
-    <i class="paw l"></i><i class="paw r"></i>
-  </div>
 
   <div class="board">
     <div class="tile t-head"><h2 id="features-h">Small things, handled</h2></div>
@@ -146,8 +143,128 @@
   </div>
 </section>
 
+<!-- ============================================================ syllabus → calendar → study blocks (try it) -->
+<section class="plan" id="plan" aria-labelledby="plan-h">
+  <div class="plan-head">
+    <h2 id="plan-h">Syllabus in.<br>Semester planned.</h2>
+    <p class="plan-try">Try it: three clicks.</p>
+  </div>
+
+  <div class="plan-flow" id="plan-demo">
+    <!-- 1. the syllabus, as the Today tab shows it after reading -->
+    <div class="step">
+      <p class="step-n"><b>1</b> Read</p>
+      <div class="mini-panel syl-card" data-ui>
+        <p class="mp-h">ENGL 210 syllabus</p>
+        <ul class="syl-list">
+          <li><button type="button" class="syl-item on" data-ev="quiz" aria-pressed="true"><i class="tick"></i><span><b>Quiz 4</b><small>Wed 9:00 AM</small></span></button></li>
+          <li><button type="button" class="syl-item on" data-ev="essay" aria-pressed="true"><i class="tick"></i><span><b>Essay 2</b><small>Due Thu</small></span></button></li>
+          <li><button type="button" class="syl-item on" data-ev="midterm" aria-pressed="true"><i class="tick"></i><span><b>Midterm</b><small>Fri 3:00 PM</small></span></button></li>
+          <li><button type="button" class="syl-item" data-ev="reading" aria-pressed="false"><i class="tick"></i><span><b>Reading 5</b><small>Mon</small></span></button></li>
+        </ul>
+        <button type="button" class="b go wide demo-add">Add 3 to calendar</button>
+      </div>
+    </div>
+
+    <!-- 2. the week on Google Calendar -->
+    <div class="step step-cal">
+      <p class="step-n"><b>2</b> Add</p>
+      <div class="mini-panel gcal" data-ui>
+        <p class="mp-h">Google Calendar</p>
+        <div class="week">
+          <span class="wd" style="grid-column:2">Mon</span><span class="wd" style="grid-column:3">Tue</span><span class="wd" style="grid-column:4">Wed</span><span class="wd" style="grid-column:5">Thu</span><span class="wd" style="grid-column:6">Fri</span>
+          <span class="hr" style="grid-row:3">9</span><span class="hr" style="grid-row:5">11</span><span class="hr" style="grid-row:7">1</span><span class="hr" style="grid-row:9">3</span><span class="hr" style="grid-row:11">5</span>
+          <span class="ev cls" style="grid-column:2;grid-row:4/6">CS 241</span>
+          <span class="ev cls" style="grid-column:4;grid-row:5/7">CS 241</span>
+          <span class="ev syl" data-ev="quiz" style="grid-column:4;grid-row:3/5">Quiz 4</span>
+          <span class="ev syl allday" data-ev="essay" style="grid-column:5;grid-row:2">Essay 2 due</span>
+          <span class="ev syl" data-ev="midterm" style="grid-column:6;grid-row:9/11">Midterm</span>
+          <span class="ev syl allday" data-ev="reading" style="grid-column:2;grid-row:2">Reading 5</span>
+          <span class="ev study" data-slot="0" style="grid-column:3;grid-row:9/12">Study: Essay 2</span>
+          <span class="ev study" data-slot="1" style="grid-column:4;grid-row:8/11">Study: Essay 2</span>
+          <span class="ev study" data-slot="2" style="grid-column:2;grid-row:7/10">Study: Essay 2</span>
+        </div>
+        <p class="legend"><i class="syl"></i>syllabus <i class="study"></i>study <i class="cls"></i>class</p>
+      </div>
+    </div>
+
+    <!-- 3. the pet offers a study block -->
+    <div class="step">
+      <p class="step-n"><b>3</b> Plan</p>
+      <div class="offer">
+        <div class="bubble offer-bubble" data-ui aria-live="polite">
+          <p class="bubble-text">Add your deadlines first.</p>
+          <div class="bubble-actions"></div>
+        </div>
+        <img class="offer-pet" src="assets/pets/cat.png" width="756" height="900" alt="" loading="lazy">
+      </div>
+    </div>
+  </div>
+
+  <ul class="chips" aria-label="What it handles">
+    <li>PDFs and photos</li><li>Every dated item</li><li>One click to Google Calendar</li><li>Study blocks booked for you</li>
+  </ul>
+</section>
+
+<!-- ============================================================ looks after you -->
+<section class="care" id="care" aria-labelledby="care-h">
+  <div class="board care-board">
+    <div class="tile t-head"><h2 id="care-h">It looks after you, too</h2></div>
+
+    <div class="tile k-procrast c-coral">
+      <div class="bubble k-bubble" data-ui>
+        <p class="bubble-text">“Lab report” is due in 3h… and we’re watching YouTube.</p>
+        <div class="bubble-actions"><span class="b go">Lock in 25 min</span><span class="b">5 more min</span><span class="b">It’s a break</span></div>
+      </div>
+      <p class="cap"><b>Catches you procrastinating</b></p>
+    </div>
+
+    <div class="tile k-week c-sky">
+      <div class="k-chart" data-ui>
+        <p class="k-big">6h 40m <small>focused</small></p>
+        <div class="k-bars"><i style="--h:40%"></i><i style="--h:72%"></i><i style="--h:55%"></i><i style="--h:100%"></i><i style="--h:30%"></i><i style="--h:18%"></i><i style="--h:8%"></i></div>
+        <div class="k-days"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+      </div>
+      <p class="cap"><b>Your week, like Screen Time</b></p>
+    </div>
+
+    <div class="tile k-eyes c-butter">
+      <div class="k-ring" data-ui>
+        <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="5"/><circle cx="20" cy="20" r="15" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-dasharray="94.25" stroke-dashoffset="34" transform="rotate(-90 20 20)"/></svg>
+        <span>0:18</span>
+      </div>
+      <p class="cap"><b>Rest your eyes</b></p>
+    </div>
+
+    <div class="tile k-journal c-pink">
+      <div class="k-lines" data-ui><p>Who made your week a little better? Did you tell them?</p><i></i><i></i><i></i></div>
+      <p class="cap"><b>Weekly journal</b></p>
+    </div>
+
+    <div class="tile k-late c-ink">
+      <p class="k-quote" data-ui>It’s getting late. Wind down soon?</p>
+      <p class="cap"><b>Late-night wind-down</b></p>
+    </div>
+
+    <div class="tile k-mood c-mint">
+      <div class="k-moods" data-ui><img src="assets/pets/ghost.png" width="540" height="519" alt="" loading="lazy"><span class="b go">on top of it</span><span class="b">due tomorrow</span></div>
+      <p class="cap"><b>Feels your workload</b></p>
+    </div>
+
+    <div class="tile k-voice c-peachdark">
+      <div class="k-wave" data-ui aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <p class="cap"><b>Talks, and knows when to hush</b></p>
+    </div>
+
+    <div class="tile k-dress c-butter">
+      <div class="k-pets" data-ui><span data-dressed="ghost"></span><span data-dressed="dog"></span><span data-dressed="blob"></span><span data-dressed="cat"></span></div>
+      <p class="cap"><b>Dress-up</b></p>
+    </div>
+  </div>
+</section>
+
 <!-- ============================================================ seven pets (the live thing) -->
-<section class="scene pets" id="pets" data-scene="pets" data-options='{"hold":4}' aria-labelledby="pets-h">
+<section class="scene pets" id="pets" data-scene="pets" data-options='{"hold":3.5}' aria-labelledby="pets-h">
   <div class="scene-stage">
   <div class="pets-grid">
     <div class="pets-list" role="group" aria-label="Choose a pet">
@@ -178,7 +295,15 @@
     <i class="paw l"></i><i class="paw r"></i>
   </div>
   <div class="two">
-    <h2 id="setup-h">Set up in four steps</h2>
+    <div class="side">
+      <h2 id="setup-h">Set up in four steps</h2>
+      <div class="mini-panel paste-card" data-ui aria-hidden="true">
+        <p class="mp-h">Brightspace deadlines</p>
+        <p class="paste">https://school.brightspace.com/d2l/le/calendar/feed.ics?token=…</p>
+        <span class="b go">Add link</span>
+        <p class="ok">Connected. Your deadlines are syncing.</p>
+      </div>
+    </div>
     <ol>
       <li><b>Install it.</b> Drag Curet.app into Applications. The first time, right-click it and choose Open: the build is not notarised yet, so a double-click is refused. If macOS says the app is damaged, run <code>xattr -dr com.apple.quarantine /Applications/Curet.app</code> once.</li>
       <li><b>Connect Brightspace.</b> In Brightspace open Calendar, then Settings, and tick Enable Calendar Feeds. Only then does Subscribe appear, and this is where almost everyone gets stuck. Choose All Calendars and Tasks, copy the link, and paste it into Curet.</li>
@@ -190,14 +315,19 @@
 
 <!-- ============================================================ questions -->
 <section class="faq" id="faq" aria-labelledby="faq-h">
-  <div class="peek" style="--w:min(26vw,350px);--r:0.83;--x:60%">
+  <div class="peek" style="--w:min(26vw,350px);--r:0.83;--x:22%">
     <div class="crop"><img src="assets/pets/blob.png" width="766" height="638" alt="Jelly, a purple blob, peeking over the edge" loading="lazy"></div>
     <i class="paw l"></i><i class="paw r"></i>
   </div>
   <div class="two">
-    <h2 id="faq-h">Questions</h2>
+    <div class="side">
+      <h2 id="faq-h">Questions</h2>
+      <p class="side-note">Curet is built by students, for the week before everything is due.</p>
+    </div>
     <div class="acc">
       <details name="faq"><summary>Is it free?</summary><p>Yes. Curet is free and open source.</p></details>
+      <details name="faq"><summary>What can it read from a syllabus?</summary><p>A PDF, a photo or a text file. It lists every dated exam, quiz, assignment and project, and you choose which go on your Google Calendar. Undated patterns like “quizzes most Fridays” are left out.</p></details>
+      <details name="faq"><summary>Does it watch my screen?</summary><p>No. To catch procrastination it reads only the name of the app in front, on your Mac, and never stores it. You can turn it off in Settings.</p></details>
       <details name="faq"><summary>Does it read my email?</summary><p>No. It only sees the calendars you connect, and nothing else.</p></details>
       <details name="faq"><summary>Where does my data live?</summary><p>On your Mac, in a private file. Calendar requests go to Google and to your Brightspace link. If you turn on chat, your questions and the details it needs go to Google’s Gemini.</p></details>
       <details name="faq"><summary>Can it change my calendar?</summary><p>Only when you ask. After you sign in with Google and allow it, Curet can add an event you describe. It never edits or deletes the ones you already have.</p></details>
@@ -210,7 +340,7 @@
 
 <!-- ============================================================ closing call -->
 <section class="cta" aria-labelledby="cta-h">
-  <div class="peek" style="--w:min(22vw,300px);--r:1.19;--x:8%">
+  <div class="peek" style="--w:min(22vw,300px);--r:1.19;--x:16%">
     <div class="crop"><img src="assets/pets/cat.png" width="756" height="900" alt="Mochi peeking over the edge again" loading="lazy"></div>
     <i class="paw l"></i><i class="paw r"></i>
   </div>
@@ -232,5 +362,7 @@
 <script src="scenes/stage.js"></script>
 <script src="scenes.js"></script>
 <script src="main.js" defer></script>
+<script type="module" src="hero-pets.js"></script>
+<script type="module" src="plan-demo.js"></script>
 </body>
 </html>

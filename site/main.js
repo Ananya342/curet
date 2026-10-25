@@ -14,7 +14,7 @@ if (reduce || !("IntersectionObserver" in window)) {
 }
 
 // Reveal the parts of the later chapters too, without having to tag each in the markup.
-const later = document.querySelectorAll(".tile, .setup li, .acc details, .cta-line > *, .dialog");
+const later = document.querySelectorAll(".tile, .plan-head > *, .plan-flow > *, .chips, .side > *, .setup li, .acc details, .cta-line > *, .dialog");
 later.forEach((el, i) => { el.classList.add("reveal"); el.style.setProperty("--d", String(i % 4)); });
 if (!reduce && "IntersectionObserver" in window) {
   const io2 = new IntersectionObserver(
@@ -80,6 +80,6 @@ if (petsScene) {
 }
 choose("ghost");
 
-// ---- the live Three.js layer: bouncing pets, sparkle trail, a spinning showcase pet.
+// ---- the live Three.js layer: the hero's pets standing together, and a spinning showcase pet.
 // It loads only when motion is welcome, and the page is complete without it.
 if (!reduce) import("./three-scene.js").catch(() => {});

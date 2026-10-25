@@ -7,6 +7,7 @@ import { StudyPlan, deadlineKey, deadlinesDone, isExam, setDeadlineDone, studyPl
 import Syllabus from "./Syllabus";
 import DatePicker from "./DatePicker";
 import Select from "./Select";
+import { GradeWeight, cleanTitle, fmtPct, gradeWeights, rank, weightOf } from "../study/grades";
 
 export default function Today() {
   const [today, setToday] = useState<CalEvent[]>([]);
@@ -14,6 +15,7 @@ export default function Today() {
   const [todo, setTodo] = useState<Task[]>([]);
   const [done, setDone] = useState<Record<string, number>>({});
   const [plans, setPlans] = useState<StudyPlan[]>([]);
+  const [weights, setWeights] = useState<GradeWeight[]>([]);
   const [title, setTitle] = useState("");
   const [hint, setHint] = useState("");
   const [syncing, setSyncing] = useState(false);
@@ -31,9 +33,10 @@ export default function Today() {
     setDeadlines(up.filter((e) => (e.kind === "deadline" && (e.start > nowSec() || !dn0[deadlineKey(e)])) || (isExam(e) && e.start > nowSec())));
     // Open tasks, then whatever was ticked off today (struck through).
     setTodo(ts.filter((x) => !x.done || (x.done_at ?? 0) >= d));
-    const [dn, ps] = await Promise.all([deadlinesDone(), studyPlans()]);
+    const [dn, ps, gw] = await Promise.all([deadlinesDone(), studyPlans(), gradeWeights()]);
     setDone(dn);
     setPlans(ps);
+    setWeights(gw);
   }, []);
 
   useEffect(() => {
@@ -86,6 +89,14 @@ export default function Today() {
   // Ticked-off tasks only keep the open ones company; with nothing left to do, the list is just empty.
   const hasOpen = todo.some((t) => !t.done);
 
+  // The planner's pick: highest grade weight ÷ days left among unfinished deadlines (see study/grades.ts).
+  const ranked = rank(deadlines.filter((e) => !done[deadlineKey(e)]), weights, now);
+  const first = ranked.length > 1 && ranked.some((r) => r.weight.known) ? ranked[0] : null;
+  const other = first && ranked.slice(1).find((r) => r.weight.known && r.weight.weight < first.weight.weight);
+  const firstWhy = !first ? "" : first.weight.known
+    ? `: it's ${fmtPct(first.weight.weight)} of your grade, due in ${untilLabel(first.event.start, now)}${other ? `. ${cleanTitle(other.event.title)} is ${fmtPct(other.weight.weight)}.` : "."}`
+    : `: it's due in ${untilLabel(first.event.start, now)}.`;
+
   return (
     <div className="scroll">
       <section aria-labelledby="h-today">
@@ -113,16 +124,18 @@ export default function Today() {
       {deadlines.length > 0 && (
         <section aria-labelledby="h-deadlines">
           <h2 id="h-deadlines">Deadlines & exams</h2>
+          {first && <p className="start-here"><b>Start with {cleanTitle(first.event.title)}</b>{firstWhy}</p>}
           <ul className="items">
             {deadlines.map((e) => {
               const key = deadlineKey(e);
               const isDone = Boolean(done[key]);
               const plan = plans.find((p) => p.key === key && p.status !== "skipped" && p.end > now);
+              const w = weightOf(e, weights);
               return (
-                <li key={e.id + e.start} className={isDone ? "done" : ""}>
+                <li key={e.id + e.start} className={`${isDone ? "done" : ""}${first && first.event === e ? " first" : ""}`}>
                   <input type="checkbox" checked={isDone} onChange={() => setDeadlineDone(key, !isDone, e.start <= now ? e.start : undefined).then(load)} aria-label={`Mark “${e.title}” as done`} />
                   <div className="grow">
-                    <div className="t">{e.title}</div>
+                    <div className="t">{cleanTitle(e.title)}{w.known && <span className="weight tnum" title="Share of your final grade, from your syllabus">{fmtPct(w.weight)}</span>}</div>
                     <div className="s tnum">
                       {isExam(e) && "Exam · "}{fmtDay(e.start)}, {fmtTime(e.start)} · {e.start <= now ? (isDone ? "done" : <b className="missed">missed</b>) : `in ${untilLabel(e.start, now)}`}
                       {plan && !isDone && <> · <b>study {fmtDay(plan.start)} {fmtTime(plan.start)}</b></>}
