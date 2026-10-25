@@ -9,7 +9,7 @@ import {
   Proposal, StudyPlan, acceptProposal, blockStartingNow, dayWord, deadlineKey, markAsked, nextProposal, setDeadlineDone, slotFor,
   studyPlans, timeWord, updatePlan,
 } from "./plans";
-import { cleanTitle, fmtPct } from "./grades";
+import { cleanTitle } from "./titles";
 
 type Action = { label: string; run: () => void };
 export interface StudyCtx {
@@ -21,18 +21,8 @@ export interface StudyCtx {
   focusActive: () => boolean;
 }
 
-/**
- * The first line of a study offer. With syllabus weights: "“Essay 2”: 20% of your grade, due Sunday 3:15 PM.
- * Quiz 4 is only 2%, so this first." Without them, just when it's due.
- */
-function why(p: Proposal) {
-  const d = p.deadline, w = p.weight, r = p.runnerUp;
-  const title = `“${cleanTitle(d.title)}”`;
-  if (!w?.known) return `${title} is due ${dayWord(d.start)} at ${timeWord(d.start)}.`;
-  const first = `${title}: ${fmtPct(w.weight)} of your grade, due ${dayWord(d.start)} ${timeWord(d.start)}.`;
-  if (!r || r.weight.weight >= w.weight) return first;
-  return `${first} ${cleanTitle(r.deadline.title)} is only ${fmtPct(r.weight.weight)}, so this first.`;
-}
+/** The first line of a study offer. */
+const why = (p: Proposal) => `“${cleanTitle(p.deadline.title)}” is due ${dayWord(p.deadline.start)} at ${timeWord(p.deadline.start)}.`;
 
 const OFFER_EVERY = 3 * 3600; // at most one unprompted plan offer every 3 hours
 // Procrastination: how long a distracting app has to stay in front before the pet says something, and how long it
@@ -60,7 +50,7 @@ export function useStudy(c: StudyCtx) {
     await rouse();
     const { say, hush } = ctx.current;
     const d = p.deadline;
-    say(`${why(p)}\n${p.weight?.known ? "Free" : "You're free"} ${dayWord(p.start)} ${timeWord(p.start)}–${timeWord(p.end)}. ${p.weight?.known ? "Book it for studying?" : "Want me to block it for studying?"}`, {
+    say(`${why(p)}\nYou're free ${dayWord(p.start)} ${timeWord(p.start)}–${timeWord(p.end)}. Want me to block it for studying?`, {
       ms: 40000,
       rich: true,
       actions: [
@@ -78,7 +68,7 @@ export function useStudy(c: StudyCtx) {
           label: "Other time",
           run: async () => {
             hush();
-            const next = await slotFor(d, p.end, p.weight);
+            const next = await slotFor(d, p.end);
             if (next) propose(next);
             else { await markAsked(`${d.source}:${d.id}`); say("That was the last free stretch before it's due. I'll keep an eye on it.", { ms: 5000 }); }
           },

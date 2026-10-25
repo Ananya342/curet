@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curet Privacy Policy</title>
+<meta name="description" content="What Curet stores, what it sends to other services, and how to remove it.">
+<meta name="theme-color" content="#FFE6D2">
+<link rel="icon" type="image/png" href="assets/curet-icon.png">
+<link rel="stylesheet" href="style.css?v=15">
+<style>
+  .doc-page { background: var(--peach); min-height: 100svh; padding: 28px var(--margin) 80px; }
+  .doc-page .bar { display: flex; justify-content: space-between; align-items: center; max-width: 720px; margin: 0 auto 36px; }
+  .doc { max-width: 720px; margin: 0 auto; background: var(--paper); border: 3px solid var(--ink); border-radius: 22px; padding: clamp(22px, 5vw, 44px); display: grid; gap: 14px; }
+  .doc h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.05; }
+  .doc h2 { font-size: 21px; line-height: 1.2; letter-spacing: -0.02em; margin-top: 14px; }
+  .doc p, .doc li { line-height: 1.6; max-width: 65ch; }
+  .doc ul { margin: 0; padding-left: 22px; display: grid; gap: 7px; }
+  .doc .date { color: #7a5f55; font-weight: 700; }
+  .doc code { font-size: 0.92em; background: var(--peach); padding: 1px 6px; border-radius: 6px; overflow-wrap: anywhere; }
+  .doc a { color: var(--ink); text-decoration-thickness: 2px; text-underline-offset: 3px; font-weight: 800; }
+</style>
+</head>
+<body>
+<main class="doc-page">
+  <div class="bar">
+    <a class="wordmark" href="./" aria-label="Curet, home" translate="no">c<b>u</b>ret</a>
+    <a class="textlink" href="./">Back to the site</a>
+  </div>
+  <article class="doc">
+    <h1>Curet Privacy Policy</h1>
+    <p class="date">Effective October 24, 2026</p>
+    <p>Curet is a small pet that lives on your Mac. It reads your calendars, helps you plan study time, and chats with you. This page explains what it keeps, where that goes, and how to remove it.</p>
+    <p>The short version: <strong>your data stays on your Mac.</strong> Curet has no accounts and no servers of its own, and the people who make it cannot see anything you do with it. The only times data leaves your Mac are the features listed under "Services Curet talks to", and each one goes straight from your Mac to that service.</p>
+    <h2>What Curet stores on your Mac</h2>
+    <p>Everything below is kept in a local database in <code>~/Library/Application Support/com.sid.lifepet/</code>:</p>
+    <ul>
+    <li>Calendar events and deadlines synced from the calendars you connect.</li>
+    <li>Your to-do list, the things you ask your pet to remember, and your recent chat history.</li>
+    <li>Your weekly journal entries, focus sessions, study blocks and which deadlines you ticked off.</li>
+    <li>Your settings, your pet and its outfit.</li>
+    <li>The API keys you paste in (Gemini, ElevenLabs) and the sign-in tokens Google gives Curet. These are stored as plain text in that database, protected by your Mac user account like any other file in your Library folder.</li>
+    </ul>
+    <h2>What Curet does not do</h2>
+    <ul>
+    <li>It does not collect analytics, usage statistics, crash reports or advertising data.</li>
+    <li>It does not read your screen, your keystrokes, your files or your other apps' content, and it does not ask for Screen Recording or Accessibility permission.</li>
+    <li>It does not sell, rent or share your data.</li>
+    </ul>
+    <h2>Services Curet talks to</h2>
+    <p><strong>Google Calendar (only if you sign in).</strong> Curet asks to see your calendar and to add events you create, including study blocks you approve. It also reads your calendar list and the email address of the account, to show who is signed in. Sign-in tokens stay on your Mac. Signing out in Settings revokes them with Google. Curet's use of information received from Google APIs follows the <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener">Google API Services User Data Policy</a>, including the Limited Use requirements.</p>
+    <p><strong>Brightspace and other calendar links.</strong> If you paste a calendar link, Curet downloads it directly from your school's or calendar provider's server. The link contains a private token, which is stored on your Mac and sent nowhere else.</p>
+    <p><strong>Google Gemini (for chat and syllabus reading).</strong> When you chat with your pet, or upload a syllabus, Curet sends this to Google's Gemini API using your own API key:</p>
+    <ul>
+    <li>Your messages and the last few messages of the conversation.</li>
+    <li>A snapshot so it can answer about your day: events for the next 3 days, deadlines for the next 45 days, your open tasks, things you asked it to remember, this week's focus totals, your pet and settings, the names of your connected calendars, and the signed-in Google email.</li>
+    <li>The syllabus file you choose, when you upload one.</li>
+    </ul>
+    <p>Your journal is not included unless you ask your pet to read it. Google's terms for the Gemini API decide how it handles that data, and they differ between free and paid plans (the free tier may use content to improve Google's products). See <a href="https://ai.google.dev/gemini-api/terms" rel="noopener">Google's Gemini API terms</a> for your plan.</p>
+    <p><strong>ElevenLabs (only if you add a key).</strong> When voice is on, the text of the reminders, briefings and nudges your pet says out loud is sent to ElevenLabs to turn into speech. Nothing else is sent. See <a href="https://elevenlabs.io/privacy" rel="noopener">ElevenLabs' privacy policy</a>.</p>
+    <h2>The "distracting app" check</h2>
+    <p>When something is due, your pet can notice that you have been on a distracting app for a while. Every 20 seconds or so while it is out, Curet looks at the <strong>name of the app in front</strong> and, if that is Safari, Chrome, Arc, Brave or another supported browser, the <strong>website (domain only, like youtube.com) of the tab in front</strong>. It compares that against a built-in list on your Mac. It never stores or sends it, and never looks at page contents, other tabs or the full address. Settings → Study help shows the last thing it checked.</p>
+    <p>macOS asks your permission before Curet can read a browser tab (Privacy &amp; Security → Automation). You can turn the check off in Settings → Study help, switch off just the website part, or refuse the macOS prompt.</p>
+    <h2>Your choices</h2>
+    <ul>
+    <li>Turn off any feature in Settings: voice, nudges, study blocks, the distracting-app check, wandering.</li>
+    <li>Remove a calendar link or sign out of Google in Settings. Signing out also revokes Curet's access at Google. You can do that yourself at <a href="https://myaccount.google.com/permissions" rel="noopener">myaccount.google.com/permissions</a>.</li>
+    <li>Clear your chat history with the clear button in the Chat tab.</li>
+    <li>Delete everything Curet stores by quitting it and deleting the <code>com.sid.lifepet</code> folder shown above. Uninstalling the app alone does not delete it.</li>
+    </ul>
+    <p>Data you sent to Google or ElevenLabs is held under their policies, so deleting it there means using their tools.</p>
+    <h2>Children</h2>
+    <p>Curet is made for students and is not directed at children under 13. If you are under 13, please don't use it.</p>
+    <h2>Changes</h2>
+    <p>If this policy changes, the new version will appear here with a new date at the top.</p>
+    <h2>Contact</h2>
+    <p>Questions or requests: open an issue at <a href="https://github.com/Ananya342/curet/issues" rel="noopener">github.com/Ananya342/curet/issues</a>.</p>
+  </article>
+</main>
+</body>
+</html>

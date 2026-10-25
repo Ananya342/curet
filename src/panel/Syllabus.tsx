@@ -3,7 +3,6 @@ import { emitTo } from "@tauri-apps/api/event";
 import { addCalendarEvent, startOfDay } from "../api";
 import { friendlyError } from "../ai/gemini";
 import { Syllabus as Parsed, SyllabusItem, readSyllabus, suggested } from "../study/syllabus";
-import { fmtPct, saveSyllabusWeights } from "../study/grades";
 
 const KIND: Record<SyllabusItem["kind"], string> = { exam: "Exam", quiz: "Quiz", assignment: "Due", project: "Project", other: "Other" };
 // How long to block when the syllabus gives a time but no length.
@@ -29,8 +28,6 @@ export default function Syllabus() {
     try {
       const s = await readSyllabus(f, setBusy);
       setParsed(s);
-      // Weights are kept even for items left off the calendar: Brightspace deadlines match against them too.
-      if (await saveSyllabusWeights(s)) emitTo("panel", "plans-updated", null).catch(() => {});
       setPicked(new Set(s.items.flatMap((i, n) => (suggested(i) ? [n] : []))));
       if (!s.items.length) setNote({ text: "I couldn't find any dated exams or deadlines in that file.", bad: true });
     } catch (e) {
@@ -73,7 +70,7 @@ export default function Syllabus() {
       <h2 id="h-syllabus">Syllabus</h2>
       {!parsed && !busy && (
         <>
-          <p className="hint">Upload a syllabus and your pet finds the exams and deadlines in it, and how much each counts toward your grade, so it can tell you what to start first.</p>
+          <p className="hint">Upload a syllabus and your pet finds the exams and deadlines in it, ready to add to your calendar.</p>
           <button className="btn" onClick={() => file.current?.click()}>Upload a syllabus</button>
         </>
       )}
@@ -82,7 +79,7 @@ export default function Syllabus() {
       {busy && <p className="status" role="status"><span className="spin" aria-hidden="true" />{busy}</p>}
       {parsed && parsed.items.length > 0 && !busy && (
         <>
-          <p className="hint">Found {parsed.items.length} in <b>{parsed.course || "your syllabus"}</b>{parsed.items.some((i) => i.weight) ? ", with how much each counts. Your pet now plans by grade weight" : ""}. Exams and quizzes are ticked; pick anything else you want.</p>
+          <p className="hint">Found {parsed.items.length} in <b>{parsed.course || "your syllabus"}</b>. Exams and quizzes are ticked; pick anything else you want.</p>
           <ul className="tasks">
             {parsed.items.map((i, n) => (
               <li key={n} className={picked.has(n) ? "" : "off"}>
@@ -90,7 +87,7 @@ export default function Syllabus() {
                   <input type="checkbox" checked={picked.has(n)} onChange={() => toggle(n)} />
                   <span className="grow">
                     <span className="tt">{i.title}</span>
-                    <em className="tnum">{KIND[i.kind]} · {when(i)}{i.weight ? ` · ${fmtPct(i.weight)} of grade` : ""}</em>
+                    <em className="tnum">{KIND[i.kind]} · {when(i)}</em>
                   </span>
                 </label>
               </li>

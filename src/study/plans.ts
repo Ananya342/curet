@@ -2,7 +2,6 @@ import { emitTo } from "@tauri-apps/api/event";
 import { CalEvent, addCalendarEvent, eventsRange, kvGet, kvSet, nowSec, startOfDay } from "../api";
 import { readList } from "../wellbeing/log";
 import { freeGaps } from "../wellbeing/gaps";
-import { Weighed, blockMinutes, gradeWeights, priority, weightOf } from "./grades";
 
 const DAY = 86400;
 
@@ -66,10 +65,9 @@ export interface Proposal {
   deadline: CalEvent;
   start: number;
   end: number;
-  /** How much the deadline counts, and the next one in line, so the pet can say why this one goes first. */
-  weight?: Weighed;
-  runnerUp?: { deadline: CalEvent; weight: Weighed };
 }
+
+const BLOCK = 120 * 60;
 
 // Exams added from a syllabus (or by hand) are calendar events, not deadlines, but deserve a study block too.
 export const EXAM = /\b(exam(ination)?s?|midterms?|finals?|quiz(zes)?|tests?)\b/i;
@@ -77,23 +75,20 @@ export const EXAM = /\b(exam(ination)?s?|midterms?|finals?|quiz(zes)?|tests?)\b/
 export const isExam = (e: Pick<CalEvent, "kind" | "title">) => e.kind === "event" && EXAM.test(e.title) && !/^study:/i.test(e.title);
 
 /**
- * The first good study slot for `deadline`: a free stretch as long as its grade weight calls for (1, 2 or 3 hours,
- * see blockMinutes), or at least an hour cut to fit, on a day before it's due, starting from today if there's
- * still time. Never in the last 2 hours before it's due.
+ * The first good study slot for `deadline`: a free stretch of 2 hours (or at least 1, cut to fit) on a day before
+ * it's due, starting from today if there's still time. Never in the last 2 hours before it's due.
  */
-export async function slotFor(deadline: CalEvent, after = nowSec(), weight?: Weighed): Promise<Proposal | null> {
-  const w = weight ?? weightOf(deadline, await gradeWeights());
-  const want = blockMinutes(w.weight);
+export async function slotFor(deadline: CalEvent, after = nowSec()): Promise<Proposal | null> {
   const cutoff = deadline.start - 2 * 3600;
   for (let d = startOfDay(new Date(after * 1000)); d <= startOfDay(new Date(cutoff * 1000)); d += DAY) {
     const day = new Date(d * 1000 + 12 * 3600 * 1000); // midday, so a DST shift can't land it on the wrong date
     const from = Math.max(after + 15 * 60, d);
-    for (const minutes of [...new Set([want, 120, 60])].filter((m) => m <= want)) {
+    for (const minutes of [120, 60]) {
       for (const g of await freeGaps(day, minutes, from)) {
         // Start on a quarter hour, so it reads like something a person would schedule.
         const start = Math.ceil(g.start / 900) * 900;
-        const end = Math.min(start + want * 60, g.end, cutoff);
-        if (end - start >= minutes * 60) return { deadline, start, end, weight: w };
+        const end = Math.min(start + BLOCK, g.end, cutoff);
+        if (end - start >= minutes * 60) return { deadline, start, end };
       }
     }
   }
@@ -104,24 +99,19 @@ export async function slotFor(deadline: CalEvent, after = nowSec(), weight?: Wei
  * The next deadline worth planning for: due within a week but not in the next few hours, not ticked off,
  * not already planned, and not one the pet already asked about. `key` asks about one deadline in particular
  * (the Plan button in Today), ignoring whether it was asked about before.
- * Candidates go in priority order (grade weight ÷ days left, see grades.ts), not just soonest first.
  */
 export async function nextProposal(key?: string): Promise<Proposal | null> {
   const now = nowSec();
-  const [evs, done, plans, seen, weights] = await Promise.all([eventsRange(now, now + 7 * DAY), readDone(), studyPlans(), asked(), gradeWeights()]);
+  const [evs, done, plans, seen] = await Promise.all([eventsRange(now, now + 7 * DAY), readDone(), studyPlans(), asked()]);
   const planned = new Set(plans.filter((p) => p.status !== "skipped").map((p) => p.key));
   const candidates = evs
     .filter((e) => e.kind === "deadline" || isExam(e))
     .filter((e) => (key ? deadlineKey(e) === key : e.start - now > 6 * 3600 && !seen[deadlineKey(e)]))
     .filter((e) => !done[deadlineKey(e)] && !planned.has(deadlineKey(e)))
-    .map((e) => ({ e, w: weightOf(e, weights) }))
-    .sort((a, b) => priority(b.w.weight, b.e.start, now) - priority(a.w.weight, a.e.start, now) || a.e.start - b.e.start);
-  for (let i = 0; i < candidates.length; i++) {
-    const slot = await slotFor(candidates[i].e, now, candidates[i].w);
-    if (slot) {
-      const next = candidates.find((c, j) => j !== i && c.w.known);
-      return { ...slot, runnerUp: next && { deadline: next.e, weight: next.w } };
-    }
+    .sort((a, b) => a.start - b.start);
+  for (const d of candidates) {
+    const slot = await slotFor(d, now);
+    if (slot) return slot;
   }
   return null;
 }

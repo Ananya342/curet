@@ -17,7 +17,7 @@ Write plainly and briefly (1–4 sentences unless asked for a plan or a list). N
 Format replies in Markdown: **bold** for titles and times, "- " bullet lists for several items, one item per line.
 You can see everything stored in Curet: it is all in the snapshot below. Answer questions about deadlines, the calendar, tasks, this week, focus mode, the pet, connected calendars and settings straight from it, without calling a tool. Never say you can't see the user's deadlines or data. The deadline list covers the next 45 days; call get_deadlines or get_events only for dates outside what is listed. If a list is empty, say so plainly, and if no calendar is connected, point to Settings.
 Never invent events, deadlines or tasks. Work out words like "tomorrow" or "Friday" from the current date and time below.
-Call add_calendar_event only when the user clearly asks to schedule something, and include the exact title and time in the reply. When they ask to be reminded or add something to do, call add_task. When the user shares a lasting preference, goal or project, call remember. Call start_focus or end_focus when they ask to start or stop focusing. When they say how much something counts toward their grade, call set_grade_weight.
+Call add_calendar_event only when the user clearly asks to schedule something, and include the exact title and time in the reply. When they ask to be reminded or add something to do, call add_task. When the user shares a lasting preference, goal or project, call remember. Call start_focus or end_focus when they ask to start or stop focusing.
 
 ${APP_GUIDE}
 
@@ -45,7 +45,6 @@ const STATUS: Record<string, string> = {
   get_events: "Checking your calendar…",
   get_deadlines: "Checking your deadlines…",
   read_journal: "Reading your journal…",
-  set_grade_weight: "Noting how much it counts…",
   start_focus: "Starting focus…",
   end_focus: "Ending focus…",
   find_free_time: "Looking for free time…",
