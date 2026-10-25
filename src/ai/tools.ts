@@ -4,6 +4,7 @@ import { addCalendarEvent, eventsRange, memories, nowSec, startOfDay, tasks } fr
 import { freeGaps } from "../wellbeing/gaps";
 import { getFocusUntil } from "../wellbeing/focus";
 import { cleanTitle, journalEntries } from "./snapshot";
+import { courseOf } from "../study/titles";
 
 export const declarations = [
   {
@@ -127,7 +128,7 @@ export async function runTool(name: string, args: Record<string, any>): Promise<
       const from = args.start_date ? startOfDay(parseDay(args.start_date)) : startOfDay();
       const to = args.end_date ? startOfDay(parseDay(args.end_date)) + 86400 : from + 90 * 86400;
       const evs = (await eventsRange(from, to)).filter((e) => e.kind === "deadline");
-      return evs.slice(0, 80).map((e) => ({ title: cleanTitle(e.title), due: e.all_day ? new Date(e.start * 1000).toDateString() : local(e.start), link: e.link || undefined }));
+      return evs.slice(0, 80).map((e) => ({ title: cleanTitle(e.title), course: courseOf(e.location) || undefined, due: e.all_day ? new Date(e.start * 1000).toDateString() : local(e.start), link: e.link || undefined }));
     }
     case "find_free_time": {
       const day = parseDay(args.date);

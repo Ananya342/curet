@@ -1,5 +1,6 @@
 import { eventsRange, fmtTime, nowSec, startOfDay, tasks, untilLabel } from "../api";
 import { runTool } from "../ai/tools";
+import { courseCode } from "../study/titles";
 
 export type BriefingKind = "morning" | "evening" | "week";
 export interface Briefing { greeting: string; lines: string[] }
@@ -9,8 +10,9 @@ const clip = (s: string, n = 34) => (s.length > n ? `${s.slice(0, n - 1)}…` : 
 /** Drop Brightspace's " - Due" suffix: the line already says it's due. */
 const short = (s: string, n = 22) => clip(s.replace(/\s*[-–]\s*(due|closes?|availability ends)\s*$/i, ""), n);
 const weekday = (ts: number) => new Date(ts * 1000).toLocaleDateString([], { weekday: "short" });
-const dueLine = (due: { title: string; start: number }[], label: (ts: number) => string) =>
-  `Due soon: ${due.slice(0, 2).map((d) => `${short(d.title)} (${label(d.start)})`).join(", ")}${due.length > 2 ? ` +${due.length - 2} more` : ""}`;
+const withCourse = (d: { title: string; location?: string }) => { const c = courseCode(d.location ?? ""); return c ? `${short(d.title, 18)} ${c}` : short(d.title); };
+const dueLine = (due: { title: string; start: number; location?: string }[], label: (ts: number) => string) =>
+  `Due soon: ${due.slice(0, 2).map((d) => `${withCourse(d)} (${label(d.start)})`).join(", ")}${due.length > 2 ? ` +${due.length - 2} more` : ""}`;
 
 /** Local YYYY-MM-DD, used to remember which day a briefing was already given. */
 export const todayKey = () => new Date().toLocaleDateString("en-CA");

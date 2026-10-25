@@ -10,6 +10,7 @@ struct Reminder {
     title: String,
     start: i64,
     link: String,
+    location: String,
     kind: String,
     all_day: bool,
 }
@@ -56,7 +57,7 @@ pub fn spawn(app: AppHandle) {
                 changed = true;
                 let _ = app.emit(
                     "reminder",
-                    Reminder { id: e.id, title: e.title, start: e.start, link: e.link, kind: e.kind, all_day: e.all_day },
+                    Reminder { id: e.id, title: e.title, start: e.start, link: e.link, location: e.location, kind: e.kind, all_day: e.all_day },
                 );
             }
             if changed {

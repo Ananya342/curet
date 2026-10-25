@@ -4,7 +4,7 @@ import { getOutfit } from "../accessories";
 import { PETS, PetId } from "../pets";
 import { DAY_NAMES, fmtMinutes, journal, weekRecap, weekStart } from "../wellbeing/recap";
 import { getFocusUntil, minutesLeft } from "../wellbeing/focus";
-import { cleanTitle } from "../study/titles";
+import { cleanTitle, courseOf } from "../study/titles";
 import { deadlineKey, deadlinesDone, studyPlans } from "../study/plans";
 
 const DAY = 86400;
@@ -12,12 +12,13 @@ const DAY = 86400;
 export { cleanTitle };
 
 const when = (e: CalEvent) => (e.all_day ? `${fmtDay(e.start)} (all day)` : `${fmtDay(e.start)} ${fmtTime(e.start)}`);
+const courseTag = (e: CalEvent) => (courseOf(e.location) ? ` (${courseOf(e.location)})` : "");
 const eventLine = (e: CalEvent) =>
   e.kind === "deadline"
-    ? `- [DEADLINE] ${cleanTitle(e.title)} — due ${when(e)}`
+    ? `- [DEADLINE] ${cleanTitle(e.title)}${courseTag(e)} — due ${when(e)}`
     : `- ${e.title} — ${e.all_day ? when(e) : `${fmtDay(e.start)} ${fmtTime(e.start)}–${fmtTime(e.end)}`}${e.location ? ` @ ${e.location}` : ""}`;
 const deadlineLine = (e: CalEvent, now: number, done: Record<string, number>) =>
-  `- ${cleanTitle(e.title)} — due ${when(e)}${e.start > now ? ` (in ${untilLabel(e.start, now)})` : ""}${done[deadlineKey(e)] ? " — DONE (ticked off)" : ""}`;
+  `- ${cleanTitle(e.title)}${courseTag(e)} — due ${when(e)}${e.start > now ? ` (in ${untilLabel(e.start, now)})` : ""}${done[deadlineKey(e)] ? " — DONE (ticked off)" : ""}`;
 
 /** "08:30" → "8:30 AM"; anything else ("off") → "off". */
 const clock = (v: string | null, fallback: string) => {

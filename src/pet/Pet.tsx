@@ -15,6 +15,7 @@ import { useWellbeing } from "../wellbeing/useWellbeing";
 import { speak, stopSpeaking } from "../voice/tts";
 import { useMindful } from "../wellbeing/useMindful";
 import { useStudy } from "../study/useStudy";
+import { courseCode } from "../study/titles";
 import { MoodInfo, currentMood } from "../study/mood";
 
 const WIN_W = 340;
@@ -644,7 +645,7 @@ export default function Pet() {
   };
 
   // ---- reminders -----------------------------------------------------------------------------------------
-  const onReminder = useCallback(async (r: { id: string; title: string; start: number; link: string; kind: string }) => {
+  const onReminder = useCallback(async (r: { id: string; title: string; start: number; link: string; kind: string; location?: string }) => {
     if (modeRef.current === "hidden" || modeRef.current === "hiding") return;
     if (wb.holdReminder(r)) return; // focus mode: it will be listed when the session ends
     if (modeRef.current === "sleeping") await wakeUp({ text: "", sleepy: true });
@@ -655,7 +656,8 @@ export default function Pet() {
     const when = mins <= 1 ? "starting now" : mins < 90 ? `in ${mins} min` : mins < 36 * 60 ? `in ${Math.round(mins / 60)}h` : `on ${fmtTime(r.start)}`;
     // Brightspace titles end in " - Due" or " - Availability Ends"; the line already says it's due
     const title = r.kind === "deadline" ? r.title.replace(/\s*[-–]\s*(due|closes?|availability ends)\s*$/i, "") : r.title;
-    const text = r.kind === "deadline" ? `${title} is due ${when}!` : `${title} ${when} (${fmtTime(r.start)})`;
+    const code = r.kind === "deadline" ? courseCode(r.location ?? "") : "";
+    const text = r.kind === "deadline" ? `${title}${code ? ` (${code})` : ""} is due ${when}!` : `${title} ${when} (${fmtTime(r.start)})`;
     const b = bounds();
     await walkTo((screen.current.x + screen.current.w / 2) - WIN_W / 2, 230);
     setMode("alert");
