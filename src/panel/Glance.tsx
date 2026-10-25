@@ -31,8 +31,6 @@ export default function Glance({ hidden, reminder, opened, onExpand, onClose, on
   }, [opened]);
 
   const toggle = () => { onClose(); emitTo("pet", "toggle-hide", null); };
-  // The pet offers a study block for the most pressing deadline, in its bubble.
-  const plan = () => { onClose(); emitTo("pet", "plan-deadline", null); };
 
   if (reminder) {
     return (
@@ -72,7 +70,7 @@ export default function Glance({ hidden, reminder, opened, onExpand, onClose, on
       <div className="glance-actions">
         <button className="act act-tuck" onClick={toggle}>{hidden ? <WakeIcon /> : <HideIcon />}<span>{hidden ? "Wake pet" : "Tuck in"}</span></button>
         <button className="act act-chat" onClick={() => onExpand("chat")}><ChatIcon /><span>Chat</span></button>
-        <button className="act act-plan" onClick={plan} title="Your pet finds a free stretch for what matters most"><TodayIcon /><span>Plan</span></button>
+        <button className="act act-plan" onClick={() => onExpand("today")}><TodayIcon /><span>Plan</span></button>
       </div>
     </main>
   );
