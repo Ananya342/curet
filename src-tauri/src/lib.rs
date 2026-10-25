@@ -166,6 +166,14 @@ fn hide_panel(app: AppHandle) {
     }
 }
 
+/// The panel floats above everything (level 21), file pickers included. While one is open the panel steps down
+/// to a normal window so the picker shows on top, then floats again.
+#[tauri::command]
+fn panel_level(app: AppHandle, raised: bool) -> Result<(), String> {
+    mac::set_level(&win(&app, "panel")?, if raised { 21 } else { 0 });
+    Ok(())
+}
+
 /// Drop the glance down from the menu bar icon. Reminders show it without taking focus.
 #[tauri::command]
 fn show_glance(app: AppHandle, focus: bool) -> Result<(), String> {
@@ -305,6 +313,7 @@ pub fn run() {
             hide_panel,
             show_glance,
             resize_glance,
+            panel_level,
             frontmost_app,
             active_site,
             expand_panel,

@@ -8,6 +8,10 @@ pub fn float(win: &WebviewWindow, _level: isize) {
     let _ = win.set_always_on_top(true);
 }
 
+pub fn set_level(win: &WebviewWindow, level: isize) {
+    let _ = win.set_always_on_top(level > 0);
+}
+
 pub fn describe(win: &WebviewWindow) -> String {
     format!("{}", win.label())
 }

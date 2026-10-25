@@ -20,6 +20,17 @@ define_class!(
     }
 );
 
+/// Change just the window level, e.g. to let a file picker show above the panel for a moment.
+pub fn set_level(win: &WebviewWindow, level: isize) {
+    let w = win.clone();
+    let _ = win.run_on_main_thread(move || {
+        if let Ok(ptr) = w.ns_window() {
+            let ns: &NSWindow = unsafe { &*(ptr as *const NSWindow) };
+            ns.setLevel(level);
+        }
+    });
+}
+
 /// Float the window at `level` on every Space, including over full-screen apps.
 pub fn float(win: &WebviewWindow, level: isize) {
     if let Ok(ptr) = win.ns_window() {

@@ -3,6 +3,7 @@ import { emitTo } from "@tauri-apps/api/event";
 import { addCalendarEvent, startOfDay } from "../api";
 import { friendlyError } from "../ai/gemini";
 import { Syllabus as Parsed, SyllabusItem, readSyllabus, suggested } from "../study/syllabus";
+import { pickingFile } from "./picking";
 
 const KIND: Record<SyllabusItem["kind"], string> = { exam: "Exam", quiz: "Quiz", assignment: "Due", project: "Project", other: "Other" };
 // How long to block when the syllabus gives a time but no length.
@@ -71,7 +72,7 @@ export default function Syllabus() {
       {!parsed && !busy && (
         <>
           <p className="hint">Upload a syllabus and your pet finds the exams and deadlines in it, ready to add to your calendar.</p>
-          <button className="btn" onClick={() => file.current?.click()}>Upload a syllabus</button>
+          <button className="btn" onClick={() => { pickingFile(); file.current?.click(); }}>Upload a syllabus</button>
         </>
       )}
       <input ref={file} type="file" accept=".pdf,.txt,.md,image/*,application/pdf" hidden

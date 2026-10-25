@@ -10,6 +10,7 @@ import Settings from "./Settings";
 import Week from "./Week";
 import Pets from "./Pets";
 import Glance, { Reminder } from "./Glance";
+import { donePicking, isPicking } from "./picking";
 
 type Tab = "chat" | "today" | "week" | "pets" | "settings";
 type Mode = "compact" | "full";
@@ -73,9 +74,10 @@ export default function Panel() {
       }),
       // The glance behaves like a menu bar dropdown and goes away when you click elsewhere.
       // Like a menu bar dropdown, the panel goes away when you click anywhere else, in either size.
+      // Except while a file picker it opened is up: that takes focus too, and the panel waits for its answer.
       getCurrentWindow().onFocusChanged(({ payload: focused }) => {
-        if (focused) auto.current = false;
-        else close();
+        if (focused) { auto.current = false; donePicking(); }
+        else if (!isPicking()) close();
       }),
     ];
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
