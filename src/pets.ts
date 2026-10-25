@@ -50,7 +50,7 @@ export const PETS: Record<PetId, PetDef> = {
   blob: {
     id: "blob", name: "Jelly", src: "/pets/blob.png", w: 168, ar: 350 / 420,
     eyes: [{ x: 0.33, y: 0.47 }, { x: 0.66, y: 0.47 }], eye: { rx: 0.056, ry: 0.07 },
-    nose: { x: 0.5, y: 0.56 }, head: { x: 0.5, y: 0.1, w: 0.6 }, neck: { x: 0.5, y: 0.7, w: 0.8 }, lid: "#cda1f4",
+    nose: { x: 0.5, y: 0.56 }, head: { x: 0.5, y: 0.1, w: 0.6 }, neck: { x: 0.5, y: 0.66, w: 0.66 }, lid: "#cda1f4",
     personality: "a blob",
     boops: ["Hi!", "Hello.", "Need something?"],
     greetings: ["Good morning.", "Hi, I'm here.", "Ready when you are."],
@@ -58,7 +58,7 @@ export const PETS: Record<PetId, PetDef> = {
   dragon: {
     id: "dragon", name: "Ember", src: "/pets/dragon.png", w: 124, ar: 420 / 328,
     eyes: [{ x: 0.46, y: 0.37 }, { x: 0.82, y: 0.36 }], eye: { rx: 0.085, ry: 0.07 },
-    nose: { x: 0.64, y: 0.43 }, head: { x: 0.62, y: 0.17, w: 0.42, tilt: 4 }, neck: { x: 0.6, y: 0.56, w: 0.38 }, lid: "#68d0b5",
+    nose: { x: 0.64, y: 0.43 }, head: { x: 0.64, y: 0.19, w: 0.56, tilt: 4 }, neck: { x: 0.6, y: 0.56, w: 0.4 }, lid: "#68d0b5",
     personality: "a baby dragon",
     boops: ["Hi!", "Hello.", "Need something?"],
     greetings: ["Good morning.", "Hi, I'm here.", "Ready when you are."],
@@ -74,11 +74,11 @@ export const PETS: Record<PetId, PetDef> = {
   perry: {
     id: "perry", name: "Perry", src: "/pets/perry.png", w: 132, ar: 420 / 308,
     eyes: [{ x: 0.195, y: 0.42 }, { x: 0.645, y: 0.42 }], eye: { rx: 0.075, ry: 0.06 },
-    nose: { x: 0.42, y: 0.55 }, head: { x: 0.41, y: 0.23, w: 0.95 }, neck: { x: 0.42, y: 0.64, w: 0.62 }, lid: "#3d93b8",
+    nose: { x: 0.42, y: 0.55 }, head: { x: 0.42, y: 0.22, w: 0.76 }, neck: { x: 0.42, y: 0.64, w: 0.62 }, lid: "#3d93b8",
     side: {
       src: "/pets/perry-side.png", ar: 402 / 420,
       eyes: [{ x: 0.69, y: 0.34 }], eye: { rx: 0.045, ry: 0.05 },
-      nose: { x: 0.88, y: 0.43 }, head: { x: 0.58, y: 0.285, w: 0.76, tilt: -4 }, neck: { x: 0.64, y: 0.55, w: 0.34 },
+      nose: { x: 0.88, y: 0.43 }, head: { x: 0.58, y: 0.29, w: 0.6, tilt: -4 }, neck: { x: 0.64, y: 0.55, w: 0.34 },
     },
     personality: "a platypus",
     boops: ["Hi!", "Hello.", "Need something?"],
@@ -87,11 +87,11 @@ export const PETS: Record<PetId, PetDef> = {
   dog: {
     id: "dog", name: "Biscuit", src: "/pets/dog.png", w: 150, ar: 420 / 375,
     eyes: [{ x: 0.34, y: 0.33 }, { x: 0.65, y: 0.33 }], eye: { rx: 0.06, ry: 0.05 },
-    nose: { x: 0.5, y: 0.39 }, head: { x: 0.5, y: 0.1, w: 0.48 }, neck: { x: 0.5, y: 0.57, w: 0.36 }, lid: "#b8693a",
+    nose: { x: 0.5, y: 0.39 }, head: { x: 0.5, y: 0.11, w: 0.58 }, neck: { x: 0.5, y: 0.57, w: 0.38 }, lid: "#b8693a",
     side: {
       src: "/pets/dog-side.png", ar: 332 / 420,
       eyes: [{ x: 0.79, y: 0.29 }], eye: { rx: 0.035, ry: 0.05 },
-      nose: { x: 0.97, y: 0.31 }, head: { x: 0.84, y: 0.1, w: 0.42, tilt: 6 }, neck: { x: 0.8, y: 0.56, w: 0.2 },
+      nose: { x: 0.97, y: 0.31 }, head: { x: 0.84, y: 0.1, w: 0.5, tilt: 6 }, neck: { x: 0.8, y: 0.56, w: 0.2 },
     },
     personality: "a puppy",
     boops: ["Hi!", "Hello.", "Need something?"],

@@ -30,13 +30,13 @@ const PETS = {
   },
   blob: {
     name: "Jelly", ar: 638 / 766, tagline: "Bounces you back on track.",
-    eyes: [[0.33, 0.47], [0.66, 0.47]], eye: [0.056, 0.07], head: [0.5, 0.1, 0.6, 0], neck: [0.5, 0.7, 0.8],
+    eyes: [[0.33, 0.47], [0.66, 0.47]], eye: [0.056, 0.07], head: [0.5, 0.1, 0.6, 0], neck: [0.5, 0.66, 0.66],
     outfit: { hat: { style: "crown", color: "#ffd95a" } },
     lines: ["boing!", "blorp!", "squish squish!"],
   },
   dragon: {
     name: "Ember", ar: 794 / 620, tagline: "Guards your calendar like treasure.",
-    eyes: [[0.46, 0.37], [0.82, 0.36]], eye: [0.085, 0.07], head: [0.62, 0.17, 0.42, 4], neck: [0.6, 0.56, 0.38],
+    eyes: [[0.46, 0.37], [0.82, 0.36]], eye: [0.085, 0.07], head: [0.64, 0.19, 0.56, 4], neck: [0.6, 0.56, 0.4],
     outfit: { glasses: { style: "shades", color: "#3a2a2a" } },
     lines: ["rawr! (a tiny one)", "*sneezes a smoke puff*", "grr… hehe"],
   },
@@ -48,13 +48,13 @@ const PETS = {
   },
   perry: {
     name: "Perry", ar: 554 / 405, tagline: "Secret agent of your schedule.",
-    eyes: [[0.195, 0.42], [0.645, 0.42]], eye: [0.075, 0.06], head: [0.41, 0.23, 0.95, 0], neck: [0.42, 0.64, 0.62],
+    eyes: [[0.195, 0.42], [0.645, 0.42]], eye: [0.075, 0.06], head: [0.42, 0.22, 0.76, 0], neck: [0.42, 0.64, 0.62],
     outfit: { collar: { color: "#ff9248", tag: "star" } },
     lines: ["krrrr!", "*tips fedora*", "agent P, reporting!"],
   },
   dog: {
     name: "Biscuit", ar: 530 / 473, tagline: "Fetches whatever is due next.",
-    eyes: [[0.34, 0.33], [0.65, 0.33]], eye: [0.06, 0.05], head: [0.5, 0.1, 0.48, 0], neck: [0.5, 0.57, 0.36],
+    eyes: [[0.34, 0.33], [0.65, 0.33]], eye: [0.06, 0.05], head: [0.5, 0.11, 0.58, 0], neck: [0.5, 0.57, 0.38],
     outfit: { cap: { color: "#3b82f6" } },
     lines: ["arf!", "*wags tail*", "woof! again again!"],
   },
@@ -94,7 +94,7 @@ let gloss = "";
 const solid = (d, fill) =>
   `<path d="${d}" fill="${fill}" stroke="rgba(40,25,30,0.35)" stroke-width="1.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><path d="${d}" fill="url(#${gloss})"/>`;
 
-const HAT_SCALE = { top: 0.85, party: 0.5, beanie: 0.95, crown: 0.55 };
+const HAT_SCALE = { top: 0.85, party: 0.64, beanie: 0.95, crown: 0.66 };
 const HAT_RISE = { top: 88, party: 124, beanie: 73, crown: 59 };
 const CAP_RISE = 42;
 
@@ -128,15 +128,18 @@ function lens(style, x, y, r, color) {
   switch (style) {
     case "round": return `<path d="${ell(x, y, r, r)}" fill="rgba(210,235,255,0.28)" ${frame}/><path d="M${x - r * 0.5} ${y - r * 0.35}q${r * 0.25} ${-r * 0.3} ${r * 0.6} ${-r * 0.3}" stroke="rgba(255,255,255,0.8)" stroke-width="${sw * 0.6}" stroke-linecap="round" fill="none"/>`;
     case "shades": return `<path d="${rr(x - r * 1.2, y - r * 0.85, r * 2.4, r * 1.7, r * 0.6)}" fill="rgba(25,20,32,0.92)" ${frame}/><path d="M${x - r * 0.75} ${y - r * 0.35}l${r * 0.5} ${-r * 0.25}" stroke="rgba(255,255,255,0.7)" stroke-width="${sw * 0.7}" stroke-linecap="round"/>`;
-    case "heart": return `<path d="${heart(x, y + r * 0.1, r * 1.1)}" fill="rgba(255,80,140,0.72)" ${frame}/>`;
-    case "star": return `<path d="${star(x, y, r * 1.35)}" fill="rgba(255,210,70,0.78)" ${frame}/>`;
+    case "heart": return `<path d="${heart(x, y + r * 0.1, r * 0.95)}" fill="rgba(255,80,140,0.72)" ${frame}/>`;
+    case "star": return `<path d="${star(x, y, r * 1.15)}" fill="rgba(255,210,70,0.78)" ${frame}/>`;
   }
   return "";
 }
 
+// How wide each lens style is, in lens radii, so two lenses never crowd past the space between the eyes.
+const LENS_HALF = { round: 1, shades: 1.2, heart: 1.15, star: 1.15 };
+
 function glasses(p, W, H, { style, color }) {
-  const r = Math.max(p.eye[0] * W, p.eye[1] * H) * (style === "shades" ? 1.25 : 1.5);
   const [a, b] = p.eyes.map(([x, y]) => ({ x: x * W, y: y * H })).sort((m, n) => m.x - n.x);
+  const r = Math.min(Math.max(p.eye[0] * W, p.eye[1] * H) * (style === "shades" ? 1.25 : 1.5), ((b.x - a.x) * 0.47) / LENS_HALF[style]);
   const sw = Math.max(1.6, r * 0.2);
   const half = style === "shades" ? r * 1.2 : r;
   const line = `stroke="${color}" stroke-width="${sw}" stroke-linecap="round" fill="none"`;
@@ -147,7 +150,7 @@ function glasses(p, W, H, { style, color }) {
 
 function collar(p, W, H, { color, tag }) {
   const cx = p.neck[0] * W, cy = p.neck[1] * H, cw = p.neck[2] * W;
-  const t = Math.max(5, cw * 0.12), sag = cw * 0.2;
+  const t = Math.max(4, cw * 0.09), sag = cw * 0.18;
   const d = `M${cx - cw / 2} ${cy - t / 2}Q${cx} ${cy + sag} ${cx + cw / 2} ${cy - t / 2}L${cx + cw / 2} ${cy + t / 2}Q${cx} ${cy + sag + t} ${cx - cw / 2} ${cy + t / 2}Z`;
   const bx = cx, by = 0.5 * (cy + t / 2) + 0.5 * (cy + sag + t);
   const ts = Math.max(4, t * 0.9);
@@ -162,9 +165,9 @@ function collar(p, W, H, { color, tag }) {
 }
 
 /** The outfit over a sprite drawn 100 units wide. */
-function outfitSvg(id) {
-  const p = PETS[id], o = p.outfit, W = 100, H = 100 * p.ar;
-  gloss = `gloss-${id}`;
+function outfitSvg(id, o = PETS[id].outfit, key = id) {
+  const p = PETS[id], W = 100, H = 100 * p.ar;
+  gloss = `gloss-${key}`;
   let body = "";
   if (o.collar) body += collar(p, W, H, o.collar);
   if (o.glasses) body += glasses(p, W, H, o.glasses);

@@ -33,7 +33,7 @@ const Solid = ({ d, fill, stroke }: { d: string; fill: string; stroke?: string }
 );
 
 // Hats and caps are drawn 100 units wide around (0, 0), the middle of where they meet the head.
-const HAT_SCALE: Record<HatStyle, number> = { top: 0.85, party: 0.5, beanie: 0.95, crown: 0.55 };
+const HAT_SCALE: Record<HatStyle, number> = { top: 0.85, party: 0.64, beanie: 0.95, crown: 0.66 };
 
 function Hat({ style, color }: { style: HatStyle; color: string }) {
   const band = isDark(color) ? "#ff4f5e" : shade(color, -0.45);
@@ -93,14 +93,19 @@ function Lens({ style, x, y, r, color }: { style: GlassesStyle; x: number; y: nu
       <path d={rr(x - r * 1.2, y - r * 0.85, r * 2.4, r * 1.7, r * 0.6)} fill="rgba(25, 20, 32, 0.92)" {...frame} />
       <path d={`M${x - r * 0.75} ${y - r * 0.35}l${r * 0.5} ${-r * 0.25}`} stroke="rgba(255,255,255,0.7)" strokeWidth={sw * 0.7} strokeLinecap="round" />
     </>;
-    case "heart": return <path d={heart(x, y + r * 0.1, r * 1.1)} fill="rgba(255, 80, 140, 0.72)" {...frame} />;
-    case "star": return <path d={star(x, y, r * 1.35)} fill="rgba(255, 210, 70, 0.78)" {...frame} />;
+    case "heart": return <path d={heart(x, y + r * 0.1, r * 0.95)} fill="rgba(255, 80, 140, 0.72)" {...frame} />;
+    case "star": return <path d={star(x, y, r * 1.15)} fill="rgba(255, 210, 70, 0.78)" {...frame} />;
   }
 }
 
+// How wide each lens style is, in lens radii, so two lenses never crowd past the space between the eyes.
+const LENS_HALF: Record<GlassesStyle, number> = { round: 1, shades: 1.2, heart: 1.15, star: 1.15 };
+
 function Glasses({ view, W, H, style, color, side }: { view: PetView; W: number; H: number; style: GlassesStyle; color: string; side: boolean }) {
-  const r = Math.max(view.eye.rx * W, view.eye.ry * H) * (style === "shades" ? 1.25 : 1.5);
   const pts = view.eyes.map((e) => ({ x: e.x * W, y: e.y * H }));
+  // Sized to the eyes, but never wider than half the gap between them (or a fifth of the head, from the side).
+  const gap = pts.length > 1 ? Math.abs(pts[0].x - pts[1].x) : view.head.w * W * 0.4;
+  const r = Math.min(Math.max(view.eye.rx * W, view.eye.ry * H) * (style === "shades" ? 1.25 : 1.5), (gap * 0.47) / LENS_HALF[style]);
   const sw = Math.max(1.6, r * 0.2);
   const half = style === "shades" ? r * 1.2 : r;
   const line = { stroke: color, strokeWidth: sw, strokeLinecap: "round" as const, fill: "none" };
@@ -122,7 +127,7 @@ function Glasses({ view, W, H, style, color, side }: { view: PetView; W: number;
 
 function Collar({ view, W, H, color, tag, side }: { view: PetView; W: number; H: number; color: string; tag: TagStyle; side: boolean }) {
   const cx = view.neck.x * W, cy = view.neck.y * H, cw = view.neck.w * W;
-  const t = Math.max(5, cw * (side ? 0.2 : 0.12)), sag = cw * (side ? 0.12 : 0.2);
+  const t = Math.max(4, cw * (side ? 0.17 : 0.09)), sag = cw * (side ? 0.11 : 0.18);
   const d = `M${cx - cw / 2} ${cy - t / 2}Q${cx} ${cy + sag} ${cx + cw / 2} ${cy - t / 2}L${cx + cw / 2} ${cy + t / 2}Q${cx} ${cy + sag + t} ${cx - cw / 2} ${cy + t / 2}Z`;
   // The tag hangs off the bottom edge: in the middle from the front, toward the chest from the side.
   const u = side ? 0.78 : 0.5;

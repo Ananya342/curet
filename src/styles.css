@@ -559,4 +559,5 @@ kbd { background: var(--raised); border: 2px solid var(--edge); border-radius: 7
 .bubble.rich { font-size: 13px; }
 
 .pick-sprite { height: 44px; display: flex; align-items: flex-end; justify-content: center; }
-.pick-sprite .sprite img { filter: none; }
+/* Fit the whole animal inside the card, however tall it is. */
+.pick-sprite img { width: 44px; height: 44px; object-fit: contain; object-position: bottom; }

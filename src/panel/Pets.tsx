@@ -1,12 +1,8 @@
-import { useEffect, useState } from "react";
 import { PETS, PET_IDS, PetId } from "../pets";
 import { setPetId } from "../api";
-import { DEFAULT_OUTFIT, Outfit, getOutfit } from "../accessories";
-import Wardrobe, { Dressed } from "./Wardrobe";
+import Wardrobe from "./Wardrobe";
 
 export default function Pets({ petId }: { petId: PetId }) {
-  const [outfit, setOutfit] = useState<Outfit>(DEFAULT_OUTFIT);
-  useEffect(() => { getOutfit().then(setOutfit); }, []);
   return (
     <div className="scroll settings">
       <section aria-labelledby="h-pet">
@@ -16,14 +12,15 @@ export default function Pets({ petId }: { petId: PetId }) {
             const def = PETS[id];
             return (
               <button key={id} role="radio" aria-checked={id === petId} className="pet-pick" onClick={() => setPetId(id)}>
-                <span className="pick-sprite" aria-hidden="true"><Dressed view={def} w={46} outfit={outfit} /></span>
+                {/* Plain, so you pick the animal itself; dressing up happens below. */}
+                <span className="pick-sprite" aria-hidden="true"><img src={def.src} alt="" draggable={false} /></span>
                 <span translate="no">{def.name}</span>
               </button>
             );
           })}
         </div>
       </section>
-      <Wardrobe petId={petId} onOutfit={setOutfit} />
+      <Wardrobe petId={petId} />
     </div>
   );
 }
