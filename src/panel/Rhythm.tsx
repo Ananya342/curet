@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { emitTo, listen } from "@tauri-apps/api/event";
 import type { InFront } from "../study/procrastination";
+import Select from "./Select";
 import { kvGet, kvSet } from "../api";
 
 const EYES = [["0", "Off"], ["20", "Every 20 min"], ["30", "Every 30 min"], ["45", "Every 45 min"]];
@@ -66,9 +67,7 @@ export default function Rhythm() {
       </div>
       <div className="rrow">
         <span id="lbl-break" className="check-label">Break reminder</span>
-        <select aria-labelledby="lbl-break" value={brk} onChange={(e) => { setBrk(e.target.value); kvSet("break_every", e.target.value); }}>
-          {BREAKS.map(([v, label]) => <option key={v} value={v}>{label}</option>)}
-        </select>
+        <Select labelledBy="lbl-break" align="end" value={brk} options={BREAKS as [string, string][]} onChange={(v) => { setBrk(v); kvSet("break_every", v); }} />
       </div>
       <div className="rrow">
         <label className="check"><input type="checkbox" checked={nudges} onChange={(e) => setNudgesOn(e.target.checked)} /><span>Free-time nudges</span></label>
@@ -82,9 +81,7 @@ export default function Rhythm() {
       </div>
       <div className="rrow">
         <span id="lbl-eyes" className="check-label">Rest your eyes (30s)</span>
-        <select aria-labelledby="lbl-eyes" value={eyes} onChange={(e) => { setEyes(e.target.value); kvSet("eye_every", e.target.value); }}>
-          {EYES.map(([v, label]) => <option key={v} value={v}>{label}</option>)}
-        </select>
+        <Select labelledBy="lbl-eyes" align="end" value={eyes} options={EYES as [string, string][]} onChange={(v) => { setEyes(v); kvSet("eye_every", v); }} />
       </div>
       <div className="rrow">
         <label className="check"><input type="checkbox" checked={late.on} onChange={(e) => late.set(e.target.checked)} /><span>Late-night wind-down</span></label>

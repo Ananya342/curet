@@ -7,6 +7,7 @@ import { Feed, kvGet, kvSet } from "../api";
 import { DEFAULT_MODEL, ENV_GEMINI_KEY } from "../ai/gemini";
 import { ENV_ELEVEN_KEY, Quiet, Voice, listVoices, quietState, resetVoiceCache, synthesize } from "../voice/tts";
 import Rhythm from "./Rhythm";
+import Select from "./Select";
 
 interface GStatus { connected: boolean; configured: boolean; email: string | null; can_write: boolean }
 type Note = { where: string; text: string; bad?: boolean };
@@ -275,9 +276,7 @@ export default function Settings(_: { petId: PetId }) {
           </form>
           {voices.length > 0 && (
             <div className="stack">
-              <select value={voice} onChange={(e) => pickVoice(e.target.value)} aria-label="Voice">
-                {voices.map((v) => <option key={v.voice_id} value={v.voice_id}>{v.name}</option>)}
-              </select>
+              <Select label="Voice" value={voice} onChange={pickVoice} options={voices.map((v) => [v.voice_id, v.name] as [string, string])} />
               <button className="btn quiet" onClick={testVoice} disabled={busy === "test"}>{busy === "test" ? "Playing…" : "Test voice"}</button>
             </div>
           )}

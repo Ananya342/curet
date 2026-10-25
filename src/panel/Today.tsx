@@ -6,6 +6,7 @@ import { CalEvent, Task, addCalendarEvent, eventsRange, fmtDay, fmtTime, nowSec,
 import { StudyPlan, deadlineKey, deadlinesDone, isExam, setDeadlineDone, studyPlans } from "../study/plans";
 import Syllabus from "./Syllabus";
 import DatePicker from "./DatePicker";
+import Select from "./Select";
 
 export default function Today() {
   const [today, setToday] = useState<CalEvent[]>([]);
@@ -150,12 +151,8 @@ export default function Today() {
             <div className="fields">
               <DatePicker value={ev.date} onChange={(date) => setEv({ ...ev, date })} />
               <input type="time" value={ev.time} onChange={(e) => setEv({ ...ev, time: e.target.value })} aria-label="Start time" disabled={ev.len === "allday"} />
-              <select value={ev.len} onChange={(e) => setEv({ ...ev, len: e.target.value })} aria-label="Length">
-                <option value="30">30 min</option>
-                <option value="60">1 hour</option>
-                <option value="120">2 hours</option>
-                <option value="allday">All day</option>
-              </select>
+              <Select label="Length" align="end" value={ev.len} onChange={(len) => setEv({ ...ev, len })}
+                options={[["30", "30 min"], ["60", "1 hour"], ["120", "2 hours"], ["allday", "All day"]]} />
             </div>
             <button type="submit" className="btn" aria-busy={adding}>Add to Google Calendar{adding && <span className="spin" aria-hidden="true" />}</button>
             <p className={`note ${evNote?.bad ? "bad" : "good"}`} role="status">{evNote ? `${evNote.bad ? "Problem: " : "Done: "}${evNote.text}` : ""}</p>
