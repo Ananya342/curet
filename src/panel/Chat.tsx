@@ -4,6 +4,41 @@ import { kvGet, kvSet } from "../api";
 import { Markdown } from "./Markdown";
 import { Msg, ask, friendlyError, replyWithoutLead } from "../ai/gemini";
 
+/**
+ * Reveals `target` a few characters per frame, like ChatGPT, however chunky the stream underneath is. It keeps a
+ * steady reading pace and speeds up when it falls behind, so a long reply never lags far behind Gemini.
+ */
+function useTypewriter(target: string) {
+  const [shown, setShown] = useState(0);
+  const pos = useRef(0);
+  const goal = useRef(target);
+  useEffect(() => {
+    // If the start of the text changed (a lead-in got trimmed), carry on from what still matches.
+    const prev = goal.current;
+    goal.current = target;
+    let same = 0;
+    while (same < pos.current && same < prev.length && prev[same] === target[same]) same++;
+    if (same < pos.current) { pos.current = same; setShown(same); }
+  }, [target]);
+  useEffect(() => {
+    // A timer rather than animation frames, so a reply still finishes if the panel is hidden halfway through.
+    let last = performance.now();
+    const t = window.setInterval(() => {
+      const now = performance.now();
+      const dt = Math.min(1000, now - last);
+      last = now;
+      const backlog = goal.current.length - pos.current;
+      if (backlog <= 0) return;
+      // ~45 chars/s when caught up, much faster when far behind.
+      pos.current = Math.min(goal.current.length, pos.current + Math.max(0.045 * dt, backlog * 0.006 * dt));
+      setShown(Math.floor(pos.current));
+    }, 16);
+    return () => window.clearInterval(t);
+  }, []);
+  const reset = () => { pos.current = 0; goal.current = ""; setShown(0); };
+  return { text: target.slice(0, shown), caughtUp: shown >= target.length && goal.current === target, reset };
+}
+
 const SUGGESTIONS = ["What’s on today?", "When am I free tomorrow?", "Help me plan my day", "What’s due this week?"];
 
 export default function Chat({ petId }: { petId: PetId }) {
@@ -12,6 +47,10 @@ export default function Chat({ petId }: { petId: PetId }) {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [draft, setDraft] = useState("");
+  const [status, setStatus] = useState("");
+  // The finished reply, held back until the typewriter has caught up with it.
+  const [final, setFinal] = useState<{ msgs: Msg[] } | null>(null);
+  const typed = useTypewriter(draft ? replyWithoutLead(draft, final != null) ?? "" : "");
   const [undo, setUndo] = useState<Msg[] | null>(null);
   const end = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLTextAreaElement>(null);
@@ -21,7 +60,21 @@ export default function Chat({ petId }: { petId: PetId }) {
     kvGet("chat").then((s) => { try { s && setMsgs(JSON.parse(s)); } catch { /* ignore */ } });
     field.current?.focus();
   }, []);
-  useEffect(() => { end.current?.scrollIntoView({ block: "end" }); }, [msgs, busy, draft]);
+  useEffect(() => { end.current?.scrollIntoView({ block: "end" }); }, [msgs, busy, typed.text]);
+
+  // Commit the reply once it's fully on screen.
+  useEffect(() => {
+    if (!final || !typed.caughtUp) return;
+    setMsgs(final.msgs);
+    setFinal(null);
+    setBusy(false);
+    setDraft("");
+    setStatus("");
+    typed.reset();
+    kvSet("chat", JSON.stringify(final.msgs.slice(-40)));
+    field.current?.focus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [final, typed.caughtUp]);
 
   const grow = () => {
     const el = field.current;
@@ -41,14 +94,13 @@ export default function Chat({ petId }: { petId: PetId }) {
     const next = [...msgs, { role: "user" as const, text: t }];
     setMsgs(next);
     setBusy(true);
+    setStatus("");
+    typed.reset();
     let reply: string;
-    try { reply = await ask(history, t, petId, undefined, setDraft); } catch (e) { reply = friendlyError(e); }
-    const done = [...next, { role: "model" as const, text: reply }];
-    setMsgs(done);
-    setBusy(false);
-    setDraft("");
-    kvSet("chat", JSON.stringify(done.slice(-40)));
-    field.current?.focus();
+    try { reply = await ask(history, t, petId, setStatus, setDraft); } catch (e) { reply = friendlyError(e); }
+    // Let the typewriter finish the last of it, then the effect above commits the message.
+    setDraft(reply);
+    setFinal({ msgs: [...next, { role: "model" as const, text: reply }] });
   };
 
   // Clearing is easy to regret, so offer a short undo instead of a confirmation dialog.
@@ -104,8 +156,8 @@ export default function Chat({ petId }: { petId: PetId }) {
             <img src={pet.src} alt="" draggable={false} />
             <div>
               <div className="who" translate="no">{pet.name}</div>
-              {draft && replyWithoutLead(draft, false)
-                ? <Markdown text={replyWithoutLead(draft, false)!} typing />
+              {typed.text
+                ? <Markdown text={typed.text} typing />
                 : <p className="status"><span className="paws" aria-hidden="true"><i /><i /><i /></span>{status || "Thinking…"}</p>}
             </div>
           </div>
