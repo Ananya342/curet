@@ -217,11 +217,12 @@ export function useStudy(c: StudyCtx) {
 
   useEffect(() => {
     const un = [
-      // Today → "Plan time" on a deadline.
-      listen<string>("plan-deadline", async (e) => {
-        const p = await nextProposal(e.payload);
+      // Today → "Plan" on a deadline.
+      // The glance's "Plan" sends no key: plan whatever matters most right now.
+      listen<string | null>("plan-deadline", async (e) => {
+        const p = await nextProposal(e.payload || undefined);
         if (p) propose(p);
-        else { await rouse(); ctx.current.say("I couldn't find a free hour before that one's due.", { ms: 5000 }); }
+        else { await rouse(); ctx.current.say(e.payload ? "I couldn't find a free hour before that one's due." : "Nothing to plan for right now.", { ms: 5000 }); }
       }),
       // Settings → demo buttons, so the whole loop can be shown without waiting for real time.
       listen<{ type: "propose" | "block" | "submit" | "procrastinate" }>("study-preview", async (e) => {

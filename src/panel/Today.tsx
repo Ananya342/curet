@@ -163,9 +163,9 @@ export default function Today() {
 
       <section aria-labelledby="h-tasks">
         <h2 id="h-tasks">To-do</h2>
-        {!hasOpen && <p className="hint">No open tasks. Add one below, or ask your pet to.</p>}
+        {!hasOpen && <p className="hint">{todo.length ? "All done. Nice." : "No open tasks. Add one below, or ask your pet to."}</p>}
         <ul className="tasks">
-          {(hasOpen ? todo : []).map((t) => (
+          {todo.map((t) => (
             <li key={t.id} className={`${t.done ? "done" : ""}${!t.done && t.due && t.due < now ? " overdue" : ""}`}>
               <label>
                 <input type="checkbox" checked={t.done} onChange={() => toggle(t)} />

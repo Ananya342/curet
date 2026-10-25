@@ -264,7 +264,7 @@ img { -webkit-user-drag: none; }
 .act:hover { transform: translateY(-2px); filter: brightness(1.04); }
 .act:active { transform: translateY(1px); }
 .act-chat { background: var(--butter); }
-.act-pets { background: var(--pink); }
+.act-plan { background: var(--mint); }
 
 /* buttons: the main action is a solid ink pill, like "Download for macOS"; the rest are soft and flat */
 .btn {
