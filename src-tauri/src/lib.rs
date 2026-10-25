@@ -232,6 +232,14 @@ async fn active_site() -> Option<(String, String)> {
     .flatten()
 }
 
+/// A short system chime, e.g. when the look-away timer ends, so you know without looking back at the screen.
+/// Played natively rather than from the page, where autoplay can be refused.
+#[tauri::command]
+fn chime() {
+    #[cfg(target_os = "macos")]
+    let _ = std::process::Command::new("afplay").args(["-v", "0.6", "/System/Library/Sounds/Glass.aiff"]).spawn();
+}
+
 #[tauri::command]
 fn log(msg: String) {
     eprintln!("[js] {msg}");
@@ -319,6 +327,7 @@ pub fn run() {
             expand_panel,
             quit,
             log,
+            chime,
             quiet::quiet_state,
             db::kv_get,
             db::kv_set,

@@ -480,7 +480,8 @@ export default function Pet() {
     eyesResting.current = false;
     setEyeRest(null);
     if (modeRef.current !== "sleeping") animate(lid, 0, { duration: 0.3, ease: "easeOut" });
-    if (finished) { spawnFx("star", 4); say(pick(["Ahh, fresh eyes.", "Much better!", "Eyes rested. Back to it!"]), { ms: 2400 }); }
+    // A chime when the time's up, so you can keep looking away until you hear it.
+    if (finished) { invoke("chime").catch(() => {}); spawnFx("star", 4); say(pick(["Ahh, fresh eyes.", "Much better!", "Eyes rested. Back to it!"]), { ms: 2400 }); }
   }, [lid, say, spawnFx]);
   const restEyes = useCallback((seconds: number) => {
     window.clearInterval(eyeTimer.current);
