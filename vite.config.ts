@@ -5,10 +5,15 @@ import process from "node:process";
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
-export default defineConfig(() => ({
+export default defineConfig(({ command }) => ({
   plugins: [react()],
-  // LIFEPET_GEMINI_KEY in .env.local becomes the default Gemini key (see .env.example).
-  envPrefix: ["VITE_", "LIFEPET_GEMINI_", "LIFEPET_ELEVEN_"],
+  // LIFEPET_GEMINI_KEY in .env.local becomes the default Gemini key (see .env.example), but only in
+  // `tauri dev`: a build is meant to be shared, and anything baked into its JavaScript can be read
+  // straight out of the app. LIFEPET_SHARE_MY_KEYS=1 bakes it into a build anyway.
+  envPrefix:
+    command === "build" && process.env.LIFEPET_SHARE_MY_KEYS !== "1"
+      ? ["VITE_"]
+      : ["VITE_", "LIFEPET_GEMINI_", "LIFEPET_ELEVEN_"],
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
