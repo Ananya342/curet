@@ -11,7 +11,7 @@ import { kvGet, kvSet } from "../api";
  * Bump `CONSENT_VERSION` whenever the list below changes, so people are asked again rather than
  * silently opted in to something new.
  */
-export const CONSENT_VERSION = "1";
+export const CONSENT_VERSION = "2";
 
 const KEY = "ai_consent";
 

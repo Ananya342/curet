@@ -1,7 +1,7 @@
 import { MutableRefObject, useCallback, useEffect, useRef } from "react";
 import { emitTo, listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { CalEvent, eventsRange, kvGet, kvSet, nowSec } from "../api";
+import { CalEvent, kvGet, kvSet, nowSec } from "../api";
 import { markSubmitAsked, unaskedPastDeadline } from "./mood";
 import { inFront, inWords, nextUnfinished } from "./procrastination";
 import { FOCUS_CHOICES } from "../wellbeing/focus";
@@ -108,19 +108,17 @@ export function useStudy(c: StudyCtx) {
   /** Seen in front of a distracting app for a while, with something due: a gentle (and slightly judgy) nudge. */
   const distracted = useRef<{ app: string; since: number } | null>(null);
   const quietUntil = useRef(0);
-  const callOut = useCallback(async (app: string, kind: string, preview = false) => {
+  const callOut = useCallback(async (app: string, kind: string) => {
     const due = await nextUnfinished(24);
     const focusing = ctx.current.focusActive();
-    if (!due && !focusing && !preview) return;
+    if (!due && !focusing) return;
     quietUntil.current = nowSec() + NUDGE_QUIET;
     await rouse();
     const { say, hush, beginFocus } = ctx.current;
     const doing = kind === "watching" ? `watching ${app}` : kind === "scrolling" ? `scrolling ${app}` : kind === "chatting" ? `chatting on ${app}` : `on ${app}`;
-    const text = focusing
+    const text = focusing || !due
       ? `Hey! We're locked in… and that's ${app}. Just saying.`
-      : due
-        ? `“${due.title}” is due in ${inWords(due.due)}… and we're ${doing}.`
-        : `We're ${doing}… nothing's due soon, so enjoy it!`;
+      : `“${due.title}” is due in ${inWords(due.due)}… and we're ${doing}.`;
     say(text, {
       ms: 20000,
       actions: [
@@ -225,29 +223,6 @@ export function useStudy(c: StudyCtx) {
         else { await rouse(); ctx.current.say(e.payload ? "I couldn't find a free hour before that one's due." : "Nothing to plan for right now.", { ms: 5000 }); }
       }),
       // Settings → demo buttons, so the whole loop can be shown without waiting for real time.
-      listen<{ type: "propose" | "block" | "submit" | "procrastinate" }>("study-preview", async (e) => {
-        if (e.payload.type === "procrastinate") {
-          const front = await inFront();
-          callOut(front?.kind ? front.label : "YouTube", front?.kind ?? "watching", true);
-          return;
-        }
-        if (e.payload.type === "submit") {
-          const now = nowSec();
-          const past = (await eventsRange(now - 7 * 86400, now)).filter((x) => x.kind === "deadline").pop();
-          if (past) askSubmitted(past);
-          else { await rouse(); ctx.current.say("No deadlines in the past week to ask about.", { ms: 4000 }); }
-          return;
-        }
-        if (e.payload.type === "propose") {
-          const p = await nextProposal();
-          if (p) propose(p);
-          else { await rouse(); ctx.current.say("No upcoming deadlines to plan for right now.", { ms: 4000 }); }
-          return;
-        }
-        const plans = (await studyPlans()).filter((p) => p.status !== "done").sort((a, b) => a.start - b.start);
-        if (plans[0]) callToBlock(plans[0]);
-        else { await rouse(); ctx.current.say("No study blocks booked yet. Try “Plan study” first.", { ms: 4000 }); }
-      }),
     ];
     const t = window.setInterval(tick, 60_000);
     const w = window.setInterval(watchApp, 20_000);

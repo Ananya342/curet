@@ -35,7 +35,7 @@ export default function Settings({ petId }: { petId: PetId }) {
   const [vKey, setVKey] = useState("");
   const [voices, setVoices] = useState<Voice[]>([]);
   const [voice, setVoice] = useState("");
-  const [voiceOn, setVoiceOn] = useState(true);
+  const [voiceOn, setVoiceOn] = useState(false);
   const [quiet, setQuiet] = useState<Quiet | null>(null);
 
   const load = useCallback(async () => {
@@ -57,7 +57,7 @@ export default function Settings({ petId }: { petId: PetId }) {
       setHasVKey(saved);
       if (saved) setVoices(await listVoices().catch(() => [] as Voice[]));
     })();
-    kvGet("voice_on").then((v) => setVoiceOn(v !== "off"));
+    kvGet("voice_on").then((v) => setVoiceOn(v === "on"));
     quietState().then(setQuiet).catch(() => setQuiet(null));
     const un = listen("events-updated", load);
     return () => { un.then((f) => f()); };
@@ -209,10 +209,13 @@ export default function Settings({ petId }: { petId: PetId }) {
             <details>
               <summary>Use a secret iCal address instead</summary>
               <ol className="guide">
-                <li>Open {link("https://calendar.google.com/calendar/r/settings", "Google Calendar settings")}.</li>
-                <li>Pick your calendar, then <b>Integrate calendar</b>.</li>
-                <li>Copy <b>Secret address in iCal format</b>. Keep it private, since anyone with it can see your events.</li>
+                <li>Open {link("https://calendar.google.com/calendar/r/settings", "Google Calendar settings")} in your browser. <i>The phone app doesn’t have this.</i></li>
+                <li>In the left sidebar, under <b>Settings for my calendars</b>, click your calendar’s name.</li>
+                <li>Click <b>Integrate calendar</b> just below it, or scroll down to that section.</li>
+                <li>Find <b>Secret address in iCal format</b> and click its copy icon. <i>Don’t use the “Public address” above it, which won’t work on a private calendar.</i></li>
+                <li>Paste it below. It ends in <code>basic.ics</code>.</li>
               </ol>
+              <p className="hint">Keep this link private, since anyone with it can see your events. If it gets out, press <b>Reset</b> next to it in Google Calendar. Don’t see it on a school or work account? Your admin may have turned it off, so use Sign in with Google instead.</p>
               <form className="inline-form" onSubmit={addFeed("ical", "Google", icalUrl, "events", "Paste your secret iCal address first.", () => setIcalUrl(""))} noValidate>
                 <input value={icalUrl} onChange={(e) => setIcalUrl(e.target.value)} placeholder="https://calendar.google.com/…/basic.ics" aria-label="Secret iCal address" autoComplete="off" spellCheck={false} inputMode="url" />
                 <button type="submit" className="btn" aria-busy={busy === "ical"}>Add link{busy === "ical" && <Spinner />}</button>
@@ -244,7 +247,7 @@ export default function Settings({ petId }: { petId: PetId }) {
       <section aria-labelledby="h-gem">
         <h2 id="h-gem">Gemini</h2>
         {hasKey || ENV_GEMINI_KEY ? (
-          <p className="hint">Your pet thinks with Gemini, using the key from <code>.env.local</code>.</p>
+          <p className="hint">Your pet thinks with Gemini, and it’s all set up.</p>
         ) : (
           <>
             <p className="hint">Your pet thinks with Gemini. Get a free key at {link("https://aistudio.google.com/apikey", "aistudio.google.com/apikey")}. It stays on this Mac.</p>
@@ -273,13 +276,13 @@ export default function Settings({ petId }: { petId: PetId }) {
         <h2 id="h-voice">Voice</h2>
         <p className="hint">
           Your pet reads its reminders, briefings and nudges out loud with ElevenLabs. Everything
-          else it says stays quiet. {hasVKey ? <>A key is saved in your Mac Keychain.</> : <>Get a key at {link("https://elevenlabs.io/app/settings/api-keys", "elevenlabs.io")}.</>}
+          else it says stays quiet. {hasVKey ? <>A key is already set up.</> : <>Get a key at {link("https://elevenlabs.io/app/settings/api-keys", "elevenlabs.io")}.</>}
         </p>
         <label className="check">
           <input
             type="checkbox"
             checked={voiceOn}
-            onChange={(e) => { setVoiceOn(e.target.checked); kvSet("voice_on", e.target.checked ? null : "off"); }}
+            onChange={(e) => { setVoiceOn(e.target.checked); kvSet("voice_on", e.target.checked ? "on" : "off"); }}
           />
           <span>Speak notifications out loud</span>
         </label>

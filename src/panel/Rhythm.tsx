@@ -28,13 +28,11 @@ export default function Rhythm() {
   const evening = useTimeSetting("briefing_evening", "20:00");
   const [brk, setBrk] = useState("50");
   useEffect(() => { kvGet("break_every").then((v) => v && setBrk(v)); }, []);
-  const preview = (type: "morning" | "evening" | "week" | "break" | "nudge") => emitTo("pet", "wellbeing-preview", { type });
   const [eyes, setEyes] = useState("20");
   useEffect(() => { kvGet("eye_every").then((v) => v && setEyes(v)); }, []);
   const late = useToggle("late_nudge");
   const recap = useToggle("recap_on");
   const ahead = useToggle("week_ahead_on");
-  const tryIt = (type: "eyes" | "late" | "recap" | "week") => emitTo("pet", "mindful-preview", { type });
   const [wander, setWander] = useState(false);
   useEffect(() => { kvGet("wander_on").then((v) => setWander(v === "on")); }, []);
   const setWanderOn = (on: boolean) => { setWander(on); kvSet("wander_on", on ? "on" : null); emitTo("pet", "wander-changed", on); };
@@ -43,7 +41,6 @@ export default function Rhythm() {
   const setNudgesOn = (on: boolean) => { setNudges(on); kvSet("nudges_on", on ? null : "off"); };
   const plans = useToggle("plans_on");
   const procrastination = useToggle("procrastination_on");
-  const study = (type: "propose" | "block" | "submit" | "procrastinate") => emitTo("pet", "study-preview", { type });
   const sites = useToggle("browser_sites_on");
   const [seen, setSeen] = useState<(InFront & { at: number }) | null>(null);
   useEffect(() => {
@@ -72,13 +69,6 @@ export default function Rhythm() {
       <div className="rrow">
         <label className="check"><input type="checkbox" checked={nudges} onChange={(e) => setNudgesOn(e.target.checked)} /><span>Free-time nudges</span></label>
       </div>
-      <div className="row-btns">
-        <button className="btn sm soft" onClick={() => preview("morning")}>Try morning</button>
-        <button className="btn sm soft" onClick={() => preview("evening")}>Try evening</button>
-        <button className="btn sm soft" onClick={() => preview("week")}>Try week</button>
-        <button className="btn sm soft" onClick={() => preview("break")}>Try break</button>
-        <button className="btn sm soft" onClick={() => preview("nudge")}>Try nudge</button>
-      </div>
       <div className="rrow">
         <span id="lbl-eyes" className="check-label">Rest your eyes (30s)</span>
         <Select labelledBy="lbl-eyes" align="end" value={eyes} options={EYES as [string, string][]} onChange={(v) => { setEyes(v); kvSet("eye_every", v); }} />
@@ -91,12 +81,6 @@ export default function Rhythm() {
       </div>
       <div className="rrow">
         <label className="check"><input type="checkbox" checked={ahead.on} onChange={(e) => ahead.set(e.target.checked)} /><span>Monday heads-up for busy weeks</span></label>
-      </div>
-      <div className="row-btns">
-        <button className="btn sm soft" onClick={() => tryIt("eyes")}>Try eye rest</button>
-        <button className="btn sm soft" onClick={() => tryIt("late")}>Try late night</button>
-        <button className="btn sm soft" onClick={() => tryIt("recap")}>Try recap</button>
-        <button className="btn sm soft" onClick={() => tryIt("week")}>Try heads-up</button>
       </div>
       <h3 className="sub">Study help</h3>
       <div className="rrow">
@@ -115,12 +99,6 @@ export default function Rhythm() {
             : "Last check: nothing yet. Your pet looks every 20 seconds while it's out."}
         </p>
       )}
-      <div className="row-btns">
-        <button className="btn sm soft" onClick={() => study("propose")}>Try study plan</button>
-        <button className="btn sm soft" onClick={() => study("block")}>Try study time</button>
-        <button className="btn sm soft" onClick={() => study("submit")}>Try “submitted?”</button>
-        <button className="btn sm soft" onClick={() => study("procrastinate")}>Try distraction</button>
-      </div>
       <p className="hint">Your pet checks only the app in front and, for a browser, the website of the tab in front (just the site, like youtube.com). It happens on this Mac and nothing is saved. macOS asks once before it can read a browser’s tab.</p>
       <p className="hint">Briefings show up when your pet is awake and out, and Sunday’s evening one previews the week: exams, deadlines and the heaviest day. For quiet time, open your pet’s menu and choose Focus: it locks in, holds your reminders, and tells you what it held when the timer ends.</p>
     </section>

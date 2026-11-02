@@ -105,13 +105,13 @@ export function useWellbeing(c: WellbeingCtx) {
   }, []);
 
   // ---- briefings & breaks --------------------------------------------------------------------------
-  const deliverBriefing = useCallback(async (kind: BriefingKind, preview = false) => {
+  const deliverBriefing = useCallback(async (kind: BriefingKind) => {
     if (busy.current) return;
-    if (!preview && (unavailable() || focusActive())) return; // Rust asks again on its next tick
+    if (unavailable() || focusActive()) return; // Rust asks again on its next tick
     busy.current = true;
     try {
       // Acknowledge first, so Rust stops announcing it.
-      if (!preview) await kvSet(`last_briefing_${kind}`, todayKey());
+      await kvSet(`last_briefing_${kind}`, todayKey());
       const { say, hush, wakeUp, openPanel, modeRef } = ctx.current;
       if (modeRef.current === "sleeping") await wakeUp({ text: "", sleepy: true });
       const text = briefingText(await composeBriefing(kind));
@@ -129,8 +129,8 @@ export function useWellbeing(c: WellbeingCtx) {
     }
   }, []);
 
-  const deliverBreak = useCallback(async (minutes: number, preview = false) => {
-    if (!preview && (unavailable() || focusActive())) return;
+  const deliverBreak = useCallback(async (minutes: number) => {
+    if (unavailable() || focusActive()) return;
     const { say, hush, wakeUp, modeRef } = ctx.current;
     if (modeRef.current === "sleeping") await wakeUp({ text: "", sleepy: true });
     say(`You’ve been at it for ${minutes} min. Stand up, stretch, sip some water.`, {
@@ -148,16 +148,14 @@ export function useWellbeing(c: WellbeingCtx) {
    * side with a poll, unlike briefings/breaks which Rust decides on its tick — this is the one
    * wellbeing path with no Rust half, so it needs no Mac build to test.
    */
-  const deliverNudge = useCallback(async (preview = false) => {
-    if (!preview) {
-      if (unavailable() || focusActive()) return;
-      if ((await kvGet("nudges_on")) === "off") return;
-      const last = Number(await kvGet("nudge_at")) || 0;
-      if (nowSec() - last < 90 * 60) return;
-    }
-    const n = await findNudge({ preview });
+  const deliverNudge = useCallback(async () => {
+    if (unavailable() || focusActive()) return;
+    if ((await kvGet("nudges_on")) === "off") return;
+    const last = Number(await kvGet("nudge_at")) || 0;
+    if (nowSec() - last < 90 * 60) return;
+    const n = await findNudge();
     if (!n) return;
-    if (!preview) await kvSet("nudge_at", String(nowSec()));
+    await kvSet("nudge_at", String(nowSec()));
     const { say, hush, wakeUp, openPanel, modeRef } = ctx.current;
     if (modeRef.current === "sleeping") await wakeUp({ text: "", sleepy: true });
     say(`You’ve got about ${n.minutes} min free ${n.until}. Want to start “${n.task}”?`, {
@@ -187,12 +185,6 @@ export function useWellbeing(c: WellbeingCtx) {
         if (e.payload.minutes > 0 && !focusActive()) beginFocus(e.payload.minutes);
         else if (e.payload.minutes === 0 && focusActive()) endFocus(false);
       }),
-      // Settings → "Try it" buttons.
-      listen<{ type: BriefingKind | "break" | "nudge" }>("wellbeing-preview", (e) =>
-        e.payload.type === "break" ? deliverBreak(50, true)
-          : e.payload.type === "nudge" ? deliverNudge(true)
-          : deliverBriefing(e.payload.type, true),
-      ),
     ];
     // Checked client-side on a poll, not via a Rust emit like the others (see deliverNudge).
     const nudgeTimer = window.setInterval(deliverNudge, 60_000);

@@ -27,6 +27,14 @@ pub const NAMES: &[&str] = &[
     "eleven_key",
 ];
 
+/// The ElevenLabs key compiled into a build made with `LIFEPET_SHARE_MY_KEYS=1` (see `build.rs`), so
+/// friends get voice without an account. A key saved in Settings wins over it.
+const SHARED_ELEVEN_KEY: Option<&str> = option_env!("LIFEPET_BAKED_ELEVEN_KEY");
+
+fn shared(name: &str) -> Option<String> {
+    (name == "eleven_key").then_some(SHARED_ELEVEN_KEY).flatten().filter(|k| !k.is_empty()).map(str::to_string)
+}
+
 fn allowed(name: &str) -> bool {
     NAMES.contains(&name)
 }
@@ -88,7 +96,7 @@ pub fn migrate(app: &AppHandle) {
 /// Whether a secret is stored, without handing it out. This is what Settings shows.
 #[tauri::command]
 pub fn secret_is_set(name: String) -> bool {
-    get(&name).is_some()
+    get(&name).is_some() || shared(&name).is_some()
 }
 
 /// Save or clear a secret. Write-only on purpose: there is no command to read one back, so a
@@ -100,9 +108,9 @@ pub fn secret_set(name: String, value: Option<String>) -> bool {
 }
 
 /// Reads a secret from the Keychain, falling back to the database for anything migration could
-/// not move. Rust-side only — never exposed as a command.
+/// not move, then to a key built into the app. Rust-side only — never exposed as a command.
 pub fn read(db: &Db, name: &str) -> Option<String> {
-    get(name).or_else(|| db::get(db, name))
+    get(name).or_else(|| db::get(db, name)).or_else(|| shared(name))
 }
 
 /// Write a secret from Rust (the OAuth flow saves tokens this way).

@@ -29,9 +29,9 @@
   </div>
   <article class="doc">
     <h1>Curet Privacy Policy</h1>
-    <p class="date">Effective October 24, 2026</p>
+    <p class="date">Effective November 2, 2026</p>
     <p>Curet is a small pet that lives on your Mac. It reads your calendars, helps you plan study time, and chats with you. This page explains what it keeps, where that goes, and how to remove it.</p>
-    <p>The short version: <strong>your data stays on your Mac.</strong> Curet has no accounts and no servers of its own, and the people who make it cannot see anything you do with it. The only times data leaves your Mac are the features listed under "Services Curet talks to", and each one goes straight from your Mac to that service.</p>
+    <p>The short version: <strong>your data stays on your Mac.</strong> Curet has no accounts and no servers of its own, and the people who make it don't receive your data. The one exception is spoken text under a shared ElevenLabs key, explained below. The only times data leaves your Mac are the features listed under "Services Curet talks to", and each one goes straight from your Mac to that service.</p>
     <h2>What Curet stores on your Mac</h2>
     <p>Everything below is kept in a local database in <code>~/Library/Application Support/com.sid.lifepet/</code>:</p>
     <ul>
@@ -39,7 +39,7 @@
     <li>Your to-do list, the things you ask your pet to remember, and your recent chat history.</li>
     <li>Your weekly journal entries, focus sessions, study blocks and which deadlines you ticked off.</li>
     <li>Your settings, your pet and its outfit.</li>
-    <li>The API keys you paste in (Gemini, ElevenLabs) and the sign-in tokens Google gives Curet. These are stored as plain text in that database, protected by your Mac user account like any other file in your Library folder.</li>
+    <li>API keys you paste in (Gemini, ElevenLabs) and the sign-in tokens Google gives Curet are kept separately, in your Mac's Keychain.</li>
     </ul>
     <h2>What Curet does not do</h2>
     <ul>
@@ -50,14 +50,14 @@
     <h2>Services Curet talks to</h2>
     <p><strong>Google Calendar (only if you sign in).</strong> Curet asks to see your calendar and to add events you create, including study blocks you approve. It also reads your calendar list and the email address of the account, to show who is signed in. Sign-in tokens stay on your Mac. Signing out in Settings revokes them with Google. Curet's use of information received from Google APIs follows the <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener">Google API Services User Data Policy</a>, including the Limited Use requirements.</p>
     <p><strong>Brightspace and other calendar links.</strong> If you paste a calendar link, Curet downloads it directly from your school's or calendar provider's server. The link contains a private token, which is stored on your Mac and sent nowhere else.</p>
-    <p><strong>Google Gemini (for chat and syllabus reading).</strong> When you chat with your pet, or upload a syllabus, Curet sends this to Google's Gemini API using your own API key:</p>
+    <p><strong>Google Gemini (for chat and syllabus reading).</strong> When you chat with your pet, or upload a syllabus, Curet sends this to Google's Gemini API. If you added your own key, Curet uses that. Otherwise it uses a shared key built into the app, which is on Google's free tier.</p>
     <ul>
     <li>Your messages and the last few messages of the conversation.</li>
     <li>A snapshot so it can answer about your day: events for the next 3 days, deadlines for the next 45 days, your open tasks, things you asked it to remember, this week's focus totals, your pet and settings, the names of your connected calendars, and the signed-in Google email.</li>
     <li>The syllabus file you choose, when you upload one.</li>
     </ul>
-    <p>Your journal is not included unless you ask your pet to read it. Google's terms for the Gemini API decide how it handles that data, and they differ between free and paid plans (the free tier may use content to improve Google's products). See <a href="https://ai.google.dev/gemini-api/terms" rel="noopener">Google's Gemini API terms</a> for your plan.</p>
-    <p><strong>ElevenLabs (only if you add a key).</strong> When voice is on, the text of the reminders, briefings and nudges your pet says out loud is sent to ElevenLabs to turn into speech. Nothing else is sent. See <a href="https://elevenlabs.io/privacy" rel="noopener">ElevenLabs' privacy policy</a>.</p>
+    <p>Your journal is not included unless you ask your pet to read it. Google's terms for the Gemini API decide how it handles that data, and they differ between free and paid plans (the free tier may use content to improve Google's products). When the shared key or any free key is used, Google may use what you send to improve its products, and its reviewers may read it, so don't put anything in chat you wouldn't want reviewed. See <a href="https://ai.google.dev/gemini-api/terms" rel="noopener">Google's Gemini API terms</a>.</p>
+    <p><strong>ElevenLabs (only when voice is on).</strong> When voice is on, the text of the reminders, briefings and nudges your pet says out loud is sent to ElevenLabs to turn into speech. Nothing else is sent. If you use a shared ElevenLabs key built into the app, ElevenLabs may keep that text in the history of the account that owns the key, where the owner of that account could see it. See <a href="https://elevenlabs.io/privacy" rel="noopener">ElevenLabs' privacy policy</a>.</p>
     <h2>The "distracting app" check</h2>
     <p>When something is due, your pet can notice that you have been on a distracting app for a while. Every 20 seconds or so while it is out, Curet looks at the <strong>name of the app in front</strong> and, if that is Safari, Chrome, Arc, Brave or another supported browser, the <strong>website (domain only, like youtube.com) of the tab in front</strong>. It compares that against a built-in list on your Mac. It never stores or sends it, and never looks at page contents, other tabs or the full address. Settings → Study help shows the last thing it checked.</p>
     <p>macOS asks your permission before Curet can read a browser tab (Privacy &amp; Security → Automation). You can turn the check off in Settings → Study help, switch off just the website part, or refuse the macOS prompt.</p>
@@ -72,7 +72,7 @@
     <h2>Children</h2>
     <p>Curet is made for students and is not directed at children under 13. If you are under 13, please don't use it.</p>
     <h2>Changes</h2>
-    <p>If this policy changes, the new version will appear here with a new date at the top.</p>
+    <p>If this policy changes, the new version will appear here with a new date at the top. See also the <a href="terms.html">Terms of Use</a>.</p>
     <h2>Contact</h2>
     <p>Questions or requests: open an issue at <a href="https://github.com/Ananya342/curet/issues" rel="noopener">github.com/Ananya342/curet/issues</a>.</p>
   </article>

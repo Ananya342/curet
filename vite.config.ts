@@ -13,7 +13,7 @@ export default defineConfig(({ command }) => ({
   envPrefix:
     command === "build" && process.env.LIFEPET_SHARE_MY_KEYS !== "1"
       ? ["VITE_"]
-      : ["VITE_", "LIFEPET_GEMINI_", "LIFEPET_ELEVEN_"],
+      : ["VITE_", "LIFEPET_GEMINI_"],
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //

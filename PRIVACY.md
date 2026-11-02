@@ -1,10 +1,10 @@
 # Curet Privacy Policy
 
-Effective October 24, 2026
+Effective November 2, 2026
 
 Curet is a small pet that lives on your Mac. It reads your calendars, helps you plan study time, and chats with you. This page explains what it keeps, where that goes, and how to remove it.
 
-The short version: **your data stays on your Mac.** Curet has no accounts and no servers of its own, and the people who make it cannot see anything you do with it. The only times data leaves your Mac are the features listed under "Services Curet talks to", and each one goes straight from your Mac to that service.
+The short version: **your data stays on your Mac.** Curet has no accounts and no servers of its own, and the people who make it don't receive your data. The one exception is spoken text under a shared ElevenLabs key, explained below. The only times data leaves your Mac are the features listed under "Services Curet talks to", and each one goes straight from your Mac to that service.
 
 ## What Curet stores on your Mac
 
@@ -14,7 +14,7 @@ Everything below is kept in a local database in `~/Library/Application Support/c
 - Your to-do list, the things you ask your pet to remember, and your recent chat history.
 - Your weekly journal entries, focus sessions, study blocks and which deadlines you ticked off.
 - Your settings, your pet and its outfit.
-- The API keys you paste in (Gemini, ElevenLabs) and the sign-in tokens Google gives Curet. These are stored as plain text in that database, protected by your Mac user account like any other file in your Library folder.
+- API keys you paste in (Gemini, ElevenLabs) and the sign-in tokens Google gives Curet are kept separately, in your Mac's Keychain.
 
 ## What Curet does not do
 
@@ -28,15 +28,15 @@ Everything below is kept in a local database in `~/Library/Application Support/c
 
 **Brightspace and other calendar links.** If you paste a calendar link, Curet downloads it directly from your school's or calendar provider's server. The link contains a private token, which is stored on your Mac and sent nowhere else.
 
-**Google Gemini (for chat and syllabus reading).** When you chat with your pet, or upload a syllabus, Curet sends this to Google's Gemini API using your own API key:
+**Google Gemini (for chat and syllabus reading).** When you chat with your pet, or upload a syllabus, Curet sends this to Google's Gemini API. If you added your own key, Curet uses that. Otherwise it uses a shared key built into the app, which is on Google's free tier.
 
 - Your messages and the last few messages of the conversation.
 - A snapshot so it can answer about your day: events for the next 3 days, deadlines for the next 45 days, your open tasks, things you asked it to remember, this week's focus totals, your pet and settings, the names of your connected calendars, and the signed-in Google email.
 - The syllabus file you choose, when you upload one.
 
-Your journal is not included unless you ask your pet to read it. Google's terms for the Gemini API decide how it handles that data, and they differ between free and paid plans (the free tier may use content to improve Google's products). See [Google's Gemini API terms](https://ai.google.dev/gemini-api/terms) for your plan.
+Your journal is not included unless you ask your pet to read it. Google's terms for the Gemini API decide how it handles that data, and they differ between free and paid plans (the free tier may use content to improve Google's products). When the shared key or any free key is used, Google may use what you send to improve its products, and its reviewers may read it, so don't put anything in chat you wouldn't want reviewed. See [Google's Gemini API terms](https://ai.google.dev/gemini-api/terms).
 
-**ElevenLabs (only if you add a key).** When voice is on, the text of the reminders, briefings and nudges your pet says out loud is sent to ElevenLabs to turn into speech. Nothing else is sent. See [ElevenLabs' privacy policy](https://elevenlabs.io/privacy).
+**ElevenLabs (only when voice is on).** When voice is on, the text of the reminders, briefings and nudges your pet says out loud is sent to ElevenLabs to turn into speech. Nothing else is sent. If you use a shared ElevenLabs key built into the app, ElevenLabs may keep that text in the history of the account that owns the key, where the owner of that account could see it. See [ElevenLabs' privacy policy](https://elevenlabs.io/privacy).
 
 ## The "distracting app" check
 

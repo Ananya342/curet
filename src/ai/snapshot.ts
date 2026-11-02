@@ -121,7 +121,7 @@ ${feeds.length ? feeds.map((f) => `- ${untrusted(f.name)} (${f.kind === "brights
 - Morning briefing: ${clock(kv.briefing_morning, "08:30")}. Evening briefing: ${clock(kv.briefing_evening, "20:00")}.
 - Break reminder: ${every(kv.break_every, "50")}. Rest your eyes: ${every(kv.eye_every, "20")}.
 - Late-night wind-down: ${onOff(kv.late_nudge, true)}. Sunday recap: ${onOff(kv.recap_on, true)}. Monday heads-up: ${onOff(kv.week_ahead_on, true)}.
-- Free-time nudges: ${onOff(kv.nudges_on, true)}. Wandering around the screen: ${kv.wander_on === "on" ? "on" : "off"}. Spoken replies: ${onOff(kv.voice_on, true)}.
+- Free-time nudges: ${onOff(kv.nudges_on, true)}. Wandering around the screen: ${kv.wander_on === "on" ? "on" : "off"}. Spoken replies: ${onOff(kv.voice_on, false)}.
 
 ## Weekly journal
 ${entries.filter((e) => e.text).length} saved entr${entries.filter((e) => e.text).length === 1 ? "y" : "ies"}. Private: call read_journal only when the user asks about their journal or reflections.

@@ -554,7 +554,6 @@ kbd { background: var(--wash); border-radius: 7px; padding: 1px 7px; font-family
 .check-label { cursor: default; }
 .rrow input[type="time"] { width: 124px; }
 .rrow .select { width: 156px; flex: none; }
-.row-btns { display: flex; gap: 6px; flex-wrap: wrap; }
 
 /* A bubble can never outgrow the pet window: the text scrolls and the buttons stay visible. */
 .bubble { display: flex; flex-direction: column; }

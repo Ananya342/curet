@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { PETS, PetId } from "../pets";
 import { kvGet, kvSet } from "../api";
 import { Markdown } from "./Markdown";
-import { Msg, ask, friendlyError, replyWithoutLead } from "../ai/gemini";
+import { ENV_GEMINI_KEY, Msg, ask, friendlyError, replyWithoutLead } from "../ai/gemini";
 import { PendingAction, setConfirmHandler } from "../ai/confirm";
 import { NOT_SENT, SENT_ON_REQUEST, SENT_TO_ELEVENLABS, SENT_TO_GEMINI, grantConsent, hasConsent } from "../ai/consent";
 
@@ -154,6 +154,8 @@ export default function Chat({ petId }: { petId: PetId }) {
           <img src={pet.src} alt="" draggable={false} />
           <h2>Before <span translate="no">{pet.name}</span> can chat</h2>
           <p>Chat runs on Google's Gemini, which means some of what Curet knows about you leaves this Mac.</p>
+
+          {ENV_GEMINI_KEY && <p>This copy of Curet uses a shared key on Google's free tier. Google may use what you send to improve its products, and its reviewers may read it, so don't put anything in chat you wouldn't want reviewed.</p>}
 
           <h3>Sent to Google every time you chat</h3>
           <ul>{SENT_TO_GEMINI.map((l) => <li key={l}>{l}</li>)}</ul>

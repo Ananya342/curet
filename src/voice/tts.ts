@@ -2,8 +2,6 @@ import { invoke } from "@tauri-apps/api/core";
 import { kvGet } from "../api";
 import { PETS, PetId } from "../pets";
 
-/** Default key from .env.local, used when none is saved in Settings (same deal as Gemini). */
-
 /** Whether a key is saved, asked of Rust. The key itself never crosses the boundary. */
 export const hasElevenKey = () => invoke<boolean>("secret_is_set", { name: "eleven_key" });
 
@@ -124,7 +122,7 @@ export async function synthesize(
  */
 export async function speak(text: string, petId?: PetId): Promise<void> {
   try {
-    if ((await kvGet("voice_on")) === "off") return;
+    if ((await kvGet("voice_on")) !== "on") return; // off until switched on, since it spends credits
     if (!(await hasElevenKey())) return;
     const line = forSpeech(text);
     if (!line) return;

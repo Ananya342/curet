@@ -1,7 +1,7 @@
 import { MutableRefObject, useEffect, useRef } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { eventsRange, kvSet, nowSec } from "../api";
-import { weekKey, weekStart } from "./recap";
+import { weekStart } from "./recap";
 import { deadlinesMet } from "../study/plans";
 import { lateLine } from "./night";
 
@@ -52,9 +52,9 @@ export function useMindful(c: MindfulCtx) {
       });
     };
 
-    const recap = async (week: string, preview = false) => {
-      if (!preview && away()) return; // Rust asks again on its next tick
-      if (!preview) await kvSet("last_recap", week);
+    const recap = async (week: string) => {
+      if (away()) return; // Rust asks again on its next tick
+      await kvSet("last_recap", week);
       await rouse();
       const { say, hush, openPanel } = ctx.current;
       const d = await deadlinesMet(weekStart(), nowSec());
@@ -68,9 +68,9 @@ export function useMindful(c: MindfulCtx) {
       });
     };
 
-    const weekAhead = async (week: string, preview = false) => {
-      if (!preview && away()) return;
-      if (!preview) await kvSet("last_week_ahead", week);
+    const weekAhead = async (week: string) => {
+      if (away()) return;
+      await kvSet("last_week_ahead", week);
       const now = nowSec();
       const due = (await eventsRange(now, now + 7 * DAY)).filter((e) => e.kind === "deadline");
       const byDay = new Map<string, number>();
@@ -82,19 +82,16 @@ export function useMindful(c: MindfulCtx) {
       let text = "";
       if (n >= 3) text = `${plural(n, "thing")} due ${busiest}. Want to start one today?`;
       else if (due.length >= 5) text = `${plural(due.length, "deadline")} this week. Want to start one today?`;
-      else if (preview) text = due.length ? `A lighter week: ${plural(due.length, "deadline")} coming up. Nice pacing!` : "Nothing due this week. Enjoy the breathing room.";
       if (!text) return;
       await rouse();
       const { say, hush, openPanel, openFocusMenu } = ctx.current;
       say(text, {
         ms: 30000,
-        actions: n >= 3 || due.length >= 5
-          ? [
-              { label: "Start focus", run: () => { hush(); openFocusMenu(); } },
-              { label: "Plan in Today", run: () => { hush(); openPanel("today"); } },
-              { label: "Later", run: hush },
-            ]
-          : [{ label: "Thanks!", run: hush }],
+        actions: [
+          { label: "Start focus", run: () => { hush(); openFocusMenu(); } },
+          { label: "Plan in Today", run: () => { hush(); openPanel("today"); } },
+          { label: "Later", run: hush },
+        ],
       });
     };
 
@@ -103,14 +100,6 @@ export function useMindful(c: MindfulCtx) {
       listen("late-night", lateNight),
       listen<{ week: string }>("weekly-recap", (e) => recap(e.payload.week)),
       listen<{ week: string }>("week-ahead", (e) => weekAhead(e.payload.week)),
-      // Settings → "Try it" buttons.
-      listen<{ type: "eyes" | "late" | "recap" | "week" }>("mindful-preview", (e) => {
-        const t = e.payload.type;
-        if (t === "eyes") ctx.current.restEyes(30);
-        else if (t === "late") lateNight();
-        else if (t === "recap") recap(weekKey(), true);
-        else weekAhead(weekKey(), true);
-      }),
     ];
     return () => un.forEach((p) => p.then((f) => f()));
   }, []);
