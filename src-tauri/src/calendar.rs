@@ -374,19 +374,20 @@ pub async fn google_disconnect(app: AppHandle) {
     let _ = app.emit("events-updated", ());
 }
 
-fn random_token() -> String {
-    use std::io::Read;
+/// 48 random bytes from the OS (getrandom works on Windows too, where there's no /dev/urandom).
+/// Returns an error rather than panicking: with `panic = "abort"`, a panic here quits the whole app.
+fn random_token() -> Result<String, String> {
     let mut b = [0u8; 48];
-    std::fs::File::open("/dev/urandom").and_then(|mut f| f.read_exact(&mut b)).expect("urandom");
-    URL_SAFE_NO_PAD.encode(b)
+    getrandom::fill(&mut b).map_err(|e| format!("Couldn't get random bytes for sign-in: {e}"))?;
+    Ok(URL_SAFE_NO_PAD.encode(b))
 }
 
 #[tauri::command]
 pub async fn google_connect(app: AppHandle) -> Result<(), String> {
     let (client_id, client_secret) = google_client()?;
-    let verifier = random_token();
+    let verifier = random_token()?;
     let challenge = URL_SAFE_NO_PAD.encode(Sha256::digest(verifier.as_bytes()));
-    let state = random_token();
+    let state = random_token()?;
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.map_err(|e| e.to_string())?;
     let redirect = format!("http://127.0.0.1:{}", listener.local_addr().unwrap().port());
