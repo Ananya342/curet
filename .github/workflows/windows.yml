@@ -29,6 +29,25 @@ jobs:
           } else {
             Write-Host "No Google client secrets set: Sign in with Google will say it isn't set up in this build."
           }
+      - name: Bake in the shared Gemini and ElevenLabs keys (only the ones whose secrets exist)
+        shell: pwsh
+        env:
+          GEMINI: ${{ secrets.LIFEPET_GEMINI_KEY }}
+          ELEVEN: ${{ secrets.LIFEPET_ELEVEN_KEY }}
+        run: |
+          if ($env:GEMINI -or $env:ELEVEN) {
+            "LIFEPET_SHARE_MY_KEYS=1" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          }
+          if ($env:GEMINI) {
+            "LIFEPET_GEMINI_KEY=$env:GEMINI" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          } else {
+            Write-Host "No Gemini secret set: users paste their own key in Settings."
+          }
+          if ($env:ELEVEN) {
+            "LIFEPET_ELEVEN_KEY=$env:ELEVEN" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          } else {
+            Write-Host "No ElevenLabs secret set: users paste their own key for voice."
+          }
       - run: npm ci
       - run: npm run tauri build -- --bundles nsis
       - uses: actions/upload-artifact@v4
